@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+
+title: >-
+  "Code for the publication: Automated Constitutive Model Discovery by Pairing Sparse Regression Algorithms with Model Selection Criteria"
+
+message: >-
+  "If you use this software, please cite it using the metadata from this file.""
+
+type: software
+
+authors:
+  - given-names: Jorge-Humberto
+    family-names: Urrea-Quintero
+    email: "jorge.urrea-quintero@tu-braunschweig.de"
+    affiliation: "Technische Universität Braunschweig"
+    orcid: "https://orcid.org/0000-0002-7690-4298"
+  - given-names: David
+    family-names: Anton
+    email: "d.anton@tu-braunschweig.de"
+    affiliation: "Technische Universität Braunschweig"
+    orcid: "https://orcid.org/0000-0002-0888-0220"
+  - given-names: Laura
+    family-names: De Lorenzis
+    email: "ldelorenzis@ethz.ch"
+    affiliation: "Eidgenössische Technische Hochschule Zürich"
+    orcid: "https://orcid.org/0000-0003-2748-3287"
+  - given-names: Henning
+    family-names: Wessels
+    email: "h.wessels@tu-braunschweig.de"
+    affiliation: "Technische Universität Braunschweig"
+    orcid: "https://orcid.org/0000-0002-2542-1130"
+
+repository-code: "https://github.com/jhurreaq/MDisc_pairing"
+
+abstract: >-
+  "The research code provides a framework for
+  the model discovery of constitutive models data. 
+  This code repository also provides the
+  software for the corresponding scientific publications
+  (see README.md file for more information)."
+
+keywords:
+  - "automated model discovery"
+  - "nonlinear model libraries"
+  - "sparse regression algorithms"
+  - "model selection criteria"
+  - "anisotropic hyperelasticity"
+  
+license: GPL-3.0
