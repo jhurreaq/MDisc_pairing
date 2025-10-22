@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 
 title: >-
-  "Code for the publication: Automated Constitutive Model Discovery by Pairing Sparse Regression Algorithms with Model Selection Criteria"
+  Code for the publication: Automated Constitutive Model Discovery by Pairing Sparse Regression Algorithms with Model Selection Criteria
 
 message: >-
-  "If you use this software, please cite it using the metadata from this file.""
+  If you use this software, please cite it using the metadata from this file.
 
 type: software
 
