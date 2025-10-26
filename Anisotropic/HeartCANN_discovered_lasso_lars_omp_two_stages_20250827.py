@@ -238,14 +238,10 @@ def calculate_stress_contribution_linearized(data_point, psi_derivs_for_one_term
     For biaxial tests, this is the contribution to the stress *difference* (e.g., s_ff - s_ss).
     For shear tests, this is the contribution to the shear stress component.
     """
-    
-    # --- SIMPLE SOLUTION TO NULLIFY I4/I8 LINEAR TERMS ---
     inv_key = term_def['inv_key']
     term_type = term_def['type']
     if ('I4' in inv_key or 'I8' in inv_key) and term_type in ['lin', 'exp_lin']:
-        return 0.0
-    # --- END OF SIMPLE SOLUTION ---
-    
+        return 0.0    
     d_psi_d_I1 = psi_derivs_for_one_term.get('I1', 0.0)
     d_psi_d_I2 = psi_derivs_for_one_term.get('I2', 0.0)
     d_psi_d_I4f_bar = psi_derivs_for_one_term.get('I4f_bar', 0.0)
@@ -321,13 +317,11 @@ def calculate_single_prediction_full_tensor(data_point, invariants, coeffs_w2, w
         w2 = coeffs_w2[term_idx]
         if abs(w2) < EPS: continue
         
-        # --- SIMPLE SOLUTION TO NULLIFY I4/I8 LINEAR TERMS ---
         inv_key = term_def['inv_key']
         term_type = term_def['type']
         if ('I4' in inv_key or 'I8' in inv_key) and term_type in ['lin', 'exp_lin']:
             continue # Skip this term's contribution entirely
-        # --- END OF SIMPLE SOLUTION ---
-        
+                
         w1 = w1_map.get(term_idx, 1.0)
         psi_derivs = get_psi_deriv_for_term(term_def, invariants, w1)
         
@@ -1888,7 +1882,6 @@ os.makedirs(BASE_SAVE_DIR, exist_ok=True)
 all_results_by_noise = {} 
 
 # --- 3. Construct Feature Matrix X (Stage 1) and Target y (Original Data) ---
-# This happens only ONCE before the noise loop
 num_data_points_orig = len(experimental_data_list)
 X_features_stage1 = np.zeros((num_data_points_orig, num_psi_terms))
 y_target_orig = np.zeros(num_data_points_orig)
@@ -1904,11 +1897,8 @@ for i, data_point in enumerate(experimental_data_list):
     invariants = get_invariants(data_point['F'])
     for j, term_def in enumerate(psi_terms_definitions): 
         psi_derivs = get_psi_deriv_for_term(term_def, invariants, w1=1.0) 
-        # X_features_stage1[i, j] = calculate_stress_contribution(data_point, psi_derivs)
-        # --- THIS IS THE CHANGE ---
-        # X_features_stage1[i, j] = calculate_stress_contribution_linearized(data_point, psi_derivs)
         X_features_stage1[i, j] = calculate_stress_contribution_linearized(data_point, psi_derivs, term_def)
-        # --- END OF CHANGE ---
+
 
 valid_rows = ~np.isnan(X_features_stage1).any(axis=1) & ~np.isinf(X_features_stage1).any(axis=1) & ~np.isnan(y_target_orig) & ~np.isinf(y_target_orig)
 if np.sum(~valid_rows) > 0:
@@ -1931,14 +1921,6 @@ print(f"Stage 1 Feature matrix built. Cleaned data points: {n_samples_clean}")
 all_invariants_filtered = [get_invariants(dp['F']) for dp in experimental_data_list_filtered]
 # Calculate PDF predictions using the final filtered invariants
 pdf_model_predictions = calculate_predictions(pdf_model_coeffs_w2, pdf_model_w1_map, all_invariants_filtered, experimental_data_list_filtered)
-
-# ADD: equal-per-mode weights (mean = 1.0), computed once on cleaned dataset
-# per_mode_equal_weights = build_equal_per_mode_weights(data_point_test_names)
-# Optional: print per-mode sums to verify equality
-# _mode_sums = {}
-# for i, m in enumerate(data_point_test_names):
-#     _mode_sums[m] = _mode_sums.get(m, 0.0) + per_mode_equal_weights[i]
-# print("Per-mode total weights:", {k: round(v, 3) for k, v in _mode_sums.items()})
 
 for noise_level in RELATIVE_NOISE_LEVELS:
     noise_prefix = f"RelNoise{noise_level*100:.0f}pct"

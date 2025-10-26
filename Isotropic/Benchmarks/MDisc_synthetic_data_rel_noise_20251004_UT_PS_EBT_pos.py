@@ -8,8 +8,7 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 from matplotlib.patches import Patch
 import matplotlib.ticker
-# from scipy.linalg import svd as scipy_svd
-# from numpy.linalg import inv, LinAlgError
+
 from numpy.linalg import eigh, LinAlgError
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import (
@@ -29,10 +28,6 @@ from sklearn.exceptions import ConvergenceWarning
 import traceback
 
 from sklearn.model_selection import KFold
-
-# Optional: filter selected warnings from sklearn
-# warnings.filterwarnings("ignore", category=ConvergenceWarning)
-# warnings.filterwarnings("ignore", category=UserWarning, module='sklearn')
 
 warnings.filterwarnings("ignore")
 
@@ -80,8 +75,6 @@ INCLUDE_EXTENDED_OGDEN = True # Often used with Ogden
 INCLUDE_ULTRA_SMALL_STRAIN = False
 
 # Maximum powers for various expansions
-# MR_MAX_POWER_I1 = 3
-# MR_MAX_POWER_I2 = 3
 MR_MAX_ORDER = 4 
 YEOH_MAX_POWER = 5
 
@@ -271,7 +264,6 @@ def generate_model_library():
         if INCLUDE_ULTRA_SMALL_STRAIN: [add_term(term) for term in ultra_terms]
 
     if INCLUDE_OGDEN:
-        # NOW uses the list determined at the start of this function
         for a in ogden_exponents_to_use:
             if a != 0: add_term(f"Ogden: λ^{a}") # Format Ogden terms
     if INCLUDE_GENT:
@@ -354,10 +346,10 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
             if not mode_data.empty:
                 # Collect all stress values for this mode
                 all_stresses = []
-                # MODIFICATION: Check if P11 column exists before accessing it.
+                # Check if P11 column exists before accessing it.
                 if 'P11' in mode_data.columns and pd.notna(mode_data['P11']).any():
                     all_stresses.extend(mode_data['P11'].dropna().abs().values)
-                # MODIFICATION: Check if P22 column exists before accessing it.
+                # Check if P22 column exists before accessing it.
                 if 'P22' in mode_data.columns and mode in ['PS', 'EBT', 'BIAX'] and pd.notna(mode_data['P22']).any():
                     all_stresses.extend(mode_data['P22'].dropna().abs().values)
                 
@@ -389,9 +381,9 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
         print("  Stress magnitude normalization disabled.")
 
     # Determine matrix size
-    # MODIFICATION: Check if P11 column exists before calculating rows.
+    # Check if P11 column exists before calculating rows.
     n_p11_rows = df_subset[pd.notna(df_subset['P11'])].shape[0] if 'P11' in df_subset.columns else 0
-    # MODIFICATION: Check if P22 column exists before calculating rows.
+    # Check if P22 column exists before calculating rows.
     n_p22_rows = 0
     if 'P22' in df_subset.columns:
         n_p22_rows = df_subset[df_subset['mode'].isin(['EBT', 'BIAX', 'PS']) & pd.notna(df_subset['P22'])].shape[0]
@@ -421,7 +413,7 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
         dW2_vec = dW2_mat[idx, :]
         dW3_vec = dW3_mat[idx, :]
 
-        # MODIFICATION: Check for column existence before checking for NaN.
+        # Check for column existence before checking for NaN.
         has_p11 = 'P11' in row_data and pd.notna(row_data['P11'])
         has_p22 = 'P22' in row_data and pd.notna(row_data['P22']) and mode in ['EBT', 'BIAX', 'PS']
 
@@ -431,9 +423,8 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
             if current_row_idx < total_rows:
                 l3_over_l1 = l3 / l1 if l1 > EPS else l3 / EPS
                 phi_row_p11 = dW1_vec - l3_over_l1 * dW3_vec
-                # Apply weight ONLY to design matrix
                 design_matrix[current_row_idx, :] = final_weight * phi_row_p11
-                target_vector[current_row_idx] = final_weight * row_data['P11']  # WEIGHTED target  
+                target_vector[current_row_idx] = final_weight * row_data['P11']   
                 row_weights_vector[current_row_idx] = final_weight
                 current_row_idx += 1
 
@@ -501,8 +492,6 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
         I2 = (l1*l2)**2 + (l2*l3)**2 + (l1*l3)**2 # Calculate I2
         i1m3 = I1 - 3.0
         i2m3 = I2 - 3.0
-        # i1m3_safe = max(i1m3, 0.0)
-        # i2m3_safe = max(i2m3, 0.0)
 
         # Check invariant derivatives are finite
         inv_derivs = [dI1dl1, dI1dl2, dI1dl3, dI2dl1, dI2dl2, dI2dl3]
@@ -562,8 +551,7 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
                      else: dW_dI1_term = p * pow_val
             # --- Low/Ultra Strain ---
             elif term_name.startswith(("Low:", "Ultra:")):
-                # [ Keep internal logic as before, ensure helpers return finite values ]
-                 dTerm_di1m3 = 0.0 # ... calculation logic ...
+                 dTerm_di1m3 = 0.0 
                  if not np.isfinite(dTerm_di1m3): term_is_finite = False
                  else: dW_dI1_term = dTerm_di1m3
             # --- Ogden ---
@@ -590,7 +578,6 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
                 dW_dI1_term = 0.0; dW_dI2_term = 0.0 # Ensure these are zero
             # --- Gent ---
             elif term_name.startswith("Gent:"):
-                 # [ Keep internal logic as before, check denom ]
                 match = gent_jm_pattern.search(term_name); Jm = float(match.group(1)) if match else 100.0
                 denom = Jm - i1m3;
                 if denom < EPS: dW_dI1_term = FINITE_LIMIT_DERIV
@@ -621,9 +608,6 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
                 dW_dl2_vec[basis_idx] = np.clip(dWterm_dl2, -FINITE_LIMIT_DERIV, FINITE_LIMIT_DERIV)
                 dW_dl3_vec[basis_idx] = np.clip(dWterm_dl3, -FINITE_LIMIT_DERIV, FINITE_LIMIT_DERIV)
             else:
-                # Print warning only once if it happens
-                # if term_name.startswith("Ogden:"): print(f"WARN: Setting NaN for Ogden term '{term_name}' at l1,l2,l3 = {l1:.3f},{l2:.3f},{l3:.3f}")
-                # elif not term_name.startswith("Ogden:"): print(f"WARN: Setting NaN for term '{term_name}' (via chain rule/dI) at l1,l2,l3 = {l1:.3f},{l2:.3f},{l3:.3f}")
                 dW_dl1_vec[basis_idx] = np.nan
                 dW_dl2_vec[basis_idx] = np.nan
                 dW_dl3_vec[basis_idx] = np.nan
@@ -2332,6 +2316,7 @@ def run_lars_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_d
         print(f"  WARN: LARS plotting failed: {e_plot}")
 
     return results
+
 def run_omp_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
     """
     OMP with a SINGLE shared greedy path used for CV, AIC, and BIC.
@@ -2772,11 +2757,6 @@ if __name__ == "__main__":
                 df_p11_ebt = df_for_discovery_all_modes[df_for_discovery_all_modes['mode'] == 'EBT'][['lambda1', 'lambda2', 'lambda3', 'P11', 'mode', 'strain_pct']]
                                 
                 df_for_discovery = pd.concat([df_p11_ut, df_p11_ps, df_p11_ebt], ignore_index=True)
-
-                # PS will use BOTH P11 and P22 for training.
-                # df_ps_p11_p22 = df_for_discovery_all_modes[df_for_discovery_all_modes['mode'] == 'PS'][['lambda1', 'lambda2', 'lambda3', 'P11', 'P22', 'mode', 'strain_pct']]
-                
-                # df_for_discovery = pd.concat([df_p11_ut, df_ps_p11_p22, df_p11_ebt], ignore_index=True)
 
                 if df_for_discovery.empty:
                     print("ERROR: No UT, PS, or EBT P11 data in generated DF for discovery. Skipping.")

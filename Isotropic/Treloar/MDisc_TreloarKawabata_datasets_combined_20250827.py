@@ -8,8 +8,7 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 from matplotlib.patches import Patch # For custom legend in heatmap
 import matplotlib.ticker # Added for tick formatting
-# from scipy.linalg import svd as scipy_svd # Not used anymore
-# from numpy.linalg import inv, LinAlgError # Not used anymore
+
 from numpy.linalg import eigh, LinAlgError # Keep eigh if used elsewhere, check needed? No, remove.
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import (
@@ -35,7 +34,7 @@ warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module='sklearn') # Ignore n_features > n_samples warnings in Lars
 
 # ==============================================
-# Global Plotting Configuration (Enhanced)
+# Global Plotting Configuration 
 # ==============================================
 PLOT_TITLE_FONTSIZE = 14
 PLOT_LABEL_FONTSIZE = 14
@@ -53,7 +52,6 @@ SMALL_FIG_LASSO_LARS_OMP = (3.0, 4.5)
 # Global Colormap Configuration
 # ==============================================
 try:
-    # Avoid deprecated matplotlib.cm.get_cmap; use pyplot.get_cmap instead
     plasma = plt.get_cmap('plasma')
     blues_cmap = plt.get_cmap('Blues')
 except Exception:
@@ -107,7 +105,6 @@ WEIGHT_FACTOR = 1.0 # Factor to multiply weights for small strains
 
 # ==============================================
 # Invariant/Derivative/Low-Strain Helpers
-# (No changes from previous versions needed)
 # ==============================================
 def compute_invariants(l1, l2, l3):
     I1 = l1**2 + l2**2 + l3**2
@@ -149,7 +146,7 @@ def safe_power(base, exponent):
         # Use np.power for element-wise operation
         if np.isscalar(exponent) or len(exponent) == 1:
             result[mask_safe] = np.power(base[mask_safe], exponent)
-        else: # Handle element-wise exponents if needed (though uncommon here)
+        else: 
              result[mask_safe] = np.power(base[mask_safe], exponent[mask_safe])
 
         # Careful with exponent type check if it could be array
@@ -157,18 +154,18 @@ def safe_power(base, exponent):
         is_neg_exp = np.all(exponent < 0) if isinstance(exponent, np.ndarray) else (exponent < 0)
 
         if is_zero_exp: result[base <= EPS] = 1.0
-        elif is_neg_exp: result[base <= EPS] = 0.0 # Or some large number? Let's keep 0 for now.
+        elif is_neg_exp: result[base <= EPS] = 0.0 
         return result
     else: # Scalar case
         if base > EPS: return base ** exponent
         elif exponent > 0: return 0.0
         elif exponent == 0: return 1.0
-        else: return 0.0 # Or some large number? Keep 0.
+        else: return 0.0 
 
 
 def safe_log(x):
     if isinstance(x, (np.ndarray)):
-        res = np.full_like(x, -700.0, dtype=float) # Use large negative for log(small)
+        res = np.full_like(x, -700.0, dtype=float)
         mask = x > EPS
         res[mask] = np.log(x[mask])
         return res
@@ -177,7 +174,6 @@ def safe_log(x):
 
 # ==============================================
 # Consolidated Model Library Generation
-# (No changes needed)
 # ==============================================
 def generate_model_library():
     """Generates a list of basis function strings based on configuration flags."""
@@ -199,14 +195,6 @@ def generate_model_library():
             basis_functions.append(term_string)
             seen_terms.add(term_string)
     if INCLUDE_NEOHOOKEAN and not INCLUDE_MOONEY_RIVLIN: add_term("NH: (I₁-3)")
-    # if INCLUDE_MOONEY_RIVLIN:
-    #     for i in range(MR_MAX_POWER_I1 + 1):
-    #         for j in range(MR_MAX_POWER_I2 + 1):
-    #             if i == 0 and j == 0: continue
-    #             term_i1 = f"(I₁-3)^{i}" if i > 1 else ("(I₁-3)" if i == 1 else "")
-    #             term_i2 = f"(I₂-3)^{j}" if j > 1 else ("(I₂-3)" if j == 1 else "")
-    #             term_str = f"MR: {term_i1}{term_i2}" if term_i1 and term_i2 else (f"MR: {term_i1}" if term_i1 else f"MR: {term_i2}")
-    #             add_term(term_str)
     if INCLUDE_MOONEY_RIVLIN:
         # max_total_power = MR_MAX_POWER_I1 + MR_MAX_POWER_I2
         for total_power in range(1, max_total_power + 1):
@@ -251,10 +239,8 @@ def generate_model_library():
     print(f"Generated {len(basis_functions)} unique basis terms for this scenario.")
     return basis_functions
 
-
 # ==============================================
 # Construct derivatives matrix (dW/dλᵢ)
-# (No changes needed)
 # ==============================================
 def construct_derivatives_matrix(df):
     num_samples = len(df)
@@ -315,7 +301,6 @@ def construct_derivatives_matrix(df):
     dW_dl1 = np.nan_to_num(dW_dl1, nan=0.0, posinf=1e12, neginf=-1e12); dW_dl2 = np.nan_to_num(dW_dl2, nan=0.0, posinf=1e12, neginf=-1e12); dW_dl3 = np.nan_to_num(dW_dl3, nan=0.0, posinf=1e12, neginf=-1e12)
     return dW_dl1, dW_dl2, dW_dl3, basis_names
 
-
 # ==============================================
 # Weighting Function
 # ==============================================
@@ -356,7 +341,6 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
         tuple: (design_matrix, target_vector, basis_names, row_weights_vector, df_subset)
                Returns empty/zero arrays on error.
     """
-    # ... (rest of the function remains the same) ...
 
     if use_small_strain_only:
         df_subset = df[df['strain_pct'] <= small_strain_threshold].copy()
@@ -458,10 +442,6 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
         design_matrix = design_matrix[finite_mask, :]
         target_vector = target_vector[finite_mask]
         row_weights_vector = row_weights_vector[finite_mask]
-        # Filter original_indices_map as well - this is tricky, requires careful index mapping
-        # For simplicity, let's assume df_subset corresponds to the *filtered* matrix rows if filtering happens.
-        # This relies on the filtering happening *before* returning df_subset. Let's pass back the *original* full df and map later.
-        # --> CHANGE: We will pass back df_subset for consistency with weighting/filtering. Mapping needs care.
 
     if design_matrix.shape[0] == 0:
         print("ERROR: Design matrix empty after filtering.")
@@ -474,7 +454,6 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
 
 # ==============================================
 # Helper Function for LaTeX Formatting of Terms
-# (No changes needed)
 # ==============================================
 def format_term_for_latex(term_name):
     if ':' in term_name: prefix, math_part = term_name.split(':', 1); term = math_part.strip()
@@ -515,7 +494,7 @@ def calculate_aic_bic(y_true, y_pred, n_params, n_samples):
 
 
 # ==============================================
-# NEW & MODIFIED Plotting Functions for Sparse Regression
+# Plotting Functions for Sparse Regression
 # ==============================================
 
 # --- Heatmap Plotters ---
@@ -527,8 +506,8 @@ def plot_activation_heatmap(
     title,
     x_axis_label,
     filename=None,
-    log_x=False, # True for Lasso (using alpha)
-    reverse_x=True, # Default for Lasso (high penalty left)
+    log_x=False,
+    reverse_x=True, 
     activation_thresh=1e-20,
     is_omp=False # Flag for OMP/LARS specific logic
 ):
@@ -656,7 +635,7 @@ def plot_activation_heatmap(
     plt.close(fig)
 
 # ==============================================
-# Physical Consistency Check Helper (Corrected for Ogden & Formula)
+# Physical Consistency Check Helper 
 # ==============================================
 def check_physical_consistency(final_terms, final_coeffs):
     """
@@ -726,15 +705,12 @@ def check_physical_consistency(final_terms, final_coeffs):
         if match:
             try:
                 alpha_i = float(match.group(1))
-                # --- !!! CORRECTION HERE !!! ---
-                # The discovered coefficient 'coeff' represents C_i = mu_i / alpha_i
-                # Therefore, mu_i = coeff * alpha_i
+
                 if abs(alpha_i) < EPS:
                     mu_i = 0.0
                     notes.append(f"  WARN: Ogden term '{term}' has alpha near zero. mu_i set to 0.")
                 else:
                     mu_i = coeff * alpha_i
-                # --- !!! END CORRECTION !!! ---
 
                 mu_alpha_product = mu_i * alpha_i
                 ogden_contrib_sum_mu_alpha += mu_alpha_product # Sum (mu_i * alpha_i)
@@ -1091,68 +1067,6 @@ def plot_model_predictions(
     return (final_selected_basis_names, final_coeffs, r2_P11_overall, rmse_P11_overall, 
             r2_P22_overall, rmse_P22_overall, is_consistent, consistency_notes, mode_specific_metrics)
 
-# def plot_treloar_prediction(df, axes, r2_overall_precomputed=np.nan):
-#     """Plot Treloar data with model predictions (Helper). Needs axes=[ax_full, ax_zoom]. Uses precomputed R2 for title."""
-#     ax_full, ax_zoom = axes
-#     colors = {'UT': TRUNCATED_PLASMA_CMAP(0.2), 'PS': TRUNCATED_PLASMA_CMAP(0.5), 'EBT': TRUNCATED_PLASMA_CMAP(0.8)}
-#     markers = {'UT': 'o', 'PS': 's', 'EBT': '^'}
-
-#     df_plot = df[df['dataset']=='Treloar'].copy()
-#     df_plot['P11'] = pd.to_numeric(df_plot['P11'], errors='coerce')
-#     df_plot['P11_pred'] = pd.to_numeric(df_plot['P11_pred'], errors='coerce')
-
-#     r2_overall = r2_overall_precomputed
-
-#     max_lambda_full = 0; min_stress_overall = 0; max_stress_overall = 0
-#     # --- First pass for limits ---
-#     for mode in ['UT', 'PS', 'EBT']:
-#         mode_data = df_plot[df_plot['mode'] == mode]
-#         if not mode_data.empty:
-#             valid_mask = ~np.isnan(mode_data['P11']) & ~np.isnan(mode_data['P11_pred'])
-#             if valid_mask.sum() == 0: continue
-#             lambda1_vals = mode_data['lambda1'][valid_mask]
-#             exp_stress = mode_data['P11'][valid_mask]; pred_stress = mode_data['P11_pred'][valid_mask]
-#             if len(lambda1_vals) > 0: max_lambda_full = max(max_lambda_full, np.nanmax(lambda1_vals))
-#             if len(exp_stress) > 0: min_stress_overall = min(min_stress_overall, np.nanmin(exp_stress)); max_stress_overall = max(max_stress_overall, np.nanmax(exp_stress))
-#             if len(pred_stress) > 0: min_stress_overall = min(min_stress_overall, np.nanmin(pred_stress)); max_stress_overall = max(max_stress_overall, np.nanmax(pred_stress))
-
-#     # --- Second pass for plotting ---
-#     max_y_zoom_overall = -np.inf; min_y_zoom_overall = np.inf
-#     for i, ax in enumerate([ax_full, ax_zoom]):
-#         legend_handles = []
-#         for mode in ['UT', 'PS', 'EBT']:
-#             mode_data = df_plot[df_plot['mode'] == mode]
-#             if not mode_data.empty:
-#                 valid_mask = ~np.isnan(mode_data['P11']) & ~np.isnan(mode_data['P11_pred'])
-#                 if valid_mask.sum() == 0: continue
-#                 lambda1_vals = mode_data['lambda1'][valid_mask]
-#                 exp_stress = mode_data['P11'][valid_mask]; pred_stress = mode_data['P11_pred'][valid_mask]
-#                 sort_idx = np.argsort(lambda1_vals); lambda1_sorted = lambda1_vals.iloc[sort_idx]; exp_sorted = exp_stress.iloc[sort_idx]; pred_sorted = pred_stress.iloc[sort_idx]
-#                 sc = ax.scatter(lambda1_sorted, exp_sorted, color=colors[mode], marker=markers[mode], s=PLOT_MARKER_SIZE, label=f"{mode} (Exp. data)" if i==0 else None, alpha=0.7, edgecolor='black', linewidth=0.5)
-#                 pl, = ax.plot(lambda1_sorted, pred_sorted, color=colors[mode], linestyle='-', linewidth=PLOT_PRED_LINEWIDTH, label=f"{mode} (Model)" if i==0 else None)
-#                 if i == 0: legend_handles.extend([sc, pl])
-#                 if i == 1:
-#                     mask_zoom_mode = (lambda1_sorted >= 0.95) & (lambda1_sorted <= 3.5)  # Reasonable zoom range for lambda
-#                     if mask_zoom_mode.sum() > 0:
-#                          max_y_zoom_overall = max(max_y_zoom_overall, np.nanmax(exp_sorted[mask_zoom_mode]), np.nanmax(pred_sorted[mask_zoom_mode]))
-#                          min_y_zoom_overall = min(min_y_zoom_overall, np.nanmin(exp_sorted[mask_zoom_mode]), np.nanmin(pred_sorted[mask_zoom_mode]))
-
-#         ax.set_xlabel('Stretch λ', fontsize=PLOT_LABEL_FONTSIZE)
-#         ax.set_ylabel('Nominal Stress P₁₁ (MPa)', fontsize=PLOT_LABEL_FONTSIZE)
-#         ax.tick_params(axis='both', which='major', labelsize=PLOT_TICK_FONTSIZE)
-
-#         if i == 0:
-#             title_r2_str = f"{r2_overall:.3f}" if pd.notna(r2_overall) else "N/A"
-#             ax.set_title(f'Treloar (Full Range, $R^2 \\approx {title_r2_str}$)', fontsize=PLOT_TITLE_FONTSIZE)
-#             ax.legend(handles=legend_handles, loc='best', fontsize=PLOT_LEGEND_FONTSIZE)
-#             ax.set_xlim(left=0.95, right=max(3.0, max_lambda_full * 1.05))
-#             ax.set_ylim(bottom=min(0, min_stress_overall - 0.2), top=max(0.2, max_stress_overall * 1.1))
-#         else:
-#             ax.set_title(f'Treloar (Zoomed)', fontsize=PLOT_TITLE_FONTSIZE)
-#             ax.set_xlim(0.95, 3.5)
-#             if not np.isfinite(min_y_zoom_overall) or not np.isfinite(max_y_zoom_overall): ax.set_ylim(0, 1)
-#             else: ax.set_ylim(bottom=min(0, min_y_zoom_overall - 0.1), top=max(0.2, max_y_zoom_overall * 1.1))
-
 def plot_treloar_prediction(df, axes, r2_overall_precomputed=np.nan):
     """Plot Treloar data with model predictions (Helper). Needs axes=[ax_full, ax_zoom]. Uses precomputed R2 for title."""
     ax_full, ax_zoom = axes
@@ -1194,7 +1108,6 @@ def plot_treloar_prediction(df, axes, r2_overall_precomputed=np.nan):
                 pl, = ax.plot(lambda1_sorted, pred_sorted, color=colors[mode], linestyle='-', linewidth=PLOT_PRED_LINEWIDTH, label=f"{mode} (Model)" if i==0 else None)
                 if i == 0: legend_handles.extend([sc, pl])
                 if i == 1:
-                    # UPDATED: Changed zoom range from (0.95, 3.5) to (1.0, 4.5)
                     mask_zoom_mode = (lambda1_sorted >= 1.0) & (lambda1_sorted <= 4.5)
                     if mask_zoom_mode.sum() > 0:
                          max_y_zoom_overall = max(max_y_zoom_overall, np.nanmax(exp_sorted[mask_zoom_mode]), np.nanmax(pred_sorted[mask_zoom_mode]))
@@ -1208,12 +1121,10 @@ def plot_treloar_prediction(df, axes, r2_overall_precomputed=np.nan):
             title_r2_str = f"{r2_overall:.3f}" if pd.notna(r2_overall) else "N/A"
             ax.set_title(f'Treloar (Full Range, $R^2 \\approx {title_r2_str}$)', fontsize=PLOT_TITLE_FONTSIZE)
             ax.legend(handles=legend_handles, loc='best', fontsize=PLOT_LEGEND_FONTSIZE)
-            # UPDATED: Changed from 0.95 to 1.0 for consistency
             ax.set_xlim(left=1.0, right=max(4.5, max_lambda_full * 1.05))
             ax.set_ylim(bottom=min(0, min_stress_overall - 0.2), top=max(0.2, max_stress_overall * 1.1))
         else:
             ax.set_title(f'Treloar (Zoomed)', fontsize=PLOT_TITLE_FONTSIZE)
-            # UPDATED: Changed zoom range from (0.95, 3.5) to (1.0, 4.5)
             ax.set_xlim(1.0, 5.5)
             if not np.isfinite(min_y_zoom_overall) or not np.isfinite(max_y_zoom_overall): 
                 ax.set_ylim(0, 1)
@@ -1322,298 +1233,6 @@ def plot_Kawabata_data(df, ax=None):
     ax.set_xlabel('λ₂', fontsize=PLOT_LABEL_FONTSIZE); ax.set_ylabel('Nominal Stress (MPa)', fontsize=PLOT_LABEL_FONTSIZE)
     ax.set_title('Kawabata Biaxial Data', fontsize=PLOT_TITLE_FONTSIZE); ax.legend(handles=handles[:12], fontsize=PLOT_LEGEND_FONTSIZE*0.9); ax.grid(alpha=0.3); ax.tick_params(axis='both', which='major', labelsize=PLOT_TICK_FONTSIZE)
     return ax
-
-# def run_lasso_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
-#     """
-#     Performs LassoCV (coordinate descent) and Lasso path AIC/BIC selection.
-#     Plots a single heatmap and criteria plots. Measures time.
-#     Returns a dictionary of results for 'LassoCV', 'LassoAIC', 'LassoBIC'.
-#     Updated to match HearthCANN/synthetic CV-NMSE plotting (now robustly normalized to [0,1]).
-#     """
-#     print(f"\n--- Running LASSO Analysis (CV, AIC, BIC) ({title_prefix}) ---")
-#     n_samples, n_features = X_scaled.shape
-#     base_results = { 'coeffs': np.zeros(n_features), 'alpha': np.nan, 'n_nonzero': 0,
-#                      'aic': np.nan, 'bic': np.nan, 'selected_features': [], 'time': np.nan,
-#                      'full_basis_names': feature_names }
-#     results = { 'LassoCV': {**base_results, 'method': 'LassoCV'},
-#                 'LassoAIC': {**base_results, 'method': 'LassoAIC'},
-#                 'LassoBIC': {**base_results, 'method': 'LassoBIC'} }
-#     if n_features == 0:
-#         print("ERROR: No features.")
-#         return results
-
-#     # --- 1. LassoCV on a controlled alpha range ---
-#     print("  Running LassoCV to determine optimal alpha...")
-#     start_time_cv = datetime.datetime.now()
-#     best_alpha_from_cv = np.nan
-
-#     alpha_min_log = -4
-#     alpha_max_log = -1
-#     alphas_cv_grid = np.logspace(alpha_min_log, alpha_max_log, 1000)  # dense for CV
-
-#     # For Row-0 CV curve
-#     alphas_cv_plot = np.array([])
-#     cv_nmse_mean_plot = np.array([])
-#     cv_nmse_std_plot  = np.array([])
-
-#     try:
-#         lasso_cv = LassoCV(
-#             cv=cv_folds,
-#             alphas=alphas_cv_grid,
-#             max_iter=5000,
-#             n_jobs=-1,
-#             random_state=random_seed,
-#             precompute='auto'   # keep as in your codebase/environment
-#         )
-#         lasso_cv.fit(X_scaled, y)
-#         best_alpha_from_cv = lasso_cv.alpha_
-#         print(f"  LassoCV determined optimal alpha: {best_alpha_from_cv:.6f}")
-
-#         # ---- Extract CV MSE and robust-normalize NMSE to [0,1] for plotting ----
-#         try:
-#             alphas_cv_full = np.asarray(lasso_cv.alphas_)      # (n_alphas,)
-#             mse_path_cv = np.asarray(lasso_cv.mse_path_)       # (n_alphas, n_folds[, n_targets])
-
-#             if mse_path_cv.ndim == 3:
-#                 cv_mse_mean_full = np.nanmean(mse_path_cv, axis=(1, 2))
-#                 cv_mse_std_full  = np.nanstd( mse_path_cv, axis=(1, 2))
-#             elif mse_path_cv.ndim == 2:
-#                 cv_mse_mean_full = np.nanmean(mse_path_cv, axis=1)
-#                 cv_mse_std_full  = np.nanstd( mse_path_cv, axis=1)
-#             else:
-#                 cv_mse_mean_full = mse_path_cv.ravel()
-#                 cv_mse_std_full  = np.zeros_like(cv_mse_mean_full)
-
-#             # Convert to statistical NMSE (for semantics), then robustly map to [0,1]
-#             y_centered = y - np.mean(y)
-#             y_var_cv = float(np.var(y_centered))
-#             if y_var_cv > EPS:
-#                 nmse_mean_full = cv_mse_mean_full / y_var_cv
-#                 nmse_std_full  = cv_mse_std_full  / y_var_cv
-#             else:
-#                 nmse_mean_full = cv_mse_mean_full
-#                 nmse_std_full  = cv_mse_std_full
-
-#             # Robust min–max via percentiles (protect from outliers)
-#             p_lo = float(np.nanpercentile(nmse_mean_full, 5))
-#             p_hi = float(np.nanpercentile(nmse_mean_full, 95))
-#             den  = max(p_hi - p_lo, EPS)
-
-#             nmse_mean_scaled = (nmse_mean_full - p_lo) / den
-#             nmse_std_scaled  = nmse_std_full / den  # scale only (std is not centered)
-
-#             # Clip to strict [0,1] display range
-#             nmse_mean_scaled = np.clip(nmse_mean_scaled, 0.0, 1.0)
-#             nmse_std_scaled  = np.clip(nmse_std_scaled,  0.0, 1.0)
-
-#             # Subsample to 20 evenly spaced points to declutter
-#             n_plot = min(20, alphas_cv_full.size)
-#             if n_plot > 0:
-#                 sample_idx = np.unique(np.linspace(0, alphas_cv_full.size - 1, n_plot, dtype=int))
-#                 alphas_cv_plot     = alphas_cv_full[sample_idx]
-#                 cv_nmse_mean_plot  = nmse_mean_scaled[sample_idx]
-#                 cv_nmse_std_plot   = nmse_std_scaled[sample_idx]
-
-#         except Exception as e:
-#             print(f"WARN: Unable to extract/normalize LassoCV CV curve: {e}")
-
-#     except Exception as e:
-#         print(f"ERROR during LassoCV: {e}")
-#         results['LassoCV'].update({'error': str(e)})
-
-#     # --- 2. Unified Lasso Path (AIC/BIC on same domain) ---
-#     print("\n  Generating a unified Lasso Path for all criteria...")
-#     start_time_path = datetime.datetime.now()
-#     df_path = pd.DataFrame()
-#     alphas_lasso, coefs_lasso = None, None
-#     try:
-#         alphas_base = np.logspace(alpha_min_log, alpha_max_log, 20)
-#         alphas_for_path = np.unique(np.concatenate(
-#             [alphas_base, [best_alpha_from_cv] if pd.notna(best_alpha_from_cv) else []]
-#         ))
-#         alphas_for_path = np.sort(alphas_for_path)[::-1]  # descending
-
-#         alphas_lasso, coefs_lasso, _ = lasso_path(
-#             X_scaled, y, alphas=alphas_for_path, max_iter=5000, precompute='auto'
-#         )
-
-#         path_results_list = []
-#         for i in range(coefs_lasso.shape[1]):
-#             alpha_i = alphas_lasso[i]
-#             beta_i  = coefs_lasso[:, i]
-#             n_params = int(np.sum(np.abs(beta_i) > EPS))
-#             if n_params == 0 and i < coefs_lasso.shape[1] - 1:
-#                 continue
-
-#             y_pred_train = X_scaled @ beta_i
-#             mse = mean_squared_error(y, y_pred_train)
-#             aic, bic = calculate_aic_bic(y, y_pred_train, n_params, n_samples)
-#             path_results_list.append({
-#                 'alpha': alpha_i, 'k': n_params, 'coeffs': beta_i,
-#                 'mse_train': mse, 'aic': aic, 'bic': bic
-#             })
-
-#         df_path = pd.DataFrame(path_results_list)
-#         print(f"  Unified path created with {len(df_path)} unique models.")
-#     except Exception as e:
-#         print(f"ERROR during unified path generation: {e}")
-#         traceback.print_exc()
-#         results['LassoCV'].update({'error': str(e)})
-#         results['LassoAIC'].update({'error': str(e)})
-#         results['LassoBIC'].update({'error': str(e)})
-#         return results
-
-#     # --- 2b. Normalized metrics on path (unchanged semantics) ---
-#     y_var = np.var(y)
-#     if y_var > EPS:
-#         df_path['norm_mse'] = df_path['mse_train'] / y_var
-#     else:
-#         df_path['norm_mse'] = df_path['mse_train']
-
-#     print(f"  DEBUG: NMSE range: {df_path['norm_mse'].min():.3f} to {df_path['norm_mse'].max():.3f}")
-#     print(f"  DEBUG: y variance: {y_var:.3f}")
-
-#     df_path['l1_norm'] = df_path['coeffs'].apply(lambda x: np.sum(np.abs(x)))
-#     max_l1_norm = df_path['l1_norm'].max()
-#     df_path['norm_l1'] = (df_path['l1_norm'] / max_l1_norm) if max_l1_norm > EPS else 0.0
-
-#     # --- 3. Pick models from unified path (unchanged) ---
-#     duration_cv = (datetime.datetime.now() - start_time_cv).total_seconds()
-#     if not df_path.empty and pd.notna(best_alpha_from_cv):
-#         cv_model_row = df_path.iloc[(df_path['alpha'] - best_alpha_from_cv).abs().argsort()[:1]].iloc[0]
-#         results['LassoCV'].update({
-#             'coeffs': cv_model_row['coeffs'], 'alpha': cv_model_row['alpha'], 'n_nonzero': cv_model_row['k'],
-#             'aic': cv_model_row['aic'], 'bic': cv_model_row['bic'],
-#             'selected_features': [feature_names[i] for i, c in enumerate(cv_model_row['coeffs']) if abs(c) > EPS],
-#             'time': duration_cv
-#         })
-#         print(f"  LassoCV model (k={cv_model_row['k']}) identified on unified path in {duration_cv:.2f}s.")
-
-#     duration_path = (datetime.datetime.now() - start_time_path).total_seconds()
-#     if not df_path.empty:
-#         aic_model_row = df_path.loc[df_path['aic'].idxmin()]
-#         results['LassoAIC'].update({
-#             'coeffs': aic_model_row['coeffs'], 'alpha': aic_model_row['alpha'], 'n_nonzero': aic_model_row['k'],
-#             'aic': aic_model_row['aic'], 'bic': aic_model_row['bic'],
-#             'selected_features': [feature_names[j] for j, c in enumerate(aic_model_row['coeffs']) if abs(c) > EPS],
-#             'time': duration_path
-#         })
-#         print(f"  LassoAIC model (k={aic_model_row['k']}) identified on unified path.")
-
-#         bic_model_row = df_path.loc[df_path['bic'].idxmin()]
-#         results['LassoBIC'].update({
-#             'coeffs': bic_model_row['coeffs'], 'alpha': bic_model_row['alpha'], 'n_nonzero': bic_model_row['k'],
-#             'aic': bic_model_row['aic'], 'bic': bic_model_row['bic'],
-#             'selected_features': [feature_names[j] for j, c in enumerate(bic_model_row['coeffs']) if abs(c) > EPS],
-#             'time': duration_path
-#         })
-#         print(f"  LassoBIC model (k={bic_model_row['k']}) identified on unified path.")
-
-#     # --- 4. Plots (unchanged layout; Row 0 uses robustly normalized CV NMSE) ---
-#     if not df_path.empty and alphas_lasso is not None and coefs_lasso is not None:
-#         print("\n  Generating plots from unified path data...")
-
-#         # exact models for marking
-#         cv_exact_model = None; aic_exact_model = None; bic_exact_model = None
-#         if pd.notna(best_alpha_from_cv):
-#             cv_exact_idx = (df_path['alpha'] - best_alpha_from_cv).abs().argsort()[0]
-#             cv_exact_model = df_path.iloc[cv_exact_idx]
-#         if not df_path.empty:
-#             aic_exact_model = df_path.loc[df_path['aic'].idxmin()]
-#             bic_exact_model = df_path.loc[df_path['bic'].idxmin()]
-
-#         def find_alpha_index_in_path(target_alpha, alphas_array):
-#             return np.argmin(np.abs(alphas_array - target_alpha))
-
-#         chosen_values_heatmap = {
-#             'CV':  {'index': find_alpha_index_in_path(cv_exact_model['alpha'], alphas_lasso) if cv_exact_model is not None else None,
-#                     'label_val': cv_exact_model['k'] if cv_exact_model is not None else None,
-#                     'color': plasma(0.25), 'linestyle': '--'},
-#             'AIC': {'index': find_alpha_index_in_path(aic_exact_model['alpha'], alphas_lasso) if aic_exact_model is not None else None,
-#                     'label_val': aic_exact_model['k'] if aic_exact_model is not None else None,
-#                     'color': plasma(0.55), 'linestyle': '-'},
-#             'BIC': {'index': find_alpha_index_in_path(bic_exact_model['alpha'], alphas_lasso) if bic_exact_model is not None else None,
-#                     'label_val': bic_exact_model['k'] if bic_exact_model is not None else None,
-#                     'color': plasma(0.85), 'linestyle': '-.'}
-#         }
-
-#         plot_activation_heatmap(
-#             alphas_lasso, coefs_lasso, feature_names, chosen_values_heatmap,
-#             title="Lasso Activation Path", x_axis_label=r'Regularization Strength',
-#             filename=os.path.join(save_dir, f"{title_prefix}_Lasso_ActivationHeatmap.pdf"),
-#             log_x=True, reverse_x=True, is_omp=False
-#         )
-
-#         df_plot = df_path.sort_values('alpha', ascending=False)
-#         fig, axs = plt.subplots(3, 1, figsize=SMALL_FIG_LASSO_LARS_OMP, sharex=True)
-
-#         alpha_for_cv  = cv_exact_model['alpha']  if cv_exact_model  is not None else None
-#         alpha_for_aic = aic_exact_model['alpha'] if aic_exact_model is not None else None
-#         alpha_for_bic = bic_exact_model['alpha'] if bic_exact_model is not None else None
-
-#         # Row 0: CV NMSE (mean ± std) vs alpha (now robustly normalized to [0,1])
-#         ax0_twin = axs[0].twinx()
-#         if isinstance(alphas_cv_plot, np.ndarray) and alphas_cv_plot.size > 0 and np.isfinite(cv_nmse_mean_plot).any():
-#             axs[0].plot(alphas_cv_plot, cv_nmse_mean_plot, 'o-', ms=3, color=plasma(0.25))
-#             if isinstance(cv_nmse_std_plot, np.ndarray) and cv_nmse_std_plot.size == cv_nmse_mean_plot.size:
-#                 try:
-#                     axs[0].fill_between(alphas_cv_plot,
-#                                         np.clip(cv_nmse_mean_plot - cv_nmse_std_plot, 0.0, 1.0),
-#                                         np.clip(cv_nmse_mean_plot + cv_nmse_std_plot, 0.0, 1.0),
-#                                         color=plasma(0.25), alpha=0.15, linewidth=0)
-#                 except Exception:
-#                     pass
-#         else:
-#             axs[0].text(0.5, 0.5, "CV NMSE unavailable", transform=axs[0].transAxes, ha='center', va='center')
-
-#         ax0_twin.plot(df_plot['alpha'], df_plot['norm_l1'], 's-', ms=3, color=plasma(0.65), alpha=0.6)
-#         axs[0].set_ylabel('CV\nNMSE', fontsize=PLOT_LABEL_FONTSIZE, color=plasma(0.25), labelpad=-20)
-#         ax0_twin.set_ylabel('Norm. L1', fontsize=PLOT_LABEL_FONTSIZE, color=plasma(0.65), labelpad=-10)
-
-#         if pd.notna(alpha_for_cv):
-#             axs[0].axvline(alpha_for_cv, color=plasma(0.25), ls='--', lw=1.5)
-#             axs[0].text(alpha_for_cv * 1.5, 0.5, f"$\\lambda_L={alpha_for_cv:.1e}$",
-#                         rotation=90, va='center', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.25))
-
-#         axs[0].set_ylim(-0.05, 1.05); ax0_twin.set_ylim(-0.05, 1.05)
-#         axs[0].set_yticks([0.0, 1.0]); ax0_twin.set_yticks([0.0, 1.0])
-#         ax0_twin.tick_params(axis='y', labelcolor=plasma(0.65))
-#         axs[0].tick_params(axis='y', labelcolor=plasma(0.25))
-
-#         # Row 1: AIC
-#         axs[1].plot(df_plot['alpha'], df_plot['aic'], 'o-', ms=3, color=plasma(0.55))
-#         axs[1].set_ylabel('AIC', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20)
-#         if pd.notna(alpha_for_aic):
-#             axs[1].axvline(alpha_for_aic, color=plasma(0.55), ls='-', lw=1.5)
-#             axs[1].text(alpha_for_aic * 1.5, np.mean(axs[1].get_ylim()), f"$\\lambda_L={alpha_for_aic:.1e}$",
-#                         rotation=90, va='center', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.55))
-#         axs[1].set_yticks([df_plot['aic'].min(), df_plot['aic'].max()])
-
-#         # Row 2: BIC
-#         axs[2].plot(df_plot['alpha'], df_plot['bic'], 'o-', ms=3, color=plasma(0.85))
-#         axs[2].set_ylabel('BIC', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20)
-#         if pd.notna(alpha_for_bic):
-#             axs[2].axvline(alpha_for_bic, color=plasma(0.85), ls='-.', lw=1.5)
-#             axs[2].text(alpha_for_bic * 1.5, np.mean(axs[2].get_ylim()), f"$\\lambda_L={alpha_for_bic:.1e}$",
-#                         rotation=90, va='center', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.85))
-#         axs[2].set_yticks([df_plot['bic'].min(), df_plot['bic'].max()])
-
-#         axs[2].set_xlabel('Regularization Strength', fontsize=PLOT_LABEL_FONTSIZE)
-#         x_min = df_plot['alpha'].min(); x_max = df_plot['alpha'].max()
-#         if isinstance(alphas_cv_plot, np.ndarray) and alphas_cv_plot.size > 0:
-#             x_min = min(x_min, np.min(alphas_cv_plot))
-#             x_max = max(x_max, np.max(alphas_cv_plot))
-#         for ax in axs:
-#             ax.set_xscale('log')
-#             ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([x_min, x_max]))
-#             ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1e'))
-#             ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-
-#         fig.tight_layout(rect=[0, 0, 1, 0.95], pad=0.5)
-#         plt.savefig(os.path.join(save_dir, f"{title_prefix}_Lasso_Criteria.pdf"), format='pdf', bbox_inches='tight')
-#         plt.close(fig)
-
-#     return results
 
 def run_lasso_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
     """
@@ -1913,187 +1532,6 @@ def run_lasso_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_
 
     return results
 
-# def run_lars_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
-#     """
-#     LARS with a SINGLE shared path (supports) used for CV, AIC, and BIC.
-#     """
-
-#     print(f"\n--- Running LARS Analysis (CV, AIC, BIC; unified path) ({title_prefix}) ---")
-#     n_samples, n_features = X_scaled.shape
-#     base_results = {
-#         'coeffs': np.zeros(n_features),
-#         'optimal_k': np.nan,
-#         'n_nonzero': 0,
-#         'aic': np.nan,
-#         'bic': np.nan,
-#         'selected_features': [],
-#         'time': np.nan,
-#         'full_basis_names': feature_names
-#     }
-#     results = {
-#         'LarsCV':  {**base_results, 'method': 'LarsCV'},
-#         'LarsAIC': {**base_results, 'method': 'LarsAIC'},
-#         'LarsBIC': {**base_results, 'method': 'LarsBIC'},
-#     }
-#     if n_features == 0:
-#         print("ERROR: No features."); return results
-
-#     # ---------- 1) LARS path on centered y ----------
-#     y_centered = y - np.mean(y)
-#     _, _, coefs_raw = lars_path(X_scaled, y_centered, method='lars')
-#     if coefs_raw.shape[1] < 2:
-#         print("ERROR: LARS path too short."); return results
-#     coefs_all = coefs_raw[:, 1:]  # remove all-zero
-#     T = coefs_all.shape[1]
-
-#     # Unique-k compression
-#     supports, kept_idx = [], []
-#     seen_k = set()
-#     for t in range(T):
-#         S_t = np.flatnonzero(np.abs(coefs_all[:, t]) > EPS)
-#         k_t = int(S_t.size)
-#         if k_t == 0 or k_t in seen_k:
-#             continue
-#         seen_k.add(k_t)
-#         supports.append(S_t)
-#         kept_idx.append(t)
-#     coefs_path = coefs_all[:, kept_idx]      # <-- filtered ONCE
-#     steps = np.arange(1, len(supports) + 1)  # 1..K
-
-#     # ---------- 2) CV on the SAME supports ----------
-#     print("  Cross-validating on unified LARS supports…")
-#     start_time_cv = datetime.datetime.now()
-#     kf = KFold(n_splits=cv_folds, shuffle=True, random_state=random_seed)
-#     cv_mse = np.zeros(len(supports))
-#     cv_mse_sq = np.zeros(len(supports))
-#     for tr, va in kf.split(X_scaled):
-#         Xtr, Xva = X_scaled[tr], X_scaled[va]
-#         ytr, yva = y[tr], y[va]
-#         for i, S in enumerate(supports):
-#             if len(S) == 0:
-#                 mse = np.mean((yva - np.mean(ytr))**2)
-#             else:
-#                 reg = Ridge(alpha=RIDGE_ALPHA_REFIT, fit_intercept=True)
-#                 reg.fit(Xtr[:, S], ytr)
-#                 yhat = reg.predict(Xva[:, S])
-#                 mse = np.mean((yva - yhat)**2)
-#             cv_mse[i] += mse
-#             cv_mse_sq[i] += mse**2
-#     cv_mse_mean = cv_mse / cv_folds
-#     cv_mse_std  = np.sqrt(np.maximum(cv_mse_sq / cv_folds - cv_mse_mean**2, 0.0))
-
-#     # Normalize to [0,1]
-#     mm, MM = float(np.min(cv_mse_mean)), float(np.max(cv_mse_mean))
-#     rng = max(MM - mm, EPS)
-#     cv_nmse_mean = (cv_mse_mean - mm) / rng
-#     cv_nmse_std  = cv_mse_std / rng
-#     best_idx = int(np.argmin(cv_mse_mean))
-#     best_step = int(steps[best_idx])
-
-#     # ---------- 3) AIC/BIC on FULL data ----------
-#     rows = []
-#     for i, S in enumerate(supports):
-#         if len(S) == 0:
-#             y_pred = np.full_like(y, fill_value=np.mean(y))
-#             k_eff = 1
-#             coeffs_full = np.zeros(n_features)
-#         else:
-#             reg = Ridge(alpha=RIDGE_ALPHA_REFIT, fit_intercept=True)
-#             reg.fit(X_scaled[:, S], y)
-#             y_pred = reg.predict(X_scaled[:, S])
-#             k_eff = len(S) + 1
-#             coeffs_full = np.zeros(n_features); coeffs_full[S] = reg.coef_
-#         aic, bic = calculate_aic_bic(y, y_pred, n_params=k_eff, n_samples=n_samples)
-#         rows.append({'step': int(steps[i]), 'k': len(S), 'coeffs': coeffs_full, 'aic': aic, 'bic': bic})
-#     df_path = pd.DataFrame(rows)
-
-#     # Best rows
-#     duration_cv = (datetime.datetime.now() - start_time_cv).total_seconds()
-#     cv_row  = df_path.iloc[best_idx]
-#     aic_row = df_path.iloc[df_path['aic'].idxmin()]
-#     bic_row = df_path.iloc[df_path['bic'].idxmin()]
-
-#     results['LarsCV'].update({
-#         'coeffs': cv_row['coeffs'], 'optimal_k': cv_row['step'], 'n_nonzero': int(np.sum(np.abs(cv_row['coeffs']) > EPS)),
-#         'aic': cv_row['aic'], 'bic': cv_row['bic'],
-#         'selected_features': [feature_names[j] for j, c in enumerate(cv_row['coeffs']) if abs(c) > EPS],
-#         'time': duration_cv
-#     })
-#     results['LarsAIC'].update({
-#         'coeffs': aic_row['coeffs'], 'optimal_k': aic_row['step'], 'n_nonzero': int(np.sum(np.abs(aic_row['coeffs']) > EPS)),
-#         'aic': aic_row['aic'], 'bic': aic_row['bic'],
-#         'selected_features': [feature_names[j] for j, c in enumerate(aic_row['coeffs']) if abs(c) > EPS]
-#     })
-#     results['LarsBIC'].update({
-#         'coeffs': bic_row['coeffs'], 'optimal_k': bic_row['step'], 'n_nonzero': int(np.sum(np.abs(bic_row['coeffs']) > EPS)),
-#         'aic': bic_row['aic'], 'bic': bic_row['bic'],
-#         'selected_features': [feature_names[j] for j, c in enumerate(bic_row['coeffs']) if abs(c) > EPS]
-#     })
-
-#     # ---------- 4) Plots ----------
-#     try:
-#         # Heatmap: pass the already-filtered coefs_path; chosen indices are (step-1)
-#         chosen_heat = {
-#             'CV':  {'index': int(cv_row['step']) - 1,  'label_val': int(cv_row['step']),  'color': plasma(0.25), 'linestyle': '--'},
-#             'AIC': {'index': int(aic_row['step']) - 1, 'label_val': int(aic_row['step']), 'color': plasma(0.55), 'linestyle': '-'},
-#             'BIC': {'index': int(bic_row['step']) - 1, 'label_val': int(bic_row['step']), 'color': plasma(0.85), 'linestyle': '-.'},
-#         }
-#         plot_activation_heatmap(
-#             steps, coefs_path, feature_names, chosen_heat,            # <-- no extra [:, kept_idx] here
-#             title="LARS Activation Path", x_axis_label='LARS Iteration',
-#             filename=os.path.join(save_dir, f"{title_prefix}_Lars_ActivationHeatmap.pdf"),
-#             log_x=False, reverse_x=False, is_omp=False
-#         )
-
-#         # Criteria (3×1)
-#         fig, axs = plt.subplots(3, 1, figsize=SMALL_FIG_LASSO_LARS_OMP, sharex=True)
-
-#         # Row 0: CV NMSE (±std)
-#         axs[0].plot(steps, cv_nmse_mean, 'o-', ms=3, color=plasma(0.25))
-#         axs[0].fill_between(steps,
-#                             np.maximum(0, cv_nmse_mean - cv_nmse_std),
-#                             np.minimum(1, cv_nmse_mean + cv_nmse_std),
-#                             alpha=0.2, color=plasma(0.25))
-#         axs[0].set_ylabel('CV\nNMSE', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20, color=plasma(0.25))
-#         axs[0].axvline(int(cv_row['step']), color=plasma(0.25), ls='--', lw=1.5)
-#         axs[0].annotate(f"Iteration = {int(cv_row['step'])}",
-#                         xy=(int(cv_row['step']), 0.5), xytext=(4, 0), textcoords='offset points',
-#                         rotation=90, va='center', ha='left', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.25))
-#         axs[0].set_yticks([0.0, 1.0])
-#         axs[0].set_xticks([int(steps.min()), int(steps.max())])
-
-#         # Row 1: AIC
-#         axs[1].plot(df_path['step'], df_path['aic'], 'o-', ms=3, color=plasma(0.55))
-#         axs[1].set_ylabel('AIC', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20)
-#         axs[1].axvline(int(aic_row['step']), color=plasma(0.55), ls='-', lw=1.5)
-#         axs[1].annotate(f"Iteration = {int(aic_row['step'])}",
-#                         xy=(int(aic_row['step']), np.mean(axs[1].get_ylim())), xytext=(4, 0), textcoords='offset points',
-#                         rotation=90, va='center', ha='left', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.55))
-#         axs[1].set_yticks([df_path['aic'].min(), df_path['aic'].max()])
-#         axs[1].set_xticks([int(steps.min()), int(steps.max())])
-
-#         # Row 2: BIC
-#         axs[2].plot(df_path['step'], df_path['bic'], 'o-', ms=3, color=plasma(0.85))
-#         axs[2].set_ylabel('BIC', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20)
-#         axs[2].axvline(int(bic_row['step']), color=plasma(0.85), ls='-.', lw=1.5)
-#         axs[2].annotate(f"Iteration = {int(bic_row['step'])}",
-#                         xy=(int(bic_row['step']), np.mean(axs[2].get_ylim())), xytext=(4, 0), textcoords='offset points',
-#                         rotation=90, va='center', ha='left', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.85))
-#         axs[2].set_yticks([df_path['bic'].min(), df_path['bic'].max()])
-#         axs[2].set_xticks([int(steps.min()), int(steps.max())])
-
-#         axs[2].set_xlabel('LARS Iteration', fontsize=PLOT_LABEL_FONTSIZE)
-#         for ax in axs:
-#             ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-
-#         fig.tight_layout(rect=[0, 0, 1, 0.95], pad=0.5)
-#         plt.savefig(os.path.join(save_dir, f"{title_prefix}_Lars_Criteria.pdf"), format='pdf', bbox_inches='tight')
-#         plt.close(fig)
-#     except Exception as e_plot:
-#         print(f"  WARN: LARS plotting failed: {e_plot}")
-
-#     return results
-
 def run_lars_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
     """
     LARS with a SINGLE shared path (supports) used for CV, AIC, and BIC.
@@ -2346,191 +1784,6 @@ def run_lars_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_d
         print(f"  WARN: LARS plotting failed: {e_plot}")
 
     return results
-
-# def run_omp_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
-#     """
-#     OMP with a SINGLE shared greedy path used for CV, AIC, and BIC.
-#     """
-
-#     print(f"\n--- Running OMP Analysis (CV, AIC, BIC; unified path) ({title_prefix}) ---")
-#     n_samples, n_features = X_scaled.shape
-#     base_results = {
-#         'coeffs': np.zeros(n_features),
-#         'optimal_k': np.nan,
-#         'n_nonzero': 0,
-#         'aic': np.nan,
-#         'bic': np.nan,
-#         'selected_features': [],
-#         'time': np.nan,
-#         'full_basis_names': feature_names
-#     }
-#     results = {
-#         'OMPCV':  {**base_results, 'method': 'OMPCV'},
-#         'OMPAIC': {**base_results, 'method': 'OMPAIC'},
-#         'OMPBIC': {**base_results, 'method': 'OMPBIC'},
-#     }
-#     if n_features == 0:
-#         print("ERROR: No features."); return results
-
-#     # ---------- 1) Greedy OMP path on centered y ----------
-#     y_centered = y - np.mean(y)
-#     X = X_scaled
-#     max_k = min(n_features, max(1, np.linalg.matrix_rank(X)))
-#     active, cols = [], []
-#     r = y_centered.copy()
-#     for k in range(1, max_k + 1):
-#         corr = X.T @ r
-#         if active:
-#             corr[np.array(active, int)] = 0.0
-#         j = int(np.argmax(np.abs(corr)))
-#         if j in active:
-#             print(f"  OMP early stop at k={k} (duplicate)."); break
-#         active.append(j)
-#         # update coefficients on centered target (no intercept in residual update)
-#         reg = Ridge(alpha=RIDGE_ALPHA_REFIT, fit_intercept=False)
-#         reg.fit(X[:, active], y_centered)
-#         beta = np.zeros(n_features); beta[active] = reg.coef_
-#         cols.append(beta.copy())
-#         r = y_centered - X @ beta
-#         if np.linalg.norm(r) < 1e-14:
-#             print(f"  OMP residual ~0 at k={k}; stopping."); break
-
-#     if not cols:
-#         print("ERROR: empty OMP path."); return results
-#     coefs_path = np.column_stack(cols)
-#     steps = np.arange(1, coefs_path.shape[1] + 1)
-#     supports = [np.flatnonzero(np.abs(coefs_path[:, i]) > EPS) for i in range(coefs_path.shape[1])]
-
-#     # ---------- 2) CV on SAME supports ----------
-#     print("  Cross-validating on unified OMP supports…")
-#     start_time_cv = datetime.datetime.now()
-#     kf = KFold(n_splits=cv_folds, shuffle=True, random_state=random_seed)
-#     cv_mse = np.zeros(len(steps))
-#     cv_mse_sq = np.zeros(len(steps))
-#     for tr, va in kf.split(X):
-#         Xtr, Xva = X[tr], X[va]
-#         ytr, yva = y[tr], y[va]
-#         for i, S in enumerate(supports):
-#             if len(S) == 0:
-#                 mse = np.mean((yva - np.mean(ytr))**2)
-#             else:
-#                 reg = Ridge(alpha=RIDGE_ALPHA_REFIT, fit_intercept=True)
-#                 reg.fit(Xtr[:, S], ytr)
-#                 yhat = reg.predict(Xva[:, S])
-#                 mse = np.mean((yva - yhat)**2)
-#             cv_mse[i] += mse
-#             cv_mse_sq[i] += mse**2
-#     cv_mse_mean = cv_mse / cv_folds
-#     cv_mse_std  = np.sqrt(np.maximum(cv_mse_sq / cv_folds - cv_mse_mean**2, 0.0))
-
-#     # Normalize to [0,1]
-#     mm, MM = float(np.min(cv_mse_mean)), float(np.max(cv_mse_mean))
-#     rng = max(MM - mm, EPS)
-#     cv_nmse_mean = (cv_mse_mean - mm) / rng
-#     cv_nmse_std  = cv_mse_std / rng
-#     best_idx = int(np.argmin(cv_mse_mean))
-#     best_step = int(steps[best_idx])
-
-#     # ---------- 3) AIC/BIC on FULL data ----------
-#     rows = []
-#     for i, S in enumerate(supports):
-#         if len(S) == 0:
-#             y_pred = np.full_like(y, fill_value=np.mean(y))
-#             k_eff = 1
-#             coeffs_full = np.zeros(n_features)
-#         else:
-#             reg = Ridge(alpha=RIDGE_ALPHA_REFIT, fit_intercept=True)
-#             reg.fit(X[:, S], y)
-#             y_pred = reg.predict(X[:, S])
-#             k_eff = len(S) + 1
-#             coeffs_full = np.zeros(n_features); coeffs_full[S] = reg.coef_
-#         aic, bic = calculate_aic_bic(y, y_pred, n_params=k_eff, n_samples=n_samples)
-#         rows.append({'step': int(steps[i]), 'k': len(S), 'coeffs': coeffs_full, 'aic': aic, 'bic': bic})
-#     df_path = pd.DataFrame(rows)
-
-#     # Results
-#     duration_cv = (datetime.datetime.now() - start_time_cv).total_seconds()
-#     cv_row  = df_path.iloc[best_idx]
-#     aic_row = df_path.iloc[df_path['aic'].idxmin()]
-#     bic_row = df_path.iloc[df_path['bic'].idxmin()]
-#     results['OMPCV'].update({
-#         'coeffs': cv_row['coeffs'], 'optimal_k': cv_row['step'], 'n_nonzero': int(np.sum(np.abs(cv_row['coeffs']) > EPS)),
-#         'aic': cv_row['aic'], 'bic': cv_row['bic'],
-#         'selected_features': [feature_names[j] for j, c in enumerate(cv_row['coeffs']) if abs(c) > EPS],
-#         'time': duration_cv
-#     })
-#     results['OMPAIC'].update({
-#         'coeffs': aic_row['coeffs'], 'optimal_k': aic_row['step'], 'n_nonzero': int(np.sum(np.abs(aic_row['coeffs']) > EPS)),
-#         'aic': aic_row['aic'], 'bic': aic_row['bic'],
-#         'selected_features': [feature_names[j] for j, c in enumerate(aic_row['coeffs']) if abs(c) > EPS]
-#     })
-#     results['OMPBIC'].update({
-#         'coeffs': bic_row['coeffs'], 'optimal_k': bic_row['step'], 'n_nonzero': int(np.sum(np.abs(bic_row['coeffs']) > EPS)),
-#         'aic': bic_row['aic'], 'bic': bic_row['bic'],
-#         'selected_features': [feature_names[j] for j, c in enumerate(bic_row['coeffs']) if abs(c) > EPS]
-#     })
-
-#     # ---------- 4) Plots ----------
-#     try:
-#         chosen_heat = {
-#             'CV':  {'index': int(cv_row['step'])  - 1, 'label_val': int(cv_row['step']),  'color': plasma(0.25), 'linestyle': '--'},
-#             'AIC': {'index': int(aic_row['step']) - 1, 'label_val': int(aic_row['step']), 'color': plasma(0.55), 'linestyle': '-'},
-#             'BIC': {'index': int(bic_row['step']) - 1, 'label_val': int(bic_row['step']), 'color': plasma(0.85), 'linestyle': '-.'},
-#         }
-#         plot_activation_heatmap(
-#             steps, coefs_path, feature_names, chosen_heat,
-#             title="OMP Activation Path", x_axis_label='OMP Iteration',
-#             filename=os.path.join(save_dir, f"{title_prefix}_OMP_ActivationHeatmap.pdf"),
-#             log_x=False, reverse_x=False, is_omp=True
-#         )
-
-#         fig, axs = plt.subplots(3, 1, figsize=SMALL_FIG_LASSO_LARS_OMP, sharex=True)
-
-#         # Row 0: CV NMSE
-#         axs[0].plot(steps, cv_nmse_mean, 'o-', ms=3, color=plasma(0.25))
-#         axs[0].fill_between(steps,
-#                             np.maximum(0, cv_nmse_mean - cv_nmse_std),
-#                             np.minimum(1, cv_nmse_mean + cv_nmse_std),
-#                             alpha=0.2, color=plasma(0.25))
-#         axs[0].set_ylabel('CV\nNMSE', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20, color=plasma(0.25))
-#         axs[0].axvline(int(cv_row['step']), color=plasma(0.25), ls='--', lw=1.5)
-#         axs[0].annotate(f"Iteration = {int(cv_row['step'])}",
-#                         xy=(int(cv_row['step']), 0.5), xytext=(4, 0), textcoords='offset points',
-#                         rotation=90, va='center', ha='left', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.25))
-#         axs[0].set_yticks([0.0, 1.0])
-#         axs[0].set_xticks([int(steps.min()), int(steps.max())])
-
-#         # Row 1: AIC
-#         axs[1].plot(df_path['step'], df_path['aic'], 'o-', ms=3, color=plasma(0.55))
-#         axs[1].set_ylabel('AIC', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20)
-#         axs[1].axvline(int(aic_row['step']), color=plasma(0.55), ls='-', lw=1.5)
-#         axs[1].annotate(f"Iteration = {int(aic_row['step'])}",
-#                         xy=(int(aic_row['step']), np.mean(axs[1].get_ylim())), xytext=(4, 0), textcoords='offset points',
-#                         rotation=90, va='center', ha='left', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.55))
-#         axs[1].set_yticks([df_path['aic'].min(), df_path['aic'].max()])
-#         axs[1].set_xticks([int(steps.min()), int(steps.max())])
-
-#         # Row 2: BIC
-#         axs[2].plot(df_path['step'], df_path['bic'], 'o-', ms=3, color=plasma(0.85))
-#         axs[2].set_ylabel('BIC', fontsize=PLOT_LABEL_FONTSIZE, labelpad=-20)
-#         axs[2].axvline(int(bic_row['step']), color=plasma(0.85), ls='-.', lw=1.5)
-#         axs[2].annotate(f"Iteration = {int(bic_row['step'])}",
-#                         xy=(int(bic_row['step']), np.mean(axs[2].get_ylim())), xytext=(4, 0), textcoords='offset points',
-#                         rotation=90, va='center', ha='left', fontsize=PLOT_LEGEND_FONTSIZE-1, color=plasma(0.85))
-#         axs[2].set_yticks([df_path['bic'].min(), df_path['bic'].max()])
-#         axs[2].set_xticks([int(steps.min()), int(steps.max())])
-
-#         axs[2].set_xlabel('OMP Iteration', fontsize=PLOT_LABEL_FONTSIZE)
-#         for ax in axs:
-#             ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-
-#         fig.tight_layout(rect=[0, 0, 1, 0.95], pad=0.5)
-#         plt.savefig(os.path.join(save_dir, f"{title_prefix}_OMP_Criteria.pdf"), format='pdf', bbox_inches='tight')
-#         plt.close(fig)
-#     except Exception as e_plot:
-#         print(f"  WARN: OMP plotting failed: {e_plot}")
-
-#     return results
 
 def run_omp_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_dir, random_seed=None):
     """
@@ -2792,7 +2045,6 @@ def run_omp_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_di
 
 # ==============================================
 # Load Data Functions
-# (No changes needed)
 # ==============================================
 def load_treloar_data(include_data=True):
     if not include_data: print("Skipping Treloar data."); return pd.DataFrame()
@@ -2841,10 +2093,7 @@ def combine_datasets(include_treloar=True, include_Kawabata=True, Kawabata_path=
 if __name__ == "__main__":
 
     # --- Configuration ---
-    # !! ADJUST PATHS AS NEEDED !!
     KAWABATA_FILE_PATH = 'input/Kawabata.csv'
-    # Assumes TreloarDataUT.csv, TreloarDataPS.csv, TreloarDataEBT.csv are in the script's directory
-    # Check file existence directly later
 
     EMPHASIZE_SMALL_STRAIN = False
     CV_FOLDS = 5
@@ -2870,9 +2119,6 @@ if __name__ == "__main__":
     MODEL_CONFIG_NAME = "MR3_OgdenExt"
     INCLUDE_NEOHOOKEAN = False
     INCLUDE_MOONEY_RIVLIN = True   # Use Mooney-Rivlin based terms
-    # MR_MAX_POWER_I1 = 3            # Max power for (I1-3)
-    # MR_MAX_POWER_I2 = 3            # Max power for (I2-3)
-    # max_total_power = 3
     INCLUDE_YEOH = False
     INCLUDE_ARRUDA_BOYCE = False
     INCLUDE_OGDEN = True           # Use Ogden terms
@@ -2993,16 +2239,6 @@ if __name__ == "__main__":
                 raise ValueError(f"Basis ({len(basis_names)}) / Matrix column ({design_matrix_weighted_fit.shape[1]}) mismatch for fitting matrix.")
 
             print(f"Weighted design matrix for FITTING created with shape: {design_matrix_weighted_fit.shape}")
-
-            # Scale the fitting data
-            # print("Scaling fitting data...")
-            # scaler = StandardScaler()
-            # X_weighted_scaled_fit = scaler.fit_transform(design_matrix_weighted_fit)
-            # if not np.all(np.isfinite(X_weighted_scaled_fit)):
-            #     print("WARN: Non-finite values after scaling fitting data. Applying nan_to_num.")
-            #     X_weighted_scaled_fit = np.nan_to_num(X_weighted_scaled_fit)
-
-            # print("Fitting data prepared and scaled successfully.")
             
             # Scale the fitting data - SCALE BOTH X AND Y
             print("Scaling fitting data (both X and y)...")
@@ -3081,30 +2317,7 @@ if __name__ == "__main__":
                 if 'error' not in result_data and 'coeffs' in result_data:
                     n_nonzero_initial = result_data.get('n_nonzero', np.sum(np.abs(result_data['coeffs']) > EPS))
                     if n_nonzero_initial > 0:
-                        try:
-                            # **** CALLING Revised PLOT/REFIT/EVALUATION ****
-                            # Pass FIT SUBSET for refit, FULL SET for prediction/plot scope
-                            # (refit_terms, refit_coeffs, r2_p11, rmse_p11, r2_p22, rmse_p22,
-                            #  is_consistent, consistency_notes) = plot_model_predictions(
-                            #      df_fitting_subset,     # <<< Pass the FIT SUBSET for refit scope
-                            #      df_full_combined,      # <<< Pass the FULL SET for prediction/plot scope
-                            #      result_data['coeffs'], # Initial coeffs from sparse fit on subset
-                            #      basis_names,           # Full list of basis names
-                            #      method_key,            # Identifier (e.g., "LassoCV")
-                            #      scenario_prefix,       # File prefix (includes fitting scenario)
-                            #      current_save_dir,      # Save directory
-                            #      weight_factor=WEIGHT_FACTOR,
-                            #      small_strain_threshold=SMALL_STRAIN_THRESHOLD,
-                            #      coeff_threshold=COEFF_THRESHOLD,
-                            #      ridge_alpha=RIDGE_ALPHA_REFIT
-                            #   )
-                            # # Store the evaluation results (metrics are now based on full set)
-                            # scenario_refit_summary[method_key] = {
-                            #     'terms': refit_terms, 'coeffs': refit_coeffs, # Coeffs from subset refit
-                            #     'r2_p11': r2_p11, 'rmse_p11': rmse_p11,       # Metrics on full set
-                            #     'r2_p22': r2_p22, 'rmse_p22': rmse_p22,       # Metrics on full set
-                            #     'consistent': is_consistent, 'notes': consistency_notes
-                            #  }
+                        try:                          
                             (refit_terms, refit_coeffs, r2_p11, rmse_p11, r2_p22, rmse_p22,
                              is_consistent, consistency_notes, mode_metrics) = plot_model_predictions(
                                  df_fitting_subset,     # FIT SUBSET for refit scope
