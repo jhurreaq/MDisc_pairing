@@ -1,5 +1,5 @@
 # MDisc_pairing
-This repository contain the necessary codes to reproduce the results reported in the paper "Automated Constitutive Model Discovery by Pairing Sparse Regression Algorithms with Model Selection Criteria"
+This repository contain the necessary codes to reproduce the results reported in the paper "Automated Constitutive Model Discovery by Pairing Sparse Regression Algorithms with Model Selection Criteria" ([https://arxiv.org/abs/2509.16040](https://arxiv.org/abs/2509.16040)).
 
 ### ⚠️ Note on `scikit-learn` Versions Used in the Paper
 
