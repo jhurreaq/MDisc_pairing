@@ -1831,21 +1831,6 @@ def run_omp_analysis(X_unscaled, y, feature_names, cv_folds, title_prefix, save_
 
     return results
 
-def compute_weighted_stats(y, sample_weight):
-    if sample_weight is None:
-        w = np.ones_like(y, dtype=float)
-    else:
-        w = np.asarray(sample_weight, dtype=float)
-        if w.shape != y.shape:  # fallback
-            w = np.ones_like(y, dtype=float)
-    w_sum = np.sum(w)
-    if w_sum <= 0:
-        w = np.ones_like(y); w_sum = len(y)
-    y_mean_w = np.sum(w * y) / w_sum
-    var_w_num = np.sum(w * (y - y_mean_w)**2)
-    var_w = var_w_num / w_sum if w_sum > 0 else np.nan
-    return w, w_sum, y_mean_w, var_w
-
 def build_equal_per_mode_weights(mode_labels, eps=1e-12):
     """
     Equalizes contribution per deformation mode:
