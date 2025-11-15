@@ -11,3 +11,7 @@ __pycache__/
 **/outputs/
 **/log.txt
 
+# Input data files (keep folders, ignore contents except .gitkeep)
+**/input/*
+!**/input/.gitkeep
+
