@@ -83,16 +83,10 @@ INCLUDE_LOW_STRAIN_TERMS = False
 INCLUDE_EXTENDED_OGDEN = False # Often used with Ogden
 INCLUDE_ULTRA_SMALL_STRAIN = False
 
-# Maximum powers for various expansions
+# Maximum powers for Mooney-Rivlin expansions
 MR_MAX_POWER_I1 = 3
 MR_MAX_POWER_I2 = 3
 max_total_power = 3
-YEOH_MAX_POWER = 5
-
-# --- Fractional powers config --- (Not used in default loop)
-STANDARD_FRACTIONAL_POWERS = [0.25, 0.5, 0.75, 1.5, 2.5, 3.5]
-SMALL_STRAIN_FRACTIONAL_POWERS = [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2]
-FRACTIONAL_POWERS = STANDARD_FRACTIONAL_POWERS # Default
 
 # --- Ogden config ---
 # Note: Will be updated based on INCLUDE_EXTENDED_OGDEN in generate_model_library
@@ -102,7 +96,6 @@ OGDEN_EXPONENTS = [] # Placeholder, will be generated
 EPS = 1e-10
 SMALL_STRAIN_THRESHOLD = 50.0 # Threshold for weighting (e.g., strain percent)
 WEIGHT_FACTOR = 1.0 # Factor to multiply weights for small strains
-
 # ==============================================
 # Invariant/Derivative/Low-Strain Helpers
 # ==============================================
@@ -117,26 +110,6 @@ def compute_invariant_derivatives(l1, l2, l3):
     dI2dl2 = 2*l2*(l1**2 + l3**2)
     dI2dl3 = 2*l3*(l1**2 + l2**2)
     return (dI1dl1, dI1dl2, dI1dl3), (dI2dl1, dI2dl2, dI2dl3)
-
-def sigmoid_function(x, scale=1.0, offset=0.0):
-    x_scaled = np.clip(-(x - offset) * scale, -700, 700)
-    return 1.0 / (1.0 + np.exp(x_scaled))
-
-def sigmoid_derivative(x, scale=1.0, offset=0.0):
-    sig = sigmoid_function(x, scale, offset)
-    return scale * sig * (1.0 - sig)
-
-def tanh_function(x, scale=1.0, offset=0.0):
-    return np.tanh((x - offset) * scale)
-
-def tanh_derivative(x, scale=1.0, offset=0.0):
-    return scale * (1.0 - np.tanh((x - offset) * scale)**2)
-
-def erf_function(x, scale=1.0, offset=0.0):
-    return erf((x - offset) * scale)
-
-def erf_derivative(x, scale=1.0, offset=0.0):
-    return scale * (2.0 / np.sqrt(np.pi)) * np.exp(-((x - offset) * scale)**2)
 
 def safe_power(base, exponent):
     base = np.maximum(base, 0)
@@ -205,37 +178,9 @@ def generate_model_library():
                 term_i2 = f"(I₂-3)^{j}" if j > 1 else ("(I₂-3)" if j == 1 else "")
                 term_str = f"MR: {term_i1}{term_i2}" if term_i1 and term_i2 else (f"MR: {term_i1}" if term_i1 else f"MR: {term_i2}")
                 add_term(term_str)
-    if INCLUDE_YEOH:
-        for n in range(1, YEOH_MAX_POWER + 1):
-            term_str = f"Yeoh: (I₁-3)^{n}" if n > 1 else "Yeoh: (I₁-3)"
-            mr_equiv = f"MR: (I₁-3)^{n}" if n > 1 else "MR: (I₁-3)"
-            if not (INCLUDE_MOONEY_RIVLIN and n <= MR_MAX_POWER_I1 and mr_equiv in seen_terms): add_term(term_str)
-    if INCLUDE_FRACTIONAL_POWERS:
-        current_frac_powers = STANDARD_FRACTIONAL_POWERS + SMALL_STRAIN_FRACTIONAL_POWERS if INCLUDE_ULTRA_SMALL_STRAIN else STANDARD_FRACTIONAL_POWERS
-        for p in current_frac_powers:
-             if p != 0: add_term(f"Frac: (I₁-3)^{p:.3f}")
-    if INCLUDE_LOW_STRAIN_TERMS or INCLUDE_ULTRA_SMALL_STRAIN:
-        low_terms = ["Low: 1-exp(-(I₁-3))", "Low: tanh(I₁-3)", "Low: (I₁-3)/(1+(I₁-3))", "Low: ln(1+(I₁-3))", "Low: sigmoid((I₁-3)*10)", "Low: sigmoid((I₁-3)*5)", "Low: sigmoid((I₁-3)*2)", "Low: sigmoid((I₁-3)*1)", "Low: tanh((I₁-3)*10)", "Low: tanh((I₁-3)*5)", "Low: tanh((I₁-3)*2)", "Low: erf((I₁-3)*5)", "Low: erf((I₁-3)*2)", "Low: erf((I₁-3)*1)"]
-        ultra_terms = ["Ultra: arctan((I₁-3)*50)", "Ultra: arctan((I₁-3)*20)", "Ultra: arctan((I₁-3)*10)", "Ultra: (I₁-3)/(0.001+(I₁-3))", "Ultra: (I₁-3)/(0.01+(I₁-3))", "Ultra: (I₁-3)/(0.1+(I₁-3))", "Ultra: (I₁-3)^2*(1-(I₁-3))", "Ultra: (I₁-3)^3*(1-(I₁-3)^2)"]
-        if INCLUDE_LOW_STRAIN_TERMS:
-            for term in low_terms: add_term(term)
-        if INCLUDE_ULTRA_SMALL_STRAIN:
-            for term in ultra_terms: add_term(term)
     if INCLUDE_OGDEN:
         for a in OGDEN_EXPONENTS:
              if a != 0: add_term(f"Ogden: λ^{a}")
-    if INCLUDE_GENT:
-        add_term("Gent: -ln(1-(I₁-3)/100)")
-        if INCLUDE_ULTRA_SMALL_STRAIN: add_term("Gent: -ln(1-(I₁-3)/10)"); add_term("Gent: -ln(1-(I₁-3)/500)")
-    if INCLUDE_ARRUDA_BOYCE:
-        for n in range(1, 6):
-            term_str = f"AB_Inspired: (I₁-3)^{n}" if n > 1 else "AB_Inspired: (I₁-3)"
-            mr_equiv = f"MR: (I₁-3)^{n}" if n > 1 else "MR: (I₁-3)"
-            yeoh_equiv = f"Yeoh: (I₁-3)^{n}" if n > 1 else "Yeoh: (I₁-3)"
-            is_mr_dup = INCLUDE_MOONEY_RIVLIN and n <= MR_MAX_POWER_I1 and mr_equiv in seen_terms
-            is_yeoh_dup = INCLUDE_YEOH and n <= YEOH_MAX_POWER and yeoh_equiv in seen_terms
-            if not (is_mr_dup or is_yeoh_dup): add_term(term_str)
-    if INCLUDE_DATA_DRIVEN: pass
     print(f"Generated {len(basis_functions)} unique basis terms for this scenario.")
     return basis_functions
 
@@ -248,10 +193,7 @@ def construct_derivatives_matrix(df):
     num_basis = len(basis_names)
     dW_dl1 = np.zeros((num_samples, num_basis)); dW_dl2 = np.zeros((num_samples, num_basis)); dW_dl3 = np.zeros((num_samples, num_basis))
     i1_power_pattern = re.compile(r'\(I₁-3\)(?:\^([\d\.-]+))?'); i2_power_pattern = re.compile(r'\(I₂-3\)(?:\^([\d\.-]+))?')
-    ogden_power_pattern = re.compile(r'λ\^([\-\+\d\.]*\d)'); gent_jm_pattern = re.compile(r'/([\d\.]+)\)')
-    frac_power_pattern = re.compile(r'\^(-?\d+\.?\d*)'); sigmoid_scale_pattern = re.compile(r'sigmoid\(\(I₁-3\)\*([\d\.]+)\)')
-    tanh_scale_pattern = re.compile(r'tanh\(\(I₁-3\)\*([\d\.]+)\)'); erf_scale_pattern = re.compile(r'erf\(\(I₁-3\)\*([\d\.]+)\)')
-    arctan_scale_pattern = re.compile(r'arctan\(\(I₁-3\)\*([\d\.]+)\)'); rational_denom_pattern = re.compile(r'\(I₁-3\)\/\(([\d\.]+)\+\(I₁-3\)\)')
+    ogden_power_pattern = re.compile(r'λ\^([\-\+\d\.]*\d)')
     for idx in range(num_samples):
         row = df.iloc[idx]; l1, l2 = max(row['lambda1'], EPS), max(row['lambda2'], EPS)
         l3_inv_prod = l1 * l2; l3 = max(1.0 / l3_inv_prod if l3_inv_prod > EPS else 1.0 / EPS, EPS)
@@ -266,35 +208,14 @@ def construct_derivatives_matrix(df):
                 j = float(j_match.group(1)) if j_match and j_match.group(1) else (1 if j_match else 0)
                 if i > 0: dW_dI1_term = i * safe_power(i1m3_safe, i - 1.0) * safe_power(i2m3_safe, j)
                 if j > 0: dW_dI2_term = safe_power(i1m3_safe, i) * j * safe_power(i2m3_safe, j - 1.0)
-            elif term_name.startswith(("NH:", "Yeoh:", "AB_Inspired:")):
+            elif term_name.startswith("NH:"):
                 match = i1_power_pattern.search(term_name); n = float(match.group(1)) if match and match.group(1) else (1 if match else 0)
                 if n > 0: dW_dI1_term = n * safe_power(i1m3_safe, n - 1.0)
-            elif term_name.startswith("Frac:"):
-                match = frac_power_pattern.search(term_name); p = float(match.group(1)) if match else 0.0
-                if p != 0: dW_dI1_term = p * safe_power(i1m3_safe, p - 1.0)
-            elif term_name.startswith(("Low:", "Ultra:")):
-                dTerm_di1m3 = 0.0
-                if "1-exp(-(I₁-3))" in term_name: dTerm_di1m3 = np.exp(-max(i1m3, -700))
-                elif "tanh(" in term_name: scale_match = tanh_scale_pattern.search(term_name); scale = float(scale_match.group(1)) if scale_match else 1.0; dTerm_di1m3 = tanh_derivative(i1m3, scale=scale)
-                elif "(I₁-3)/(1+(I₁-3))" in term_name: denom = 1.0 + i1m3; dTerm_di1m3 = 1.0 / safe_power(max(denom, EPS), 2.0)
-                elif "ln(1+(I₁-3))" in term_name: denom = 1.0 + i1m3; dTerm_di1m3 = 1.0 / max(denom, EPS)
-                elif "sigmoid(" in term_name: scale_match = sigmoid_scale_pattern.search(term_name); scale = float(scale_match.group(1)) if scale_match else 1.0; dTerm_di1m3 = sigmoid_derivative(i1m3, scale=scale)
-                elif "erf(" in term_name: scale_match = erf_scale_pattern.search(term_name); scale = float(scale_match.group(1)) if scale_match else 1.0; dTerm_di1m3 = erf_derivative(i1m3, scale=scale)
-                elif "arctan(" in term_name: scale_match = arctan_scale_pattern.search(term_name); scale = float(scale_match.group(1)) if scale_match else 1.0; dTerm_di1m3 = scale / (1.0 + (scale * i1m3)**2)
-                elif term_name.startswith("Ultra: (I₁-3)/("): match = rational_denom_pattern.search(term_name); d_val = float(match.group(1)) if match else 0.01; denom = d_val + i1m3; dTerm_di1m3 = d_val / safe_power(max(denom, EPS), 2.0)
-                elif "Ultra: (I₁-3)^2*(1-(I₁-3))" in term_name: dTerm_di1m3 = 2.0*i1m3 - 3.0*safe_power(i1m3_safe, 2.0)
-                elif "Ultra: (I₁-3)^3*(1-(I₁-3)^2)" in term_name: dTerm_di1m3 = 3.0*safe_power(i1m3_safe, 2.0) - 5.0*safe_power(i1m3_safe, 4.0)
-                else: print(f"Warning: Derivative logic missing for Low/Ultra term '{term_name}'")
-                dW_dI1_term = dTerm_di1m3
             elif term_name.startswith("Ogden:"):
                 match = ogden_power_pattern.search(term_name); alpha = float(match.group(1)) if match else 0.0
                 if alpha != 0.0:
                     dWterm_dl1 = alpha * safe_power(l1, alpha - 1.0); dWterm_dl2 = alpha * safe_power(l2, alpha - 1.0); dWterm_dl3 = alpha * safe_power(l3, alpha - 1.0)
                     dW_dI1_term = 0.0; dW_dI2_term = 0.0
-            elif term_name.startswith("Gent:"):
-                match = gent_jm_pattern.search(term_name); Jm = float(match.group(1)) if match else 100.0
-                denom = Jm - i1m3; dW_dI1_term = min(1.0 / max(denom, EPS), 1e12)
-            elif term_name.startswith("DD:"): pass
             if not term_name.startswith("Ogden:"):
                 dWterm_dl1 = dW_dI1_term * dI1dl1 + dW_dI2_term * dI2dl1; dWterm_dl2 = dW_dI1_term * dI1dl2 + dW_dI2_term * dI2dl2; dWterm_dl3 = dW_dI1_term * dI1dl3 + dW_dI2_term * dI2dl3
             dW_dl1[idx, basis_idx] = dWterm_dl1; dW_dl2[idx, basis_idx] = dWterm_dl2; dW_dl3[idx, basis_idx] = dWterm_dl3
