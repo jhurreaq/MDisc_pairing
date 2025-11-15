@@ -62,34 +62,21 @@ HEATMAP_CMAP = blues_cmap
 # Standard model components (Will be overridden in main loop)
 INCLUDE_NEOHOOKEAN = True
 INCLUDE_MOONEY_RIVLIN = True
-INCLUDE_YEOH = False
-INCLUDE_ARRUDA_BOYCE = False
 INCLUDE_OGDEN = True
-INCLUDE_GENT = False
-INCLUDE_DATA_DRIVEN = False
 
 # Optional components for S-shaped response
-INCLUDE_FRACTIONAL_POWERS = False
-INCLUDE_LOW_STRAIN_TERMS = False
 INCLUDE_EXTENDED_OGDEN = True # Often used with Ogden
-INCLUDE_ULTRA_SMALL_STRAIN = False
 
 # Maximum powers for various expansions
 MR_MAX_ORDER = 4 
-YEOH_MAX_POWER = 5
 
 # Fractional-powers configuration (optional)
-STANDARD_FRACTIONAL_POWERS = [0.25, 0.5, 0.75, 1.5, 2.5, 3.5]
-SMALL_STRAIN_FRACTIONAL_POWERS = [0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2]
-FRACTIONAL_POWERS = STANDARD_FRACTIONAL_POWERS
 
 # Ogden configuration (exponents set during library generation)
 OGDEN_EXPONENTS = []
 
-# Numerical stability & weighting
+# Numerical stability
 EPS = 1e-10
-SMALL_STRAIN_THRESHOLD = 50.0 # Threshold for weighting (e.g., strain percent)
-WEIGHT_FACTOR = 1.0 # Factor to multiply weights for small strains
 
 # Coefficient threshold and ridge alpha used in refits
 COEFF_THRESHOLD = 1e-6
@@ -107,26 +94,6 @@ def compute_invariant_derivatives(l1, l2, l3):
     dI2dl2 = 2*l2*(l1**2 + l3**2)
     dI2dl3 = 2*l3*(l1**2 + l2**2)
     return (dI1dl1, dI1dl2, dI1dl3), (dI2dl1, dI2dl2, dI2dl3)
-
-def sigmoid_function(x, scale=1.0, offset=0.0):
-    x_scaled = np.clip(-(x - offset) * scale, -700, 700)
-    return 1.0 / (1.0 + np.exp(x_scaled))
-
-def sigmoid_derivative(x, scale=1.0, offset=0.0):
-    sig = sigmoid_function(x, scale, offset)
-    return scale * sig * (1.0 - sig)
-
-def tanh_function(x, scale=1.0, offset=0.0):
-    return np.tanh((x - offset) * scale)
-
-def tanh_derivative(x, scale=1.0, offset=0.0):
-    return scale * (1.0 - np.tanh((x - offset) * scale)**2)
-
-def erf_function(x, scale=1.0, offset=0.0):
-    return erf((x - offset) * scale)
-
-def erf_derivative(x, scale=1.0, offset=0.0):
-    return scale * (2.0 / np.sqrt(np.pi)) * np.exp(-((x - offset) * scale)**2)
 
 def safe_power(base, exponent, *, tol_int=1e-12, limit=1e18):
     """
@@ -196,10 +163,10 @@ def generate_model_library():
     # in the __main__ block before this function is called.
     # Access global variables needed.
     global OGDEN_EXPONENTS
-    global MR_MAX_ORDER, YEOH_MAX_POWER # Access other globals needed
-    global INCLUDE_NEOHOOKEAN, INCLUDE_MOONEY_RIVLIN, INCLUDE_YEOH, INCLUDE_ARRUDA_BOYCE
-    global INCLUDE_OGDEN, INCLUDE_GENT, INCLUDE_DATA_DRIVEN, INCLUDE_FRACTIONAL_POWERS
-    global INCLUDE_LOW_STRAIN_TERMS, INCLUDE_ULTRA_SMALL_STRAIN, INCLUDE_EXTENDED_OGDEN # Read this flag
+    global MR_MAX_ORDER
+    global INCLUDE_NEOHOOKEAN, INCLUDE_MOONEY_RIVLIN
+    global INCLUDE_OGDEN
+    global INCLUDE_EXTENDED_OGDEN
 
     # --- Determine which Ogden exponents list to use ---
     # Check if OGDEN_EXPONENTS was properly set globally via main block
@@ -212,7 +179,6 @@ def generate_model_library():
          print("WARN: Global OGDEN_EXPONENTS not set. Falling back based on INCLUDE_EXTENDED_OGDEN.")
          if INCLUDE_EXTENDED_OGDEN:
              STANDARD_OGDEN_EXPONENTS_local = [-4, -2, -1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1, 2, 4]
-             SMALL_STRAIN_OGDEN_EXPONENTS_local = [-0.1, -0.05, -0.01, 0.01, 0.05, 0.1]
              ogden_exponents_to_use = STANDARD_OGDEN_EXPONENTS_local
          else:
              ogden_exponents_to_use = [-2, -1, -0.5, 0.5, 1, 2, 3]
@@ -245,88 +211,24 @@ def generate_model_library():
                 else:
                     term_str = f"MR: {term_i2}"
                 add_term(term_str)
-    if INCLUDE_YEOH:
-        for n in range(1, YEOH_MAX_POWER + 1):
-            term_str = f"Yeoh: (I₁-3)^{n}" if n > 1 else "Yeoh: (I₁-3)"
-            mr_equiv = f"MR: (I₁-3)^{n}" if n > 1 else "MR: (I₁-3)"
-            if not (INCLUDE_MOONEY_RIVLIN and n <= MR_MAX_ORDER and mr_equiv in seen_terms): add_term(term_str)
-
-    if INCLUDE_FRACTIONAL_POWERS:
-        current_frac_powers = STANDARD_FRACTIONAL_POWERS + SMALL_STRAIN_FRACTIONAL_POWERS if INCLUDE_ULTRA_SMALL_STRAIN else STANDARD_FRACTIONAL_POWERS
-        for p in current_frac_powers:
-             if p != 0: add_term(f"Frac: (I₁-3)^{p:.3f}")
-
-    if INCLUDE_LOW_STRAIN_TERMS or INCLUDE_ULTRA_SMALL_STRAIN:
-         # Low- and ultra-small-strain terms
-        low_terms = ["Low: 1-exp(-(I₁-3))", "Low: tanh(I₁-3)", "Low: (I₁-3)/(1+(I₁-3))", "Low: ln(1+(I₁-3))", "Low: sigmoid((I₁-3)*10)", "Low: sigmoid((I₁-3)*5)", "Low: sigmoid((I₁-3)*2)", "Low: sigmoid((I₁-3)*1)", "Low: tanh((I₁-3)*10)", "Low: tanh((I₁-3)*5)", "Low: tanh((I₁-3)*2)", "Low: erf((I₁-3)*5)", "Low: erf((I₁-3)*2)", "Low: erf((I₁-3)*1)"]
-        ultra_terms = ["Ultra: arctan((I₁-3)*50)", "Ultra: arctan((I₁-3)*20)", "Ultra: arctan((I₁-3)*10)", "Ultra: (I₁-3)/(0.001+(I₁-3))", "Ultra: (I₁-3)/(0.01+(I₁-3))", "Ultra: (I₁-3)/(0.1+(I₁-3))", "Ultra: (I₁-3)^2*(1-(I₁-3))", "Ultra: (I₁-3)^3*(1-(I₁-3)^2)"]
-        if INCLUDE_LOW_STRAIN_TERMS: [add_term(term) for term in low_terms]
-        if INCLUDE_ULTRA_SMALL_STRAIN: [add_term(term) for term in ultra_terms]
-
     if INCLUDE_OGDEN:
         for a in ogden_exponents_to_use:
             if a != 0: add_term(f"Ogden: λ^{a}") # Format Ogden terms
-    if INCLUDE_GENT:
-         # Gent terms
-        add_term("Gent: -ln(1-(I₁-3)/100)")
-        if INCLUDE_ULTRA_SMALL_STRAIN: add_term("Gent: -ln(1-(I₁-3)/10)"); add_term("Gent: -ln(1-(I₁-3)/500)")
-    if INCLUDE_ARRUDA_BOYCE:
-         # Arruda–Boyce-inspired terms
-        for n in range(1, 6):
-            term_str = f"AB_Inspired: (I₁-3)^{n}" if n > 1 else "AB_Inspired: (I₁-3)"
-            mr_equiv = f"MR: (I₁-3)^{n}" if n > 1 else "MR: (I₁-3)"
-            yeoh_equiv = f"Yeoh: (I₁-3)^{n}" if n > 1 else "Yeoh: (I₁-3)"
-            is_mr_dup = INCLUDE_MOONEY_RIVLIN and n <= MR_MAX_POWER_I1 and mr_equiv in seen_terms
-            is_yeoh_dup = INCLUDE_YEOH and n <= YEOH_MAX_POWER and yeoh_equiv in seen_terms
-            if not (is_mr_dup or is_yeoh_dup): add_term(term_str)
-    if INCLUDE_DATA_DRIVEN: pass
-
     print(f"Generated {len(basis_functions)} unique basis terms for this scenario (using determined OGDEN_EXPONENTS).")
     return basis_functions
 
 
 # ==============================================
-# Weighting Function
-# ==============================================
-def weighting_function(strain_pct, emphasize_small_strain=False, weight_factor=WEIGHT_FACTOR, small_strain_threshold=SMALL_STRAIN_THRESHOLD):
-    """Applies weights to data points, potentially emphasizing small strains."""
-    weights = np.ones_like(strain_pct, dtype=float)
-    if not emphasize_small_strain:
-        print("INFO: Weighting disabled.")
-        return weights
-    small_strain_mask = strain_pct <= small_strain_threshold
-    num_weighted = np.sum(small_strain_mask)
-    if num_weighted > 0:
-        weights[small_strain_mask] = weight_factor
-        print(f"INFO: Applied weight factor {weight_factor} to {num_weighted} points <= {small_strain_threshold}% strain.")
-    else:
-        print("INFO: Weighting enabled, but no points met the small strain threshold.")
-    return weights
-
-# ==============================================
 # Construct design matrix (Φ) and target vector (y)
-# (Includes weighting) - PK1 STRESS Formulation
+# PK1 STRESS Formulation
 # ==============================================
-def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_strain=False, 
-                          weight_factor=WEIGHT_FACTOR, small_strain_threshold=SMALL_STRAIN_THRESHOLD,
-                          normalize_by_stress_magnitude=True):
+def construct_design_matrix(df, normalize_by_stress_magnitude=True):
     """
     Constructs the design matrix Phi and target vector y for regression.
-    Now includes automatic weight normalization based on stress magnitudes.
+    Includes automatic weight normalization based on stress magnitudes.
     """
-    if use_small_strain_only:
-        df_subset = df[df['strain_pct'] <= small_strain_threshold].copy()
-        print(f"Using small strain data subset: {len(df_subset)} points.")
-        if len(df_subset) < 5:
-            print(f"WARN: Not enough small strain points ({len(df_subset)}). Using full dataset instead.")
-            df_subset = df.copy()
-    else:
-        df_subset = df.copy()
-
+    df_subset = df.copy()
     df_subset = df_subset.reset_index(drop=True)
-
-    # Calculate base weights (small strain emphasis if enabled)
-    base_point_weights = weighting_function(df_subset['strain_pct'].values, emphasize_small_strain, weight_factor, small_strain_threshold)
 
     dW1_mat, dW2_mat, dW3_mat, basis_names = construct_derivatives_matrix(df_subset)
     n_samp, n_basis = dW1_mat.shape
@@ -404,10 +306,9 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
         l3 = max(1.0 / l3_inv_prod if l3_inv_prod > EPS else 1.0 / EPS, EPS)
         mode = row_data['mode']
         
-        # Combine base weight with mode-specific normalization weight
-        base_weight = base_point_weights[idx]
+        # Apply mode-specific normalization weight (uniform base weights)
         mode_norm_weight = mode_weights.get(mode, 1.0)
-        final_weight = base_weight * mode_norm_weight
+        final_weight = mode_norm_weight
 
         dW1_vec = dW1_mat[idx, :]
         dW2_vec = dW2_mat[idx, :]
@@ -464,7 +365,7 @@ def construct_design_matrix(df, use_small_strain_only=False, emphasize_small_str
         print("ERROR: Design matrix empty after filtering.")
         return np.zeros((0, n_basis)), np.zeros((0,)), basis_names, np.zeros((0,)), df_subset
 
-    print(f"Constructed design matrix (Base: {'Weighted' if emphasize_small_strain else 'Unweighted'}, Stress-Normalized: {normalize_by_stress_magnitude}): {design_matrix.shape}")
+    print(f"Constructed design matrix (Stress-Normalized: {normalize_by_stress_magnitude}): {design_matrix.shape}")
     return design_matrix, target_vector, basis_names, row_weights_vector, df_subset
 
 # Helper to calculate dW/dl vectors
@@ -503,17 +404,10 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
         print(f"ERROR calculating invariants/derivs at l1,l2,l3 = {l1:.3f},{l2:.3f},{l3:.3f}: {e}")
         return None # Cannot proceed if this fails
 
-    # Pre-compile regex patterns (ensure re is imported)
+    # Pre-compile regex patterns for active model types only
     i1_power_pattern = re.compile(r'\(I₁-3\)(?:\^([\d\.-]+))?')
     i2_power_pattern = re.compile(r'\(I₂-3\)(?:\^([\d\.-]+))?')
-    ogden_power_pattern = re.compile(r'Ogden: λ\^([\-\+\d\.]+)$') # Match exponent at end more precisely
-    gent_jm_pattern = re.compile(r'/([\d\.]+)\)')
-    frac_power_pattern = re.compile(r'\^(-?\d+\.?\d*)')
-    sigmoid_scale_pattern = re.compile(r'sigmoid\(\(I₁-3\)\*([\d\.]+)\)')
-    tanh_scale_pattern = re.compile(r'tanh\(\(I₁-3\)\*([\d\.]+)\)')
-    erf_scale_pattern = re.compile(r'erf\(\(I₁-3\)\*([\d\.]+)\)')
-    arctan_scale_pattern = re.compile(r'arctan\(\(I₁-3\)\*([\d\.]+)\)')
-    rational_denom_pattern = re.compile(r'\(I₁-3\)\/\(([\d\.]+)\+\(I₁-3\)\)')
+    ogden_power_pattern = re.compile(r'Ogden: λ\^([\-\+\d\.]+)$')
 
     FINITE_LIMIT_DERIV = 1e12 # Limit for individual derivative components
 
@@ -524,12 +418,12 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
 
         try:
             # --- Calculate dW/dIi or direct dW/dli for this term ---
-            # --- Mooney-Rivlin & related terms ---
-            if term_name.startswith(("MR:", "NH:", "Yeoh:", "AB_Inspired:")):
+            # --- Mooney-Rivlin & Neo-Hookean terms ---
+            if term_name.startswith(("MR:", "NH:")):
                 math_part = term_name.split(":", 1)[1].strip(); i_match = i1_power_pattern.search(math_part); j_match = i2_power_pattern.search(math_part)
                 i = float(i_match.group(1)) if i_match and i_match.group(1) else (1 if i_match else 0)
                 j = float(j_match.group(1)) if j_match and j_match.group(1) else (1 if j_match else 0)
-                if not j_match and term_name.startswith(("NH:", "Yeoh:", "AB_Inspired:")): j = 0.0
+                if not j_match and term_name.startswith("NH:"): j = 0.0
                 elif not i_match and term_name.startswith("MR:") and j_match: i = 0.0
                 # Use safe_power, check results before calculating derivatives
                 pow_i1 = safe_power(i1m3, i - 1.0) if i > 0 else (safe_power(i1m3, i) if j > 0 else 1.0)
@@ -542,18 +436,6 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
                 else:
                     if i > 0: dW_dI1_term = i * pow_i1 * pow_i2_full
                     if j > 0: dW_dI2_term = j * pow_i1_full * pow_i2
-            # --- Fractional Power ---
-            elif term_name.startswith("Frac:"):
-                match = frac_power_pattern.search(term_name); p = float(match.group(1)) if match else 0.0
-                if p != 0:
-                     pow_val = safe_power(i1m3, p - 1.0)
-                     if not np.isfinite(pow_val): term_is_finite = False
-                     else: dW_dI1_term = p * pow_val
-            # --- Low/Ultra Strain ---
-            elif term_name.startswith(("Low:", "Ultra:")):
-                 dTerm_di1m3 = 0.0 
-                 if not np.isfinite(dTerm_di1m3): term_is_finite = False
-                 else: dW_dI1_term = dTerm_di1m3
             # --- Ogden ---
             elif term_name.startswith("Ogden:"):
                 match = ogden_power_pattern.search(term_name)
@@ -576,15 +458,6 @@ def calculate_dW_dl_vectors(l1, l2, l3, basis_names):
                      print(f"WARN: Could not match exponent pattern for Ogden term '{term_name}'")
                      term_is_finite = False
                 dW_dI1_term = 0.0; dW_dI2_term = 0.0 # Ensure these are zero
-            # --- Gent ---
-            elif term_name.startswith("Gent:"):
-                match = gent_jm_pattern.search(term_name); Jm = float(match.group(1)) if match else 100.0
-                denom = Jm - i1m3;
-                if denom < EPS: dW_dI1_term = FINITE_LIMIT_DERIV
-                else: dW_dI1_term = 1.0 / denom
-                if not np.isfinite(dW_dI1_term): term_is_finite = False
-            # Data-driven terms
-            elif term_name.startswith("DD:"): pass
 
             # --- Check finiteness of dW/dIi before chain rule ---
             if not term_name.startswith("Ogden:") and not np.all(np.isfinite([dW_dI1_term, dW_dI2_term])):
@@ -1180,14 +1053,9 @@ def plot_model_predictions(
     method_key, 
     scenario_prefix, 
     save_dir,
-    emphasize_small_strain,
-    weight_factor=None, 
-    small_strain_threshold=None, 
     coeff_threshold=None, 
     ridge_alpha=None 
 ):
-    weight_factor = weight_factor if weight_factor is not None else WEIGHT_FACTOR
-    small_strain_threshold = small_strain_threshold if small_strain_threshold is not None else SMALL_STRAIN_THRESHOLD
     coeff_threshold = coeff_threshold if coeff_threshold is not None else COEFF_THRESHOLD
     ridge_alpha = ridge_alpha if ridge_alpha is not None else RIDGE_ALPHA_REFIT
 
@@ -1202,8 +1070,7 @@ def plot_model_predictions(
     r2_P11_ebt, rmse_P11_ebt_kPa, nrmse_P11_ebt = np.nan, np.nan, np.nan
     is_consistent, consistency_notes = False, ["Processing error before completion"]
 
-    global TRUNCATED_PLASMA_CMAP 
-    global EMPHASIZE_SMALL_STRAIN
+    global TRUNCATED_PLASMA_CMAP
 
     selected_indices = np.where(np.abs(sparse_coeffs) > EPS)[0]
     if len(selected_indices) == 0:
@@ -1224,8 +1091,7 @@ def plot_model_predictions(
     phi_weighted, target_weighted, basis_names_weighted, _, df_subset_weighted = None, None, None, None, None
     try:
         phi_weighted, target_weighted, basis_names_weighted, _, df_subset_weighted = construct_design_matrix(
-            df_for_refit, emphasize_small_strain=emphasize_small_strain, 
-            weight_factor=weight_factor, small_strain_threshold=small_strain_threshold
+            df_for_refit
         )
         if not isinstance(df_subset_weighted, pd.DataFrame): raise TypeError("df_subset_weighted type error")
         if phi_weighted.shape[0] == 0: raise ValueError("Weighted design matrix empty.")
@@ -2610,7 +2476,7 @@ if __name__ == "__main__":
     # Define the log file path inside BASE_SAVE_DIR
     log_file_name = os.path.join(
         BASE_SAVE_DIR,
-        "log.txt"
+        "log_clean.txt"
     )
     original_stdout = sys.stdout  # Save a reference to the original standard output
     log_file_handle = None # Initialize file handle
@@ -2625,9 +2491,6 @@ if __name__ == "__main__":
         np.random.seed(RANDOM_SEED) # Seed NumPy's random number generator
         print(f"INFO: Using global random seed: {RANDOM_SEED}")
         
-        EMPHASIZE_SMALL_STRAIN = False 
-        WEIGHT_FACTOR = 1.0
-        SMALL_STRAIN_THRESHOLD = 1.0 
         CV_FOLDS = 5
         # BASE_SAVE_DIR is already defined relative to the script directory above
         COEFF_THRESHOLD = 1e-6 
@@ -2767,7 +2630,7 @@ if __name__ == "__main__":
                     print(f"Model Library for Discovery: {MODEL_CONFIG_NAME}")
                     
                     design_matrix_unweighted, _, basis_names_from_matrix, _, _ = construct_design_matrix(
-                        df_for_discovery, emphasize_small_strain=False
+                        df_for_discovery
                     )
                     if design_matrix_unweighted.shape[0] == 0: raise ValueError("Unweighted matrix for scaling is empty.")
                     
@@ -2775,7 +2638,7 @@ if __name__ == "__main__":
                     scaler.fit(design_matrix_unweighted)
 
                     design_matrix_final, target_vector_weighted, _, _, _ = construct_design_matrix(
-                        df_for_discovery, emphasize_small_strain=EMPHASIZE_SMALL_STRAIN
+                        df_for_discovery
                     )
                     if design_matrix_final.shape[0] == 0: raise ValueError("Final design matrix is empty.")
 
@@ -2830,7 +2693,6 @@ if __name__ == "__main__":
                                      ) = plot_model_predictions(
                                          df_generated_full, initial_coeffs_MPa, basis_names_for_analysis, 
                                          method_key, file_prefix, current_save_dir,
-                                         emphasize_small_strain=EMPHASIZE_SMALL_STRAIN,
                                          coeff_threshold=COEFF_THRESHOLD, ridge_alpha=RIDGE_ALPHA_REFIT
                                      )
 
