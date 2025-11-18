@@ -95,6 +95,70 @@ def compute_invariant_derivatives(l1, l2, l3):
     dI2dl3 = 2*l3*(l1**2 + l2**2)
     return (dI1dl1, dI1dl2, dI1dl3), (dI2dl1, dI2dl2, dI2dl3)
 
+# ==============================================
+# Generalized Deformation Mode Parameterization
+# ==============================================
+# Canonical mode configurations: (alpha, beta)
+# F = diag(λ, α·λ^β, 1/(α·λ^(β+1)))
+# Ensures incompressibility: det(F) = λ · α·λ^β · 1/(α·λ^(β+1)) = 1
+CANONICAL_MODES = {
+    'UT': (1.0, -0.5),    # Uniaxial Tension: λ₁=λ, λ₂=λ₃=λ^(-1/2)
+    'PS': (1.0, -1.0),    # Pure Shear I (better identifiability): λ₁=λ, λ₂=λ^(-1), λ₃=1
+    'EBT': (1.0, 1.0),    # Equibiaxial Tension: λ₁=λ₂=λ, λ₃=λ^(-2)
+}
+
+def compute_stretches_from_alpha_beta(lam, alpha, beta):
+    """
+    Compute principal stretches from the unified parameterization.
+    
+    Args:
+        lam (float): Primary stretch parameter λ
+        alpha (float): Amplitude parameter α
+        beta (float): Exponent parameter β
+    
+    Returns:
+        tuple: (λ₁, λ₂, λ₃) where:
+            λ₁ = λ
+            λ₂ = α·λ^β
+            λ₃ = 1/(α·λ^(β+1))
+    
+    Canonical modes:
+        UT:  α=1, β=-1/2 → λ₁=λ, λ₂=λ^(-1/2), λ₃=λ^(-1/2)
+        PS:  α=1, β=-1   → λ₁=λ, λ₂=λ^(-1),   λ₃=1
+        EBT: α=1, β=1    → λ₁=λ, λ₂=λ,        λ₃=λ^(-2)
+    """
+    l1 = max(float(lam), EPS)
+    l2 = max(float(alpha * (lam ** beta)), EPS)
+    l3 = max(1.0 / (alpha * (lam ** (beta + 1.0))), EPS)
+    return l1, l2, l3
+
+def compute_invariants_from_alpha_beta(lam, alpha, beta):
+    """
+    Compute invariants directly from (λ, α, β) parameterization.
+    
+    Args:
+        lam (float): Primary stretch parameter λ
+        alpha (float): Amplitude parameter α
+        beta (float): Exponent parameter β
+    
+    Returns:
+        tuple: (I₁, I₂) where:
+            I₁ = λ² + α²λ^(2β) + 1/(α²λ^(2β+2))
+            I₂ = α²λ^(2β+2) + 1/λ² + 1/(α²λ^(2β))
+    """
+    lam = max(float(lam), EPS)
+    alpha = max(float(alpha), EPS)
+    
+    lam2 = lam ** 2
+    alpha2 = alpha ** 2
+    lam_2beta = lam ** (2 * beta)
+    lam_2beta_plus_2 = lam ** (2 * beta + 2)
+    
+    I1 = lam2 + alpha2 * lam_2beta + 1.0 / (alpha2 * lam_2beta_plus_2)
+    I2 = alpha2 * lam_2beta_plus_2 + 1.0 / lam2 + 1.0 / (alpha2 * lam_2beta)
+    
+    return I1, I2
+
 def safe_power(base, exponent, *, tol_int=1e-12, limit=1e18):
     """
     Compute base**exponent with:
@@ -544,17 +608,23 @@ def generate_synth_data_via_framework(model_name, term_coeff_map, basis_names,
                                       relative_noise_levels,
                                       lambda_range, gamma_range, n_points):
     """
-    Generates synthetic UT(P11) and SS(P11, P22) data using the discovery
+    Generates synthetic UT(P11), PS(P11, P22), and EBT(P11, P22) data using the discovery
     framework's logic (dW/dl_i summation) for stress calculation.
     Noise is added relative to the true stress value.
+    
+    Uses unified deformation parameterization: F = diag(λ, α·λ^β, 1/(α·λ^(β+1)))
+    with canonical modes:
+        UT:  (α=1, β=-1/2) → λ₁=λ, λ₂=λ^(-1/2), λ₃=λ^(-1/2)
+        PS:  (α=1, β=-1)   → λ₁=λ, λ₂=λ^(-1),   λ₃=1  (Pure Shear I)
+        EBT: (α=1, β=1)    → λ₁=λ, λ₂=λ,        λ₃=λ^(-2)
 
     Args:
         model_name (str): Name for the dataset column (e.g., "MR2").
         term_coeff_map (dict): Map {'basis_term_string': coefficient_Pa}. Coefficients should be in Pa.
         basis_names (list): Full list of basis names from generate_model_library.
         relative_noise_levels (list): List of relative noise levels (e.g., [0.0, 0.05 for 5%]).
-        lambda_range (tuple): Min/max lambda for UT.
-        gamma_range (tuple): Min/max gamma for SS.
+        lambda_range (tuple): Min/max lambda for deformation.
+        gamma_range (tuple): Min/max gamma for SS (not used in current implementation).
         n_points (int): Number of points per mode.
 
     Returns:
@@ -582,158 +652,84 @@ def generate_synth_data_via_framework(model_name, term_coeff_map, basis_names,
 
     print(f"--- Generating Synthetic UT, PS & EBT Data [Framework Logic] for: {model_name} ---")
 
-    # --- Uniaxial Tension/Compression ---
-    print(f"  Generating Uniaxial (UT) data (λ = {lambda_range}, {n_points} points)...")
-    for lam_val in lambdas:
-        l1 = max(float(lam_val), EPS)
-        l2 = max(l1**(-0.5), EPS)
-        l3 = l2 # Incompressible UT
-
-        deriv_vecs = calculate_dW_dl_vectors(l1, l2, l3, basis_names)
-        if deriv_vecs is None: continue 
-
-        dW_dl1_all, dW_dl2_all, dW_dl3_all = deriv_vecs
-
-        dW_total_dl1_Pa = 0.0; dW_total_dl2_Pa = 0.0; dW_total_dl3_Pa = 0.0
-        # term_coeff_map provides coefficients in Pa
-        for term, coeff_Pa in term_coeff_map.items(): 
-            idx = term_indices[term]
-            dW_total_dl1_Pa += coeff_Pa * dW_dl1_all[idx]
-            dW_total_dl2_Pa += coeff_Pa * dW_dl2_all[idx]
-            dW_total_dl3_Pa += coeff_Pa * dW_dl3_all[idx]
-
-        p11_true_Pa = dW_total_dl1_Pa - (l3 / l1) * dW_total_dl3_Pa
-        p11_true_MPa = p11_true_Pa * pa_to_mpa
-
-        for rel_noise in relative_noise_levels:
-            # Calculate absolute noise standard deviation based on relative level and true stress
-            noise_std_dev_Pa = rel_noise * abs(p11_true_Pa) 
-            # Add a very small constant to std_dev if p11_true_Pa is zero to avoid issues,
-            # or ensure np.random.normal handles scale=0 gracefully (it does, returns mean)
-            if abs(p11_true_Pa) < EPS and rel_noise > 0: # Only add if true stress is zero but noise is requested
-                noise_std_dev_Pa = rel_noise * (EPS * 1000) # Add noise relative to a small nominal stress
-                
-            actual_noise_Pa = np.random.normal(0, noise_std_dev_Pa)
-            P11_noisy_Pa = p11_true_Pa + actual_noise_Pa
-            P11_noisy_MPa = P11_noisy_Pa * pa_to_mpa
-            
-            dataset_name = f"{model_name}_RelNoise{rel_noise*100:.0f}pct"
-
-            data_point = { 
-                'lambda1': l1, 'lambda2': l2, 'lambda3': l3,
-                'gamma': np.nan,
-                'P11': P11_noisy_MPa, 'P22': 0.0, 'P12': np.nan, 
-                'P11_true': p11_true_MPa, 'P12_true': np.nan, 'P22_true': 0.0,
-                'mode': 'UT', 'dataset': dataset_name,
-                'noise_sigma': rel_noise, # Storing the relative noise level
-                'strain_pct': (l1 - 1.0) * 100.0
-            }
-            all_synth_data.append(data_point)
-
-    # --- Pure Shear ---
-    print(f"  Generating Pure Shear (PS) data (λ = {lambda_range}, {n_points} points)...")
-    for lam_val in lambdas:
-        l1_ps = max(float(lam_val), EPS)
-        l2_ps = 1.0
-        l3_ps = max(1.0 / l1_ps, EPS)
-
-        deriv_vecs = calculate_dW_dl_vectors(l1_ps, l2_ps, l3_ps, basis_names)
-        if deriv_vecs is None: continue
-
-        dW_dl1_all, dW_dl2_all, dW_dl3_all = deriv_vecs
-
-        dW_total_dl1_Pa = 0.0; dW_total_dl2_Pa = 0.0; dW_total_dl3_Pa = 0.0
-        for term, coeff_Pa in term_coeff_map.items():
-            idx = term_indices[term]
-            dW_total_dl1_Pa += coeff_Pa * dW_dl1_all[idx]
-            dW_total_dl2_Pa += coeff_Pa * dW_dl2_all[idx]
-            dW_total_dl3_Pa += coeff_Pa * dW_dl3_all[idx]
-
-        # PK1 with incompressibility
-        p11_true_Pa = dW_total_dl1_Pa - (l3_ps / l1_ps) * dW_total_dl3_Pa if l1_ps > EPS else 0.0
-        p22_true_Pa = dW_total_dl2_Pa - (l3_ps / l2_ps) * dW_total_dl3_Pa if l2_ps > EPS else 0.0
-        p11_true_MPa = p11_true_Pa * pa_to_mpa
-        p22_true_MPa = p22_true_Pa * pa_to_mpa
-
-        for rel_noise in relative_noise_levels:
-            noise11_std_dev_Pa = rel_noise * abs(p11_true_Pa)
-            noise22_std_dev_Pa = rel_noise * abs(p22_true_Pa)
-            
-            if abs(p11_true_Pa) < EPS and rel_noise > 0:
-                noise11_std_dev_Pa = rel_noise * (EPS * 1000) 
-            if abs(p22_true_Pa) < EPS and rel_noise > 0:
-                noise22_std_dev_Pa = rel_noise * (EPS * 1000)
-
-            noise11_Pa = np.random.normal(0, noise11_std_dev_Pa)
-            noise22_Pa = np.random.normal(0, noise22_std_dev_Pa)
-            P11_noisy_Pa = p11_true_Pa + noise11_Pa
-            P22_noisy_Pa = p22_true_Pa + noise22_Pa
-            P11_noisy_MPa = P11_noisy_Pa * pa_to_mpa
-            P22_noisy_MPa = P22_noisy_Pa * pa_to_mpa
-            
-            dataset_name = f"{model_name}_RelNoise{rel_noise*100:.0f}pct"
-
-            data_point = {
-                'lambda1': l1_ps, 'lambda2': l2_ps, 'lambda3': l3_ps,
-                'gamma': np.nan,
-                'P11': P11_noisy_MPa, 'P22': P22_noisy_MPa, 'P12': np.nan,
-                'P11_true': p11_true_MPa, 'P12_true': np.nan, 'P22_true': p22_true_MPa,
-                'mode': 'PS', 'dataset': dataset_name,
-                'noise_sigma': rel_noise,
-                'strain_pct': abs(l1_ps - 1.0) * 100.0
-            }
-            all_synth_data.append(data_point)
-
-    # --- Equi-biaxial Tension ---
-    print(f"  Generating Equi-biaxial (EBT) data (λ = {lambda_range}, {n_points} points)...")
-    for lam_val in lambdas:
-        l1_ebt = max(float(lam_val), EPS)
-        l2_ebt = l1_ebt  # Stretch is equal in both directions
-        l3_ebt = max(l1_ebt**(-2.0), EPS)  # Incompressible: l1 * l2 * l3 = 1
+    # Unified loop over all canonical deformation modes
+    for mode_name, (alpha, beta) in CANONICAL_MODES.items():
+        print(f"  Generating {mode_name} data (λ = {lambda_range}, {n_points} points, α={alpha}, β={beta})...")
         
-        deriv_vecs = calculate_dW_dl_vectors(l1_ebt, l2_ebt, l3_ebt, basis_names)
-        if deriv_vecs is None: continue
-
-        dW_dl1_all, dW_dl2_all, dW_dl3_all = deriv_vecs
-
-        dW_total_dl1_Pa = 0.0; dW_total_dl2_Pa = 0.0; dW_total_dl3_Pa = 0.0
-        for term, coeff_Pa in term_coeff_map.items():
-            idx = term_indices[term]
-            dW_total_dl1_Pa += coeff_Pa * dW_dl1_all[idx]
-            dW_total_dl2_Pa += coeff_Pa * dW_dl2_all[idx]
-            dW_total_dl3_Pa += coeff_Pa * dW_dl3_all[idx]
-
-        p11_true_Pa = dW_total_dl1_Pa - (l3_ebt / l1_ebt) * dW_total_dl3_Pa if l1_ebt > EPS else 0.0
-        p22_true_Pa = dW_total_dl2_Pa - (l3_ebt / l2_ebt) * dW_total_dl3_Pa if l2_ebt > EPS else 0.0
-        p11_true_MPa = p11_true_Pa * pa_to_mpa
-        p22_true_MPa = p22_true_Pa * pa_to_mpa
-
-        for rel_noise in relative_noise_levels:
-            noise11_std_dev_Pa = rel_noise * abs(p11_true_Pa)
-            noise22_std_dev_Pa = rel_noise * abs(p22_true_Pa)
+        for lam_val in lambdas:
+            # Compute stretches using unified parameterization
+            l1, l2, l3 = compute_stretches_from_alpha_beta(lam_val, alpha, beta)
             
-            if abs(p11_true_Pa) < EPS and rel_noise > 0: noise11_std_dev_Pa = rel_noise * (EPS * 1000) 
-            if abs(p22_true_Pa) < EPS and rel_noise > 0: noise22_std_dev_Pa = rel_noise * (EPS * 1000)
+            # Calculate stress derivatives using framework logic
+            deriv_vecs = calculate_dW_dl_vectors(l1, l2, l3, basis_names)
+            if deriv_vecs is None: 
+                continue
 
-            noise11_Pa = np.random.normal(0, noise11_std_dev_Pa)
-            noise22_Pa = np.random.normal(0, noise22_std_dev_Pa)
-            P11_noisy_MPa = p11_true_Pa + noise11_Pa
-            P22_noisy_MPa = p22_true_Pa + noise22_Pa
-            P11_noisy_MPa = P11_noisy_MPa * pa_to_mpa
-            P22_noisy_MPa = P22_noisy_MPa * pa_to_mpa
+            dW_dl1_all, dW_dl2_all, dW_dl3_all = deriv_vecs
+
+            # Sum contributions from all terms
+            dW_total_dl1_Pa = 0.0
+            dW_total_dl2_Pa = 0.0
+            dW_total_dl3_Pa = 0.0
+            for term, coeff_Pa in term_coeff_map.items():
+                idx = term_indices[term]
+                dW_total_dl1_Pa += coeff_Pa * dW_dl1_all[idx]
+                dW_total_dl2_Pa += coeff_Pa * dW_dl2_all[idx]
+                dW_total_dl3_Pa += coeff_Pa * dW_dl3_all[idx]
+
+            # Compute PK1 stress with incompressibility constraint (plane stress)
+            # P₁₁ = ∂W/∂λ₁ - (λ₃/λ₁)·∂W/∂λ₃
+            p11_true_Pa = dW_total_dl1_Pa - (l3 / l1) * dW_total_dl3_Pa if l1 > EPS else 0.0
+            p11_true_MPa = p11_true_Pa * pa_to_mpa
             
-            dataset_name = f"{model_name}_RelNoise{rel_noise*100:.0f}pct"
+            # For UT, only P11 is non-zero (uniaxial loading)
+            # For PS and EBT, both P11 and P22 are non-zero
+            if mode_name == 'UT':
+                p22_true_Pa = 0.0
+                p22_true_MPa = 0.0
+            else:
+                # P₂₂ = ∂W/∂λ₂ - (λ₃/λ₂)·∂W/∂λ₃
+                p22_true_Pa = dW_total_dl2_Pa - (l3 / l2) * dW_total_dl3_Pa if l2 > EPS else 0.0
+                p22_true_MPa = p22_true_Pa * pa_to_mpa
 
-            data_point = {
-                'lambda1': l1_ebt, 'lambda2': l2_ebt, 'lambda3': l3_ebt,
-                'gamma': np.nan,
-                'P11': P11_noisy_MPa, 'P22': P22_noisy_MPa, 'P12': np.nan,
-                'P11_true': p11_true_MPa, 'P12_true': np.nan, 'P22_true': p22_true_MPa,
-                'mode': 'EBT', 'dataset': dataset_name,
-                'noise_sigma': rel_noise,
-                'strain_pct': abs(l1_ebt - 1.0) * 100.0
-            }
-            all_synth_data.append(data_point)
+            # Add noise and store data points
+            for rel_noise in relative_noise_levels:
+                # Calculate noise standard deviations
+                noise11_std_dev_Pa = rel_noise * abs(p11_true_Pa)
+                if abs(p11_true_Pa) < EPS and rel_noise > 0:
+                    noise11_std_dev_Pa = rel_noise * (EPS * 1000)
+                
+                if mode_name != 'UT':
+                    noise22_std_dev_Pa = rel_noise * abs(p22_true_Pa)
+                    if abs(p22_true_Pa) < EPS and rel_noise > 0:
+                        noise22_std_dev_Pa = rel_noise * (EPS * 1000)
+                else:
+                    noise22_std_dev_Pa = 0.0
+
+                # Add noise
+                noise11_Pa = np.random.normal(0, noise11_std_dev_Pa)
+                P11_noisy_Pa = p11_true_Pa + noise11_Pa
+                P11_noisy_MPa = P11_noisy_Pa * pa_to_mpa
+                
+                if mode_name != 'UT':
+                    noise22_Pa = np.random.normal(0, noise22_std_dev_Pa)
+                    P22_noisy_Pa = p22_true_Pa + noise22_Pa
+                    P22_noisy_MPa = P22_noisy_Pa * pa_to_mpa
+                else:
+                    P22_noisy_MPa = 0.0
+                
+                dataset_name = f"{model_name}_RelNoise{rel_noise*100:.0f}pct"
+
+                data_point = {
+                    'lambda1': l1, 'lambda2': l2, 'lambda3': l3,
+                    'gamma': np.nan,
+                    'P11': P11_noisy_MPa, 'P22': P22_noisy_MPa, 'P12': np.nan,
+                    'P11_true': p11_true_MPa, 'P12_true': np.nan, 'P22_true': p22_true_MPa,
+                    'mode': mode_name, 'dataset': dataset_name,
+                    'noise_sigma': rel_noise,
+                    'strain_pct': abs(l1 - 1.0) * 100.0
+                }
+                all_synth_data.append(data_point)
     
     print(f"--- Finished generating data [Framework Logic] for: {model_name} ---")
     df = pd.DataFrame(all_synth_data)
@@ -1945,7 +1941,8 @@ def run_lars_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_d
         from sklearn.linear_model import lars_path
         _, _, coefs_path_raw = lars_path(
             X_scaled, y_centered,
-            method='lars',
+            # method='lars',
+            method='lasso',
             copy_X=True,
             eps=1e-10,
             max_iter=min(5 * n_features, max(n_features, 100))
@@ -2469,14 +2466,14 @@ if __name__ == "__main__":
     # Resolve output directories relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Save outputs as a single-level hierarchy: outputs/<scenario>
-    outputs_root = os.path.join(script_dir, "outputs")
+    outputs_root = os.path.join(script_dir, "outputs_PSII")
     BASE_SAVE_DIR = outputs_root
     os.makedirs(BASE_SAVE_DIR, exist_ok=True)
 
     # Define the log file path inside BASE_SAVE_DIR
     log_file_name = os.path.join(
         BASE_SAVE_DIR,
-        "log_clean.txt"
+        "log_PSII.txt"
     )
     original_stdout = sys.stdout  # Save a reference to the original standard output
     log_file_handle = None # Initialize file handle
