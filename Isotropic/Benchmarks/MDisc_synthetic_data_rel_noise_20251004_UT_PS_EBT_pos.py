@@ -741,6 +741,255 @@ def generate_synth_data_via_framework(model_name, term_coeff_map, basis_names,
     return df
 
 # ==============================================
+# Test Dataset Generation (Generalized Deformation Modes)
+# ==============================================
+def generate_test_data_generalized_modes(model_name, term_coeff_map, basis_names,
+                                         lambda_range, n_points,
+                                         alpha_values, beta_fixed=-1.0):
+    """
+    Generates test dataset for generalized deformation modes by sampling α
+    with fixed β. This tests model generalization beyond canonical modes.
+    
+    Uses unified parameterization: F = diag(λ, α·λ^β, 1/(α·λ^(β+1)))
+    
+    Args:
+        model_name (str): Name for the dataset column (e.g., "MR2").
+        term_coeff_map (dict): Map {'basis_term_string': coefficient_Pa}.
+        basis_names (list): Full list of basis names from generate_model_library.
+        lambda_range (tuple): Min/max lambda for deformation.
+        n_points (int): Number of lambda points per α value.
+        alpha_values (list): List of α values to sample (e.g., [1.0, 1.5, 2.0, ...]).
+        beta_fixed (float): Fixed β value for all modes (default: -1.0).
+    
+    Returns:
+        pd.DataFrame: DataFrame with test data (noise-free, ground truth only).
+    """
+    all_test_data = []
+    lambdas = np.linspace(lambda_range[0], lambda_range[1], n_points)
+    pa_to_mpa = 1e-6
+    
+    # Find indices of required terms
+    term_indices = {}
+    missing_terms = []
+    for term in term_coeff_map.keys():
+        try:
+            term_indices[term] = basis_names.index(term)
+        except ValueError:
+            missing_terms.append(term)
+    
+    if missing_terms:
+        print(f"ERROR: Cannot generate test data for '{model_name}'. Required terms missing:")
+        for term in missing_terms: 
+            print(f" - {term}")
+        return None
+    
+    print(f"--- Generating Test Dataset (Generalized Modes) for: {model_name} ---")
+    print(f"    α values: {alpha_values}")
+    print(f"    Fixed β = {beta_fixed}")
+    print(f"    λ range: {lambda_range}, {n_points} points per α")
+    
+    for alpha in alpha_values:
+        mode_name = f"GM_α{alpha:.1f}"  # GM = Generalized Mode
+        print(f"  Generating {mode_name} data (α={alpha}, β={beta_fixed})...")
+        
+        for lam_val in lambdas:
+            # Compute stretches using unified parameterization
+            l1, l2, l3 = compute_stretches_from_alpha_beta(lam_val, alpha, beta_fixed)
+            
+            # Calculate stress derivatives
+            deriv_vecs = calculate_dW_dl_vectors(l1, l2, l3, basis_names)
+            if deriv_vecs is None:
+                continue
+            
+            dW_dl1_all, dW_dl2_all, dW_dl3_all = deriv_vecs
+            
+            # Sum contributions from all terms (ground truth model)
+            dW_total_dl1_Pa = 0.0
+            dW_total_dl2_Pa = 0.0
+            dW_total_dl3_Pa = 0.0
+            for term, coeff_Pa in term_coeff_map.items():
+                idx = term_indices[term]
+                dW_total_dl1_Pa += coeff_Pa * dW_dl1_all[idx]
+                dW_total_dl2_Pa += coeff_Pa * dW_dl2_all[idx]
+                dW_total_dl3_Pa += coeff_Pa * dW_dl3_all[idx]
+            
+            # Compute PK1 stress with incompressibility (plane stress)
+            p11_true_Pa = dW_total_dl1_Pa - (l3 / l1) * dW_total_dl3_Pa if l1 > EPS else 0.0
+            p22_true_Pa = dW_total_dl2_Pa - (l3 / l2) * dW_total_dl3_Pa if l2 > EPS else 0.0
+            p11_true_MPa = p11_true_Pa * pa_to_mpa
+            p22_true_MPa = p22_true_Pa * pa_to_mpa
+            
+            dataset_name = f"{model_name}_TestSet"
+            
+            # Store only NOISE-FREE ground truth data
+            data_point = {
+                'lambda1': l1, 'lambda2': l2, 'lambda3': l3,
+                'gamma': np.nan,
+                'P11': p11_true_MPa,  # Ground truth = measured for test set
+                'P22': p22_true_MPa,
+                'P12': np.nan,
+                'P11_true': p11_true_MPa,
+                'P12_true': np.nan,
+                'P22_true': p22_true_MPa,
+                'mode': mode_name,
+                'dataset': dataset_name,
+                'alpha': alpha,
+                'beta': beta_fixed,
+                'noise_sigma': 0.0,  # Test set is noise-free
+                'strain_pct': abs(l1 - 1.0) * 100.0
+            }
+            all_test_data.append(data_point)
+    
+    print(f"--- Finished generating test data for: {model_name} ---")
+    df = pd.DataFrame(all_test_data)
+    num_cols = ['lambda1', 'lambda2', 'lambda3', 'gamma', 'P11', 'P22', 'P12',
+                'P11_true', 'P12_true', 'P22_true', 'alpha', 'beta',
+                'strain_pct', 'noise_sigma']
+    for col in num_cols:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    df = df.dropna(subset=['P11'])
+    
+    print(f"  Generated {len(df)} test points across {len(alpha_values)} α values")
+    return df
+
+# ==============================================
+# Test Set Evaluation
+# ==============================================
+def evaluate_on_test_set(df_test, discovered_terms, discovered_coeffs_MPa, basis_names):
+    """
+    Evaluate discovered model on test dataset and compute R² and MSE.
+    
+    Args:
+        df_test (pd.DataFrame): Test dataset with ground truth stresses.
+        discovered_terms (list): List of discovered basis term names.
+        discovered_coeffs_MPa (np.array): Discovered coefficients in MPa.
+        basis_names (list): Full list of basis names.
+    
+    Returns:
+        dict: Dictionary with evaluation metrics {
+            'r2_P11': R² for P11 predictions,
+            'mse_P11': MSE for P11 predictions (MPa²),
+            'rmse_P11': RMSE for P11 predictions (MPa),
+            'r2_P22': R² for P22 predictions,
+            'mse_P22': MSE for P22 predictions (MPa²),
+            'rmse_P22': RMSE for P22 predictions (MPa),
+            'n_points': Number of evaluation points
+        }
+    """
+    if df_test is None or df_test.empty:
+        print("  WARNING: Test set is empty, cannot evaluate")
+        return {
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'n_points': 0
+        }
+    
+    if len(discovered_terms) == 0:
+        print("  WARNING: No terms discovered, cannot evaluate on test set")
+        return {
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'n_points': 0
+        }
+    
+    print(f"\n  === Evaluating Discovered Model on Test Set ===")
+    print(f"  Test set size: {len(df_test)} points")
+    print(f"  Discovered model: {len(discovered_terms)} terms")
+    
+    # Get indices of discovered terms in full library
+    try:
+        term_indices = [basis_names.index(term) for term in discovered_terms]
+    except ValueError as e:
+        print(f"  ERROR: Discovered term not found in basis: {e}")
+        return {
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'n_points': 0
+        }
+    
+    # Make predictions for all test points
+    P11_pred_list = []
+    P11_true_list = []
+    P22_pred_list = []
+    P22_true_list = []
+    
+    for idx, row in df_test.iterrows():
+        l1 = float(row['lambda1'])
+        l2 = float(row['lambda2'])
+        l3 = float(row['lambda3'])
+        
+        # Calculate derivatives
+        deriv_vecs = calculate_dW_dl_vectors(l1, l2, l3, basis_names)
+        if deriv_vecs is None:
+            continue
+        
+        dW_dl1_all, dW_dl2_all, dW_dl3_all = deriv_vecs
+        
+        # Check for NaNs in discovered terms
+        if np.any(np.isnan(dW_dl1_all[term_indices])) or \
+           np.any(np.isnan(dW_dl2_all[term_indices])) or \
+           np.any(np.isnan(dW_dl3_all[term_indices])):
+            continue
+        
+        # Predict stresses
+        dW_pred_dl1_MPa = np.sum(discovered_coeffs_MPa * dW_dl1_all[term_indices])
+        dW_pred_dl2_MPa = np.sum(discovered_coeffs_MPa * dW_dl2_all[term_indices])
+        dW_pred_dl3_MPa = np.sum(discovered_coeffs_MPa * dW_dl3_all[term_indices])
+        
+        p11_pred_MPa = dW_pred_dl1_MPa - (l3 / l1) * dW_pred_dl3_MPa if l1 > EPS else 0.0
+        p22_pred_MPa = dW_pred_dl2_MPa - (l3 / l2) * dW_pred_dl3_MPa if l2 > EPS else 0.0
+        
+        if not np.isfinite(p11_pred_MPa) or not np.isfinite(p22_pred_MPa):
+            continue
+        
+        # Get ground truth
+        p11_true_MPa = float(row['P11_true'])
+        p22_true_MPa = float(row['P22_true'])
+        
+        P11_pred_list.append(p11_pred_MPa)
+        P11_true_list.append(p11_true_MPa)
+        P22_pred_list.append(p22_pred_MPa)
+        P22_true_list.append(p22_true_MPa)
+    
+    if len(P11_pred_list) == 0:
+        print("  WARNING: No valid predictions on test set")
+        return {
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'n_points': 0
+        }
+    
+    # Convert to arrays
+    P11_pred = np.array(P11_pred_list)
+    P11_true = np.array(P11_true_list)
+    P22_pred = np.array(P22_pred_list)
+    P22_true = np.array(P22_true_list)
+    
+    # Compute metrics
+    r2_P11 = r2_score(P11_true, P11_pred)
+    mse_P11 = mean_squared_error(P11_true, P11_pred)
+    rmse_P11 = np.sqrt(mse_P11)
+    
+    r2_P22 = r2_score(P22_true, P22_pred)
+    mse_P22 = mean_squared_error(P22_true, P22_pred)
+    rmse_P22 = np.sqrt(mse_P22)
+    
+    print(f"\n  Test Set Performance:")
+    print(f"    P11: R² = {r2_P11:.6f}, RMSE = {rmse_P11:.6f} MPa")
+    print(f"    P22: R² = {r2_P22:.6f}, RMSE = {rmse_P22:.6f} MPa")
+    print(f"    Evaluated on {len(P11_pred)} points")
+    
+    return {
+        'r2_P11': r2_P11,
+        'mse_P11': mse_P11,
+        'rmse_P11': rmse_P11,
+        'r2_P22': r2_P22,
+        'mse_P22': mse_P22,
+        'rmse_P22': rmse_P22,
+        'n_points': len(P11_pred)
+    }
+
+# ==============================================
 # Helper Function for LaTeX Formatting of Terms
 # ==============================================
 def format_term_for_latex(term_name):
@@ -1941,8 +2190,8 @@ def run_lars_analysis(X_scaled, y, feature_names, cv_folds, title_prefix, save_d
         from sklearn.linear_model import lars_path
         _, _, coefs_path_raw = lars_path(
             X_scaled, y_centered,
-            # method='lars',
-            method='lasso',
+            method='lars',
+            # method='lasso',
             copy_X=True,
             eps=1e-10,
             max_iter=min(5 * n_features, max(n_features, 100))
@@ -2473,7 +2722,7 @@ if __name__ == "__main__":
     # Define the log file path inside BASE_SAVE_DIR
     log_file_name = os.path.join(
         BASE_SAVE_DIR,
-        "log_PSII.txt"
+        "log_PSII_test.txt"
     )
     original_stdout = sys.stdout  # Save a reference to the original standard output
     log_file_handle = None # Initialize file handle
@@ -2607,6 +2856,31 @@ if __name__ == "__main__":
                     plt.close(fig_raw)
                 except Exception as e: print(f"ERROR during data generation/plotting: {e}"); traceback.print_exc(); continue
 
+                # ==============================================
+                # Generate Test Dataset (Generalized Modes)
+                # ==============================================
+                print("\n--- Generating Test Dataset (Generalized Deformation Modes) ---")
+                TEST_ALPHA_VALUES = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+                TEST_BETA_FIXED = -1.0
+                df_test_generalized = None
+                try:
+                    df_test_generalized = generate_test_data_generalized_modes(
+                        synth_model_name, term_coeff_map_Pa, CURRENT_BASIS_NAMES,
+                        SYNTH_LAMBDA_RANGE, SYNTH_N_POINTS,
+                        TEST_ALPHA_VALUES, TEST_BETA_FIXED
+                    )
+                    if df_test_generalized is not None and not df_test_generalized.empty:
+                        print(f"  Successfully generated test set: {len(df_test_generalized)} points")
+                        # Save test dataset to CSV
+                        test_csv_path = os.path.join(current_save_dir, f"{file_prefix}_TestSet_Generalized.csv")
+                        df_test_generalized.to_csv(test_csv_path, index=False)
+                        print(f"  Saved test dataset to: {test_csv_path}")
+                    else:
+                        print("  WARNING: Test dataset generation returned empty DataFrame")
+                except Exception as e:
+                    print(f"  ERROR during test dataset generation: {e}")
+                    traceback.print_exc()
+
                 # Preparing data for model discovery (UT P11 + PS P11 + EBT P11)
                 print("\n--- Preparing data for model discovery (UT P11 + PS P11 + EBT P11) ---")
                 df_for_discovery_all_modes = df_generated_full[df_generated_full['mode'].isin(['UT', 'PS', 'EBT'])].copy()
@@ -2693,12 +2967,29 @@ if __name__ == "__main__":
                                          coeff_threshold=COEFF_THRESHOLD, ridge_alpha=RIDGE_ALPHA_REFIT
                                      )
 
-                                    # Store summary (using Pa/NRMSE)
+                                    # Evaluate on Test Set (Generalized Modes)
+                                    test_metrics = {'r2_P11': np.nan, 'rmse_P11': np.nan, 'r2_P22': np.nan, 'rmse_P22': np.nan}
+                                    if df_test_generalized is not None and not df_test_generalized.empty and len(refit_terms) > 0:
+                                        print(f"\n  Evaluating {method_key} on Test Set (Generalized Modes)...")
+                                        try:
+                                            # Convert coefficients back to MPa for evaluation
+                                            refit_coeffs_MPa = np.array(refit_coeffs_kPa) / 1000.0
+                                            test_metrics = evaluate_on_test_set(
+                                                df_test_generalized, refit_terms, refit_coeffs_MPa, basis_names_for_analysis
+                                            )
+                                        except Exception as test_e:
+                                            print(f"  ERROR during test set evaluation: {test_e}")
+                                            traceback.print_exc()
+
+                                    # Store summary (using kPa/NRMSE)
                                     scenario_refit_summary[method_key] = {
                                         'terms': refit_terms, 'coeffs': refit_coeffs_kPa, 
                                         'r2_p11_ut': r2_p11_ut, 'rmse_p11_ut': rmse_p11_ut_kPa, 'nrmse_p11_ut': nrmse_p11_ut,
                                         'r2_p11_ps': r2_p11_ps, 'rmse_p11_ps': rmse_p11_ps_kPa, 'nrmse_p11_ps': nrmse_p11_ps,
                                         'r2_p11_ebt': r2_p11_ebt, 'rmse_p11_ebt': rmse_p11_ebt_kPa, 'nrmse_p11_ebt': nrmse_p11_ebt,
+                                        'r2_test_P11': test_metrics['r2_P11'], 'rmse_test_P11_MPa': test_metrics['rmse_P11'],
+                                        'r2_test_P22': test_metrics['r2_P22'], 'rmse_test_P22_MPa': test_metrics['rmse_P22'],
+                                        'n_test_points': test_metrics.get('n_points', 0),
                                         'consistent': is_consistent, 'notes': consistency_notes
                                     }
 
@@ -2746,9 +3037,9 @@ if __name__ == "__main__":
                     opt_param_str = " ".join(opt_param_details) if opt_param_details else "N/A"; print(f"| {method_print_key:<11} | {opt_param_str:<16} | {n_nonzero:<8} | {aic_str} | {bic_str} | {time_str} |")
 
         header_width = 170 
-        print("\n" + "="*header_width); print(f"### OVERALL FINAL REFIT MODEL SUMMARY (Refit: {REFIT_REGRESSION_TYPE}, Thresh={COEFF_THRESHOLD:.1e}) ###".center(header_width)); print("### Metrics: UT(P11), PS(P11), EBT(P11) on UNWEIGHTED Data | Consistency Check ###".center(header_width))
-        print(f"| {'Method':<11} | {'N Terms':<7} | {'R²(UT)':<8} | {'RMSE(UT)[kPa]':<13} | {'NRMSE(UT)':<9} | {'R²(PS11)':<9} | {'RMSE(PS11)[kPa]':<15} | {'NRMSE(PS11)':<11} | {'R²(EBT11)':<10} | {'RMSE(EBT11)[kPa]':<16} | {'NRMSE(EBT11)':<12} | {'Consist':<7} | {'Notes':<30} |")
-        print(f"|{'-'*13}|{'-'*9}|{'-'*10}|{'-'*15}|{'-'*11}|{'-'*11}|{'-'*17}|{'-'*13}|{'-'*12}|{'-'*18}|{'-'*14}|{'-'*9}|{'-'*32}|")
+        print("\n" + "="*header_width); print(f"### OVERALL FINAL REFIT MODEL SUMMARY (Refit: {REFIT_REGRESSION_TYPE}, Thresh={COEFF_THRESHOLD:.1e}) ###".center(header_width)); print("### Metrics: UT(P11), PS(P11), EBT(P11) on UNWEIGHTED Data | Test Set (Generalized Modes) | Consistency Check ###".center(header_width))
+        print(f"| {'Method':<11} | {'N Terms':<7} | {'R²(UT)':<8} | {'RMSE(UT)[kPa]':<13} | {'NRMSE(UT)':<9} | {'R²(PS11)':<9} | {'RMSE(PS11)[kPa]':<15} | {'NRMSE(PS11)':<11} | {'R²(EBT11)':<10} | {'RMSE(EBT11)[kPa]':<16} | {'NRMSE(EBT11)':<12} | {'R²(Test)':<9} | {'RMSE(Test)[MPa]':<16} | {'Consist':<7} | {'Notes':<30} |")
+        print(f"|{'-'*13}|{'-'*9}|{'-'*10}|{'-'*15}|{'-'*11}|{'-'*11}|{'-'*17}|{'-'*13}|{'-'*12}|{'-'*18}|{'-'*14}|{'-'*11}|{'-'*18}|{'-'*9}|{'-'*32}|")
 
         for scenario_name_sum, methods_summary_sum in all_refit_summaries.items(): 
             print(f"\n--- Scenario: {scenario_name_sum} ---")
@@ -2765,10 +3056,12 @@ if __name__ == "__main__":
                     r2_ebt11 = f"{summary.get('r2_p11_ebt', np.nan):.4f}" if pd.notna(summary.get('r2_p11_ebt', np.nan)) else " N/A  "
                     rmse_ebt11 = f"{summary.get('rmse_p11_ebt', np.nan):.1f}" if pd.notna(summary.get('rmse_p11_ebt', np.nan)) else " N/A"
                     nrmse_ebt11 = f"{summary.get('nrmse_p11_ebt', np.nan):.4f}" if pd.notna(summary.get('nrmse_p11_ebt', np.nan)) else " N/A"
+                    r2_test = f"{summary.get('r2_test_P11', np.nan):.4f}" if pd.notna(summary.get('r2_test_P11', np.nan)) else " N/A  "
+                    rmse_test = f"{summary.get('rmse_test_P11_MPa', np.nan):.6f}" if pd.notna(summary.get('rmse_test_P11_MPa', np.nan)) else " N/A"
                     consistent = "OK" if summary.get('consistent') is True else "FAIL" if summary.get('consistent') is False else "N/A"
                     notes_list = summary.get('notes', ["N/A"])
                     notes_str = (notes_list[0][:27] + '...') if notes_list and len(notes_list[0]) > 30 else (notes_list[0] if notes_list else "N/A")
-                    print(f"| {method_key_sum:<11} | {n_terms:<7} | {r2_ut:<8} | {rmse_ut:<13} | {nrmse_ut:<9} | {r2_ps11:<9} | {rmse_ps11:<15} | {nrmse_ps11:<11} | {r2_ebt11:<10} | {rmse_ebt11:<16} | {nrmse_ebt11:<12} | {consistent:<7} | {notes_str:<30} |")
+                    print(f"| {method_key_sum:<11} | {n_terms:<7} | {r2_ut:<8} | {rmse_ut:<13} | {nrmse_ut:<9} | {r2_ps11:<9} | {rmse_ps11:<15} | {nrmse_ps11:<11} | {r2_ebt11:<10} | {rmse_ebt11:<16} | {nrmse_ebt11:<12} | {r2_test:<9} | {rmse_test:<16} | {consistent:<7} | {notes_str:<30} |")
 
         print("\n" + "="*150); print("### VERIFICATION SUMMARY: Discovered vs. Ground Truth Terms ###"); print("="*150)
         verification_summary_list = []
@@ -2787,9 +3080,19 @@ if __name__ == "__main__":
                 except KeyError: continue
 
                 for method_key_sum in process_order:
-                    summary_row = { "Scenario": scenario_name_sum, "Method": method_key_sum, "N_Ground_Truth": n_ground_truth, "N_Discovered": 0, "N_Correct": 0, "N_Missed": n_ground_truth, "N_Spurious": 0, "Avg_Coeff_Rel_Error(%)": np.nan, "Correct_Terms": "-", "Missed_Terms": "-", "Spurious_Terms": "-"}
+                    summary_row = { 
+                        "Scenario": scenario_name_sum, "Method": method_key_sum, 
+                        "N_Ground_Truth": n_ground_truth, "N_Discovered": 0, "N_Correct": 0, "N_Missed": n_ground_truth, "N_Spurious": 0, 
+                        "Avg_Coeff_Rel_Error(%)": np.nan, 
+                        "R2_Test": np.nan, "RMSE_Test_MPa": np.nan,
+                        "Correct_Terms": "-", "Missed_Terms": "-", "Spurious_Terms": "-"
+                    }
                     if method_key_sum in methods_summary_sum:
                         summary = methods_summary_sum.get(method_key_sum, {})
+                        
+                        # Add test set metrics
+                        summary_row["R2_Test"] = summary.get('r2_test_P11', np.nan)
+                        summary_row["RMSE_Test_MPa"] = summary.get('rmse_test_P11_MPa', np.nan)
                         
                         if ('terms' in summary and isinstance(summary['terms'], list)):
                             final_coeffs_map_MPa = {}
@@ -2825,12 +3128,12 @@ if __name__ == "__main__":
                     
             if verification_summary_list:
                 verification_df = pd.DataFrame(verification_summary_list)
-                cols_ordered = ["Scenario", "Method", "N_Ground_Truth", "N_Discovered", "N_Correct", "N_Missed", "N_Spurious", "Avg_Coeff_Rel_Error(%)", "Correct_Terms", "Missed_Terms", "Spurious_Terms"]
+                cols_ordered = ["Scenario", "Method", "N_Ground_Truth", "N_Discovered", "N_Correct", "N_Missed", "N_Spurious", "Avg_Coeff_Rel_Error(%)", "R2_Test", "RMSE_Test_MPa", "Correct_Terms", "Missed_Terms", "Spurious_Terms"]
                 for col in cols_ordered:
                     if col not in verification_df.columns: verification_df[col] = np.nan 
                 verification_df = verification_df.reindex(columns=cols_ordered)
                 print("\nVerification Summary Table:");
-                with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 200): print(verification_df.to_string(index=False, float_format="%.1f", na_rep="-"))
+                with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 250): print(verification_df.to_string(index=False, float_format="%.4f", na_rep="-"))
             else: print("No verification results collected for this scenario to print.")
         print("\n" + "="*150); print("### END Verification Summary Table ###"); print("="*150)
 
