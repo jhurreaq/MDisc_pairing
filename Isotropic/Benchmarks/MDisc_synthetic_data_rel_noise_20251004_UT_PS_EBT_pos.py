@@ -2860,7 +2860,7 @@ if __name__ == "__main__":
                 # Generate Test Dataset (Generalized Modes)
                 # ==============================================
                 print("\n--- Generating Test Dataset (Generalized Deformation Modes) ---")
-                TEST_ALPHA_VALUES = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+                TEST_ALPHA_VALUES = [1.75, 2.35, 3.45, 4.65]
                 TEST_BETA_FIXED = -1.0
                 df_test_generalized = None
                 try:
