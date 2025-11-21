@@ -23,6 +23,7 @@ import re
 import datetime
 import os
 from scipy.special import erf
+from scipy.optimize import lsq_linear
 import warnings
 from sklearn.exceptions import ConvergenceWarning
 import traceback
@@ -870,25 +871,27 @@ def evaluate_on_test_set(df_test, discovered_terms, discovered_coeffs_MPa, basis
             'r2_P11': R² for P11 predictions,
             'mse_P11': MSE for P11 predictions (MPa²),
             'rmse_P11': RMSE for P11 predictions (MPa),
+            'nrmse_P11': NRMSE for P11 predictions (normalized by range),
             'r2_P22': R² for P22 predictions,
             'mse_P22': MSE for P22 predictions (MPa²),
             'rmse_P22': RMSE for P22 predictions (MPa),
+            'nrmse_P22': NRMSE for P22 predictions (normalized by range),
             'n_points': Number of evaluation points
         }
     """
     if df_test is None or df_test.empty:
         print("  WARNING: Test set is empty, cannot evaluate")
         return {
-            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
-            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan, 'nrmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan, 'nrmse_P22': np.nan,
             'n_points': 0
         }
     
     if len(discovered_terms) == 0:
         print("  WARNING: No terms discovered, cannot evaluate on test set")
         return {
-            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
-            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan, 'nrmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan, 'nrmse_P22': np.nan,
             'n_points': 0
         }
     
@@ -902,8 +905,8 @@ def evaluate_on_test_set(df_test, discovered_terms, discovered_coeffs_MPa, basis
     except ValueError as e:
         print(f"  ERROR: Discovered term not found in basis: {e}")
         return {
-            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
-            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan, 'nrmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan, 'nrmse_P22': np.nan,
             'n_points': 0
         }
     
@@ -954,8 +957,8 @@ def evaluate_on_test_set(df_test, discovered_terms, discovered_coeffs_MPa, basis
     if len(P11_pred_list) == 0:
         print("  WARNING: No valid predictions on test set")
         return {
-            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan,
-            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan,
+            'r2_P11': np.nan, 'mse_P11': np.nan, 'rmse_P11': np.nan, 'nrmse_P11': np.nan,
+            'r2_P22': np.nan, 'mse_P22': np.nan, 'rmse_P22': np.nan, 'nrmse_P22': np.nan,
             'n_points': 0
         }
     
@@ -970,22 +973,41 @@ def evaluate_on_test_set(df_test, discovered_terms, discovered_coeffs_MPa, basis
     mse_P11 = mean_squared_error(P11_true, P11_pred)
     rmse_P11 = np.sqrt(mse_P11)
     
+    # Compute NRMSE (normalized by range)
+    range_P11 = np.ptp(P11_true)  # peak-to-peak (max - min)
+    if range_P11 > 1e-10:
+        nrmse_P11 = rmse_P11 / range_P11
+    elif rmse_P11 < 1e-10:
+        nrmse_P11 = 0.0
+    else:
+        nrmse_P11 = np.inf
+    
     r2_P22 = r2_score(P22_true, P22_pred)
     mse_P22 = mean_squared_error(P22_true, P22_pred)
     rmse_P22 = np.sqrt(mse_P22)
     
+    range_P22 = np.ptp(P22_true)
+    if range_P22 > 1e-10:
+        nrmse_P22 = rmse_P22 / range_P22
+    elif rmse_P22 < 1e-10:
+        nrmse_P22 = 0.0
+    else:
+        nrmse_P22 = np.inf
+    
     print(f"\n  Test Set Performance:")
-    print(f"    P11: R² = {r2_P11:.6f}, RMSE = {rmse_P11:.6f} MPa")
-    print(f"    P22: R² = {r2_P22:.6f}, RMSE = {rmse_P22:.6f} MPa")
+    print(f"    P11: R² = {r2_P11:.6f}, RMSE = {rmse_P11:.6f} MPa, NRMSE = {nrmse_P11:.6f}")
+    print(f"    P22: R² = {r2_P22:.6f}, RMSE = {rmse_P22:.6f} MPa, NRMSE = {nrmse_P22:.6f}")
     print(f"    Evaluated on {len(P11_pred)} points")
     
     return {
         'r2_P11': r2_P11,
         'mse_P11': mse_P11,
         'rmse_P11': rmse_P11,
+        'nrmse_P11': nrmse_P11,
         'r2_P22': r2_P22,
         'mse_P22': mse_P22,
         'rmse_P22': rmse_P22,
+        'nrmse_P22': nrmse_P22,
         'n_points': len(P11_pred)
     }
 
@@ -1356,15 +1378,24 @@ def plot_model_predictions(
         consistency_notes = [f"Matrix Recon Error: {e}"]
         return [], [], np.nan, np.nan, np.nan, False, consistency_notes
 
-    print(f"  Refitting {len(initial_selected_basis_names)} features on WEIGHTED data (shape: {phi_selected_weighted.shape}) using Ridge...")
+    print(f"  Refitting {len(initial_selected_basis_names)} features on WEIGHTED data (shape: {phi_selected_weighted.shape}) using Non-Negative Ridge (lsq_linear)...")
     refit_coeffs_weighted_MPa = None
     try:
-        ridge_refit = Ridge(alpha=ridge_alpha, fit_intercept=False, solver='auto')
-        ridge_refit.fit(phi_selected_weighted, target_weighted) 
-        refit_coeffs_weighted_MPa = ridge_refit.coef_
+        # Add L2 regularization by augmenting the design matrix
+        n_features = phi_selected_weighted.shape[1]
+        ridge_penalty = np.sqrt(ridge_alpha) * np.eye(n_features)
+        X_augmented = np.vstack([phi_selected_weighted, ridge_penalty])
+        y_augmented = np.concatenate([target_weighted, np.zeros(n_features)])
+        
+        # Solve with non-negative constraint using lsq_linear
+        result = lsq_linear(X_augmented, y_augmented, bounds=(0, np.inf), method='bvls', verbose=0)
+        refit_coeffs_weighted_MPa = result.x
+        
+        if not result.success:
+            print(f"WARNING: lsq_linear did not fully converge: {result.message}")
     except Exception as e:
-        print(f"ERROR: Failed during Ridge Regression refit for {method_key}: {e}"); traceback.print_exc()
-        consistency_notes = [f"Ridge Refit Error: {e}"]
+        print(f"ERROR: Failed during Non-Negative Ridge refit for {method_key}: {e}"); traceback.print_exc()
+        consistency_notes = [f"NN-Ridge Refit Error: {e}"]
         return [], [], np.nan, np.nan, np.nan, False, consistency_notes
 
     print(f"  Applying threshold ({coeff_threshold:.1e}) to Ridge coefficients...")
