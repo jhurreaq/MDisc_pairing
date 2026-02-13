@@ -1372,7 +1372,7 @@ def run_lars_analysis(X_unscaled, y, feature_names, cv_folds, title_prefix, save
     start_time_path = datetime.datetime.now()
     try:
         from sklearn.linear_model import lars_path
-        _, _, coefs_raw = lars_path(X_unscaled, y, method='lasso', positive=True) 
+        _, _, coefs_raw = lars_path(X_unscaled, y, method='lars', positive=True) 
         clean_cols, steps_k = [], []
         last_k = 0
         for j in range(1, coefs_raw.shape[1]):  # skip the initial all-zero column
