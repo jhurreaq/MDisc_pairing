@@ -308,6 +308,10 @@ def calculate_single_prediction_full_tensor(data_point, invariants, coeffs_w2, w
     try:
         B = F @ F.T
         I1_val = invariants.get('I1', np.trace(B))
+        # Use pushed-forward structural directions in the current configuration.
+        mf = F @ f0
+        ms = F @ s0
+        mn = F @ n0
     except np.linalg.LinAlgError:
         return np.nan
 
@@ -317,22 +321,24 @@ def calculate_single_prediction_full_tensor(data_point, invariants, coeffs_w2, w
         w2 = coeffs_w2[term_idx]
         if abs(w2) < EPS: continue
         
+        # --- SIMPLE SOLUTION TO NULLIFY I4/I8 LINEAR TERMS ---
         inv_key = term_def['inv_key']
         term_type = term_def['type']
         if ('I4' in inv_key or 'I8' in inv_key) and term_type in ['lin', 'exp_lin']:
             continue # Skip this term's contribution entirely
-                
+        # --- END OF SIMPLE SOLUTION ---
+        
         w1 = w1_map.get(term_idx, 1.0)
         psi_derivs = get_psi_deriv_for_term(term_def, invariants, w1)
         
         if 'I1' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I1'] * 2 * B
         if 'I2' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I2'] * 2 * (I1_val * B - B @ B)
-        if 'I4f_bar' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I4f_bar'] * 2 * np.outer(f0, f0)
-        if 'I4s_bar' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I4s_bar'] * 2 * np.outer(s0, s0)
-        if 'I4n_bar' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I4n_bar'] * 2 * np.outer(n0, n0)
-        if 'I8fs' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I8fs'] * (np.outer(f0, s0) + np.outer(s0, f0))
-        if 'I8fn' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I8fn'] * (np.outer(f0, n0) + np.outer(n0, f0))
-        if 'I8sn' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I8sn'] * (np.outer(s0, n0) + np.outer(n0, s0))
+        if 'I4f_bar' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I4f_bar'] * 2 * np.outer(mf, mf)
+        if 'I4s_bar' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I4s_bar'] * 2 * np.outer(ms, ms)
+        if 'I4n_bar' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I4n_bar'] * 2 * np.outer(mn, mn)
+        if 'I8fs' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I8fs'] * (np.outer(mf, ms) + np.outer(ms, mf))
+        if 'I8fn' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I8fn'] * (np.outer(mf, mn) + np.outer(mn, mf))
+        if 'I8sn' in psi_derivs: sigma_hyper_tensor += w2 * psi_derivs['I8sn'] * (np.outer(ms, mn) + np.outer(mn, ms))
 
     # Enforce sigma_ss = 0 by defining pressure p = sigma_hyper_ss
     pressure_p = sigma_hyper_tensor[1, 1]
