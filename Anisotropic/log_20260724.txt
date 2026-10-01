@@ -1,0 +1,658 @@
+Successfully loaded Excel: './input/CANNsHEARTdata_shear05.xlsx', Sheet: 'Sheet1'
+
+Starting Anisotropic Model Discovery at: 2026-07-24 10:17:49
+Building Stage 1 feature matrix (fixed w1=1.0) using original data...
+Stage 1 Feature matrix built. Cleaned data points: 176
+
+################################################################################
+### PROCESSING NOISE LEVEL: RelNoise0pct ###
+################################################################################
+INFO: Building weights based on inverse stress magnitude per mode...
+    Mode 'fs': RMS Stress = 2.179 kPa
+    Mode 'fn': RMS Stress = 1.983 kPa
+    Mode 'sf': RMS Stress = 1.379 kPa
+    Mode 'sn': RMS Stress = 1.345 kPa
+    Mode 'nf': RMS Stress = 1.072 kPa
+    Mode 'ns': RMS Stress = 1.090 kPa
+    Mode '1:1_f': RMS Stress = 3.239 kPa
+    Mode '1:1_n': RMS Stress = 1.890 kPa
+    Mode '1:0.75_f': RMS Stress = 2.338 kPa
+    Mode '1:0.75_n': RMS Stress = 1.134 kPa
+    Mode '0.75:1_f': RMS Stress = 1.502 kPa
+    Mode '0.75:1_n': RMS Stress = 1.140 kPa
+    Mode '1:0.5_f': RMS Stress = 1.894 kPa
+    Mode '1:0.5_n': RMS Stress = 0.719 kPa
+    Mode '0.5:1_f': RMS Stress = 1.114 kPa
+    Mode '0.5:1_n': RMS Stress = 1.433 kPa
+    Global RMS Stress (for normalization): 1.705 kPa
+    Mode 'fs': Final Weight Factor = 0.782
+    Mode 'fn': Final Weight Factor = 0.860
+    Mode 'sf': Final Weight Factor = 1.236
+    Mode 'sn': Final Weight Factor = 1.268
+    Mode 'nf': Final Weight Factor = 1.590
+    Mode 'ns': Final Weight Factor = 1.564
+    Mode '1:1_f': Final Weight Factor = 0.526
+    Mode '1:1_n': Final Weight Factor = 0.902
+    Mode '1:0.75_f': Final Weight Factor = 0.729
+    Mode '1:0.75_n': Final Weight Factor = 1.503
+    Mode '0.75:1_f': Final Weight Factor = 1.135
+    Mode '0.75:1_n': Final Weight Factor = 1.495
+    Mode '1:0.5_f': Final Weight Factor = 0.900
+    Mode '1:0.5_n': Final Weight Factor = 2.372
+    Mode '0.5:1_f': Final Weight Factor = 1.530
+    Mode '0.5:1_n': Final Weight Factor = 1.189
+[RelNoise0pct] Using inverse stress magnitude sample weights.
+
+============================== Running Lasso Variants for RelNoise0pct ==============================
+
+--- Running LASSO Analysis (CV, AIC, BIC) (RelNoise0pct) ---
+  Running LassoCV to determine optimal alpha...
+  LassoCV determined optimal alpha: 0.006394
+
+  Generating a unified Lasso Path for all criteria...
+  Unified path created with 18 unique models.
+  DEBUG (Lasso+pos): weighted var=1.582473e+00, NMSE min=0.177, max=0.671
+  LassoCV model (k=4) identified on unified path in 0.23s.
+  LassoAIC model (k=5) identified on unified path.
+  LassoBIC model (k=5) identified on unified path.
+
+  Generating plots from unified path data...
+Saved activation heatmap: outputs_cofC/RelNoise0pct/RelNoise0pct_Lasso_ActivationHeatmap.pdf
+
+============================== Running LARS Variants for RelNoise0pct ==============================
+
+--- Running LARS Analysis (CV, AIC, BIC; unified path, POSITIVE) (RelNoise0pct) ---
+  Cross-validating on unified LARS supports…
+Saved activation heatmap: outputs_cofC/RelNoise0pct/RelNoise0pct_LARS_ActivationHeatmap.pdf
+
+============================== Running OMP Variants for RelNoise0pct ==============================
+
+--- Running OMP Analysis (CV, AIC, BIC; unified path, POSITIVE) (RelNoise0pct) ---
+  Cross-validating on unified OMP supports…
+Saved activation heatmap: outputs_cofC/RelNoise0pct/RelNoise0pct_OMP_ActivationHeatmap.pdf
+
+--- Stage 2: Refining RelNoise0pct LassoCV Model ---
+  Optimizing 7 parameters (4 w2, 3 w1) for 4 active terms...
+  Optimization finished in 26.64 seconds. Success: True
+
+  --- Refined RelNoise0pct LassoCV Model Summary ---
+  Number of active terms: 4
+    Term 7 (c7(I2-3)^2): w2 = 4.8988
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0706, w1 = 6.1944
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 0.7999, w1 = 2.9110
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0047, w1 = 13.4547
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_LassoCV_LassoCV_Comparison.pdf
+
+--- Stage 2: Refining RelNoise0pct LassoAIC Model ---
+  Optimizing 10 parameters (5 w2, 5 w1) for 5 active terms...
+  Optimization finished in 45.87 seconds. Success: True
+
+  --- Refined RelNoise0pct LassoAIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.3410, w1 = 1.2162
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0763, w1 = 6.1302
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.2081, w1 = 2.1136
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0114, w1 = 11.1578
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1625, w1 = 1.9163
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_LassoAIC_LassoAIC_Comparison.pdf
+
+--- Stage 2: Refining RelNoise0pct LassoBIC Model ---
+  Optimizing 10 parameters (5 w2, 5 w1) for 5 active terms...
+  Optimization finished in 46.47 seconds. Success: True
+
+  --- Refined RelNoise0pct LassoBIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.3410, w1 = 1.2162
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0763, w1 = 6.1302
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.2081, w1 = 2.1136
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0114, w1 = 11.1578
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1625, w1 = 1.9163
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_LassoBIC_LassoBIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsCV coefficients.
+    NNLS for LarsCV: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise0pct LarsCV Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise0pct LarsCV coefficients.
+    NNLS for RelNoise0pct LarsCV: 5 initially selected -> 5 positive coefficients.
+  Optimizing 9 parameters (5 w2, 4 w1) for 5 active terms...
+  Optimization finished in 28.06 seconds. Success: True
+
+  --- Refined RelNoise0pct LarsCV Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 4.4832, w1 = 0.8431
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0758, w1 = 6.2531
+    Term 19 (c19(I4n-1)^2): w2 = 3.2327
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.1455, w1 = 4.2880
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.2862, w1 = 1.2499
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_LarsCV_LarsCV_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsAIC coefficients.
+    NNLS for LarsAIC: 4 -> 4 positive coefficients.
+
+--- Stage 2: Refining RelNoise0pct LarsAIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise0pct LarsAIC coefficients.
+    NNLS for RelNoise0pct LarsAIC: 4 initially selected -> 4 positive coefficients.
+  Optimizing 7 parameters (4 w2, 3 w1) for 4 active terms...
+  Optimization finished in 26.79 seconds. Success: True
+
+  --- Refined RelNoise0pct LarsAIC Model Summary ---
+  Number of active terms: 4
+    Term 7 (c7(I2-3)^2): w2 = 4.8899
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0705, w1 = 6.2049
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 0.9456, w1 = 2.5139
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0051, w1 = 13.1898
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_LarsAIC_LarsAIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsBIC coefficients.
+    NNLS for LarsBIC: 4 -> 4 positive coefficients.
+
+--- Stage 2: Refining RelNoise0pct LarsBIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise0pct LarsBIC coefficients.
+    NNLS for RelNoise0pct LarsBIC: 4 initially selected -> 4 positive coefficients.
+  Optimizing 7 parameters (4 w2, 3 w1) for 4 active terms...
+  Optimization finished in 26.96 seconds. Success: True
+
+  --- Refined RelNoise0pct LarsBIC Model Summary ---
+  Number of active terms: 4
+    Term 7 (c7(I2-3)^2): w2 = 4.8899
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0705, w1 = 6.2049
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 0.9456, w1 = 2.5139
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0051, w1 = 13.1898
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_LarsBIC_LarsBIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPCV coefficients.
+    NNLS for OMPCV: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise0pct OMPCV Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise0pct OMPCV coefficients.
+    NNLS for RelNoise0pct OMPCV: 5 initially selected -> 5 positive coefficients.
+  Optimizing 8 parameters (5 w2, 3 w1) for 5 active terms...
+  Optimization finished in 17.17 seconds. Success: True
+
+  --- Refined RelNoise0pct OMPCV Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 5.0438, w1 = 0.9331
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0720, w1 = 6.1732
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.8675, w1 = 1.1994
+    Term 23 (c23(I8fs)^2): w2 = 0.9015
+    Term 27 (c27(I8fn)^2): w2 = 0.2570
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_OMPCV_OMPCV_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPAIC coefficients.
+    NNLS for OMPAIC: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise0pct OMPAIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise0pct OMPAIC coefficients.
+    NNLS for RelNoise0pct OMPAIC: 5 initially selected -> 5 positive coefficients.
+  Optimizing 8 parameters (5 w2, 3 w1) for 5 active terms...
+  Optimization finished in 17.01 seconds. Success: True
+
+  --- Refined RelNoise0pct OMPAIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 5.0438, w1 = 0.9331
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0720, w1 = 6.1732
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.8675, w1 = 1.1994
+    Term 23 (c23(I8fs)^2): w2 = 0.9015
+    Term 27 (c27(I8fn)^2): w2 = 0.2570
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_OMPAIC_OMPAIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPBIC coefficients.
+    NNLS for OMPBIC: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise0pct OMPBIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise0pct OMPBIC coefficients.
+    NNLS for RelNoise0pct OMPBIC: 5 initially selected -> 5 positive coefficients.
+  Optimizing 8 parameters (5 w2, 3 w1) for 5 active terms...
+  Optimization finished in 16.85 seconds. Success: True
+
+  --- Refined RelNoise0pct OMPBIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 5.0438, w1 = 0.9331
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0720, w1 = 6.1732
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.8675, w1 = 1.1994
+    Term 23 (c23(I8fs)^2): w2 = 0.9015
+    Term 27 (c27(I8fn)^2): w2 = 0.2570
+Saved plot: outputs_cofC/RelNoise0pct/RelNoise0pct_OMPBIC_OMPBIC_Comparison.pdf
+
+################################################################################
+### PROCESSING NOISE LEVEL: RelNoise5pct ###
+################################################################################
+INFO: Building weights based on inverse stress magnitude per mode...
+    Mode 'fs': RMS Stress = 2.256 kPa
+    Mode 'fn': RMS Stress = 1.907 kPa
+    Mode 'sf': RMS Stress = 1.346 kPa
+    Mode 'sn': RMS Stress = 1.313 kPa
+    Mode 'nf': RMS Stress = 1.076 kPa
+    Mode 'ns': RMS Stress = 1.106 kPa
+    Mode '1:1_f': RMS Stress = 3.079 kPa
+    Mode '1:1_n': RMS Stress = 1.794 kPa
+    Mode '1:0.75_f': RMS Stress = 2.431 kPa
+    Mode '1:0.75_n': RMS Stress = 1.115 kPa
+    Mode '0.75:1_f': RMS Stress = 1.606 kPa
+    Mode '0.75:1_n': RMS Stress = 1.147 kPa
+    Mode '1:0.5_f': RMS Stress = 1.874 kPa
+    Mode '1:0.5_n': RMS Stress = 0.730 kPa
+    Mode '0.5:1_f': RMS Stress = 1.093 kPa
+    Mode '0.5:1_n': RMS Stress = 1.458 kPa
+    Global RMS Stress (for normalization): 1.691 kPa
+    Mode 'fs': Final Weight Factor = 0.750
+    Mode 'fn': Final Weight Factor = 0.887
+    Mode 'sf': Final Weight Factor = 1.256
+    Mode 'sn': Final Weight Factor = 1.288
+    Mode 'nf': Final Weight Factor = 1.572
+    Mode 'ns': Final Weight Factor = 1.528
+    Mode '1:1_f': Final Weight Factor = 0.549
+    Mode '1:1_n': Final Weight Factor = 0.943
+    Mode '1:0.75_f': Final Weight Factor = 0.696
+    Mode '1:0.75_n': Final Weight Factor = 1.516
+    Mode '0.75:1_f': Final Weight Factor = 1.053
+    Mode '0.75:1_n': Final Weight Factor = 1.474
+    Mode '1:0.5_f': Final Weight Factor = 0.902
+    Mode '1:0.5_n': Final Weight Factor = 2.317
+    Mode '0.5:1_f': Final Weight Factor = 1.548
+    Mode '0.5:1_n': Final Weight Factor = 1.160
+[RelNoise5pct] Using inverse stress magnitude sample weights.
+
+============================== Running Lasso Variants for RelNoise5pct ==============================
+
+--- Running LASSO Analysis (CV, AIC, BIC) (RelNoise5pct) ---
+  Running LassoCV to determine optimal alpha...
+  LassoCV determined optimal alpha: 0.006050
+
+  Generating a unified Lasso Path for all criteria...
+  Unified path created with 18 unique models.
+  DEBUG (Lasso+pos): weighted var=1.562095e+00, NMSE min=0.180, max=0.676
+  LassoCV model (k=4) identified on unified path in 0.19s.
+  LassoAIC model (k=5) identified on unified path.
+  LassoBIC model (k=5) identified on unified path.
+
+  Generating plots from unified path data...
+Saved activation heatmap: outputs_cofC/RelNoise5pct/RelNoise5pct_Lasso_ActivationHeatmap.pdf
+
+============================== Running LARS Variants for RelNoise5pct ==============================
+
+--- Running LARS Analysis (CV, AIC, BIC; unified path, POSITIVE) (RelNoise5pct) ---
+  Cross-validating on unified LARS supports…
+Saved activation heatmap: outputs_cofC/RelNoise5pct/RelNoise5pct_LARS_ActivationHeatmap.pdf
+
+============================== Running OMP Variants for RelNoise5pct ==============================
+
+--- Running OMP Analysis (CV, AIC, BIC; unified path, POSITIVE) (RelNoise5pct) ---
+  Cross-validating on unified OMP supports…
+Saved activation heatmap: outputs_cofC/RelNoise5pct/RelNoise5pct_OMP_ActivationHeatmap.pdf
+
+--- Stage 2: Refining RelNoise5pct LassoCV Model ---
+  Optimizing 7 parameters (4 w2, 3 w1) for 4 active terms...
+  Optimization finished in 10.37 seconds. Success: True
+
+  --- Refined RelNoise5pct LassoCV Model Summary ---
+  Number of active terms: 4
+    Term 7 (c7(I2-3)^2): w2 = 5.1716
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0796, w1 = 5.6956
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 2.1052, w1 = 0.9764
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.8142, w1 = 0.8894
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_LassoCV_LassoCV_Comparison.pdf
+
+--- Stage 2: Refining RelNoise5pct LassoAIC Model ---
+  Optimizing 10 parameters (5 w2, 5 w1) for 5 active terms...
+  Optimization finished in 46.25 seconds. Success: True
+
+  --- Refined RelNoise5pct LassoAIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.5368, w1 = 1.1638
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0861, w1 = 5.6869
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.2065, w1 = 1.9117
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0137, w1 = 10.5214
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1992, w1 = 1.6337
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_LassoAIC_LassoAIC_Comparison.pdf
+
+--- Stage 2: Refining RelNoise5pct LassoBIC Model ---
+  Optimizing 10 parameters (5 w2, 5 w1) for 5 active terms...
+  Optimization finished in 45.88 seconds. Success: True
+
+  --- Refined RelNoise5pct LassoBIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.5368, w1 = 1.1638
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0861, w1 = 5.6869
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.2065, w1 = 1.9117
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0137, w1 = 10.5214
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1992, w1 = 1.6337
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_LassoBIC_LassoBIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsCV coefficients.
+    NNLS for LarsCV: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise5pct LarsCV Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise5pct LarsCV coefficients.
+    NNLS for RelNoise5pct LarsCV: 5 initially selected -> 5 positive coefficients.
+  Optimizing 9 parameters (5 w2, 4 w1) for 5 active terms...
+  Optimization finished in 40.87 seconds. Success: True
+
+  --- Refined RelNoise5pct LarsCV Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.3760, w1 = 1.2233
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0859, w1 = 5.6872
+    Term 19 (c19(I4n-1)^2): w2 = 2.4610
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0137, w1 = 10.5190
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1508, w1 = 2.0141
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_LarsCV_LarsCV_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsAIC coefficients.
+    NNLS for LarsAIC: 4 -> 4 positive coefficients.
+
+--- Stage 2: Refining RelNoise5pct LarsAIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise5pct LarsAIC coefficients.
+    NNLS for RelNoise5pct LarsAIC: 4 initially selected -> 4 positive coefficients.
+  Optimizing 7 parameters (4 w2, 3 w1) for 4 active terms...
+  Optimization finished in 28.19 seconds. Success: True
+
+  --- Refined RelNoise5pct LarsAIC Model Summary ---
+  Number of active terms: 4
+    Term 7 (c7(I2-3)^2): w2 = 4.9454
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0802, w1 = 5.7251
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.0025, w1 = 2.1643
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0052, w1 = 13.0350
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_LarsAIC_LarsAIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsBIC coefficients.
+    NNLS for LarsBIC: 3 -> 3 positive coefficients.
+
+--- Stage 2: Refining RelNoise5pct LarsBIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise5pct LarsBIC coefficients.
+    NNLS for RelNoise5pct LarsBIC: 3 initially selected -> 3 positive coefficients.
+  Optimizing 5 parameters (3 w2, 2 w1) for 3 active terms...
+  Optimization finished in 5.25 seconds. Success: True
+
+  --- Refined RelNoise5pct LarsBIC Model Summary ---
+  Number of active terms: 3
+    Term 7 (c7(I2-3)^2): w2 = 6.0279
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0717, w1 = 5.8073
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.2449, w1 = 1.7281
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_LarsBIC_LarsBIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPCV coefficients.
+    NNLS for OMPCV: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise5pct OMPCV Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise5pct OMPCV coefficients.
+    NNLS for RelNoise5pct OMPCV: 5 initially selected -> 5 positive coefficients.
+  Optimizing 8 parameters (5 w2, 3 w1) for 5 active terms...
+  Optimization finished in 56.62 seconds. Success: True
+
+  --- Refined RelNoise5pct OMPCV Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 0.2214, w1 = 11.6117
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0957, w1 = 5.6369
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.3887, w1 = 1.5378
+    Term 23 (c23(I8fs)^2): w2 = 1.0965
+    Term 27 (c27(I8fn)^2): w2 = 0.4613
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_OMPCV_OMPCV_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPAIC coefficients.
+    NNLS for OMPAIC: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise5pct OMPAIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise5pct OMPAIC coefficients.
+    NNLS for RelNoise5pct OMPAIC: 5 initially selected -> 5 positive coefficients.
+  Optimizing 8 parameters (5 w2, 3 w1) for 5 active terms...
+  Optimization finished in 56.42 seconds. Success: True
+
+  --- Refined RelNoise5pct OMPAIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 0.2214, w1 = 11.6117
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0957, w1 = 5.6369
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.3887, w1 = 1.5378
+    Term 23 (c23(I8fs)^2): w2 = 1.0965
+    Term 27 (c27(I8fn)^2): w2 = 0.4613
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_OMPAIC_OMPAIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPBIC coefficients.
+    NNLS for OMPBIC: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise5pct OMPBIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise5pct OMPBIC coefficients.
+    NNLS for RelNoise5pct OMPBIC: 5 initially selected -> 5 positive coefficients.
+  Optimizing 8 parameters (5 w2, 3 w1) for 5 active terms...
+  Optimization finished in 56.97 seconds. Success: True
+
+  --- Refined RelNoise5pct OMPBIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 0.2214, w1 = 11.6117
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0957, w1 = 5.6369
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.3887, w1 = 1.5378
+    Term 23 (c23(I8fs)^2): w2 = 1.0965
+    Term 27 (c27(I8fn)^2): w2 = 0.4613
+Saved plot: outputs_cofC/RelNoise5pct/RelNoise5pct_OMPBIC_OMPBIC_Comparison.pdf
+
+################################################################################
+### PROCESSING NOISE LEVEL: RelNoise10pct ###
+################################################################################
+INFO: Building weights based on inverse stress magnitude per mode...
+    Mode 'fs': RMS Stress = 2.147 kPa
+    Mode 'fn': RMS Stress = 1.927 kPa
+    Mode 'sf': RMS Stress = 1.394 kPa
+    Mode 'sn': RMS Stress = 1.257 kPa
+    Mode 'nf': RMS Stress = 1.123 kPa
+    Mode 'ns': RMS Stress = 0.975 kPa
+    Mode '1:1_f': RMS Stress = 3.174 kPa
+    Mode '1:1_n': RMS Stress = 1.641 kPa
+    Mode '1:0.75_f': RMS Stress = 2.440 kPa
+    Mode '1:0.75_n': RMS Stress = 1.135 kPa
+    Mode '0.75:1_f': RMS Stress = 1.579 kPa
+    Mode '0.75:1_n': RMS Stress = 1.202 kPa
+    Mode '1:0.5_f': RMS Stress = 1.993 kPa
+    Mode '1:0.5_n': RMS Stress = 0.789 kPa
+    Mode '0.5:1_f': RMS Stress = 1.130 kPa
+    Mode '0.5:1_n': RMS Stress = 1.422 kPa
+    Global RMS Stress (for normalization): 1.694 kPa
+    Mode 'fs': Final Weight Factor = 0.789
+    Mode 'fn': Final Weight Factor = 0.879
+    Mode 'sf': Final Weight Factor = 1.215
+    Mode 'sn': Final Weight Factor = 1.347
+    Mode 'nf': Final Weight Factor = 1.508
+    Mode 'ns': Final Weight Factor = 1.737
+    Mode '1:1_f': Final Weight Factor = 0.534
+    Mode '1:1_n': Final Weight Factor = 1.032
+    Mode '1:0.75_f': Final Weight Factor = 0.694
+    Mode '1:0.75_n': Final Weight Factor = 1.492
+    Mode '0.75:1_f': Final Weight Factor = 1.073
+    Mode '0.75:1_n': Final Weight Factor = 1.409
+    Mode '1:0.5_f': Final Weight Factor = 0.850
+    Mode '1:0.5_n': Final Weight Factor = 2.146
+    Mode '0.5:1_f': Final Weight Factor = 1.499
+    Mode '0.5:1_n': Final Weight Factor = 1.191
+[RelNoise10pct] Using inverse stress magnitude sample weights.
+
+============================== Running Lasso Variants for RelNoise10pct ==============================
+
+--- Running LASSO Analysis (CV, AIC, BIC) (RelNoise10pct) ---
+  Running LassoCV to determine optimal alpha...
+  LassoCV determined optimal alpha: 0.006394
+
+  Generating a unified Lasso Path for all criteria...
+  Unified path created with 18 unique models.
+  DEBUG (Lasso+pos): weighted var=1.550829e+00, NMSE min=0.186, max=0.688
+  LassoCV model (k=4) identified on unified path in 0.19s.
+  LassoAIC model (k=5) identified on unified path.
+  LassoBIC model (k=5) identified on unified path.
+
+  Generating plots from unified path data...
+Saved activation heatmap: outputs_cofC/RelNoise10pct/RelNoise10pct_Lasso_ActivationHeatmap.pdf
+
+============================== Running LARS Variants for RelNoise10pct ==============================
+
+--- Running LARS Analysis (CV, AIC, BIC; unified path, POSITIVE) (RelNoise10pct) ---
+  Cross-validating on unified LARS supports…
+Saved activation heatmap: outputs_cofC/RelNoise10pct/RelNoise10pct_LARS_ActivationHeatmap.pdf
+
+============================== Running OMP Variants for RelNoise10pct ==============================
+
+--- Running OMP Analysis (CV, AIC, BIC; unified path, POSITIVE) (RelNoise10pct) ---
+  Cross-validating on unified OMP supports…
+Saved activation heatmap: outputs_cofC/RelNoise10pct/RelNoise10pct_OMP_ActivationHeatmap.pdf
+
+--- Stage 2: Refining RelNoise10pct LassoCV Model ---
+  Optimizing 7 parameters (4 w2, 3 w1) for 4 active terms...
+  Optimization finished in 10.88 seconds. Success: True
+
+  --- Refined RelNoise10pct LassoCV Model Summary ---
+  Number of active terms: 4
+    Term 7 (c7(I2-3)^2): w2 = 4.9183
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0969, w1 = 5.1291
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.9102, w1 = 1.1264
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.6877, w1 = 1.1334
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_LassoCV_LassoCV_Comparison.pdf
+
+--- Stage 2: Refining RelNoise10pct LassoAIC Model ---
+  Optimizing 10 parameters (5 w2, 5 w1) for 5 active terms...
+  Optimization finished in 44.96 seconds. Success: True
+
+  --- Refined RelNoise10pct LassoAIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.7277, w1 = 0.9782
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.1064, w1 = 5.1213
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.5358, w1 = 1.5952
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0242, w1 = 9.2206
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1273, w1 = 3.0738
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_LassoAIC_LassoAIC_Comparison.pdf
+
+--- Stage 2: Refining RelNoise10pct LassoBIC Model ---
+  Optimizing 10 parameters (5 w2, 5 w1) for 5 active terms...
+  Optimization finished in 45.28 seconds. Success: True
+
+  --- Refined RelNoise10pct LassoBIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.7277, w1 = 0.9782
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.1064, w1 = 5.1213
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.5358, w1 = 1.5952
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0242, w1 = 9.2206
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1273, w1 = 3.0738
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_LassoBIC_LassoBIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsCV coefficients.
+    NNLS for LarsCV: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise10pct LarsCV Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise10pct LarsCV coefficients.
+    NNLS for RelNoise10pct LarsCV: 5 initially selected -> 5 positive coefficients.
+  Optimizing 9 parameters (5 w2, 4 w1) for 5 active terms...
+  Optimization finished in 44.30 seconds. Success: True
+
+  --- Refined RelNoise10pct LarsCV Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 3.7513, w1 = 0.9777
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.1079, w1 = 5.0738
+    Term 19 (c19(I4n-1)^2): w2 = 2.5677
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0244, w1 = 9.1820
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1221, w1 = 3.1513
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_LarsCV_LarsCV_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsAIC coefficients.
+    NNLS for LarsAIC: 4 -> 4 positive coefficients.
+
+--- Stage 2: Refining RelNoise10pct LarsAIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise10pct LarsAIC coefficients.
+    NNLS for RelNoise10pct LarsAIC: 4 initially selected -> 4 positive coefficients.
+  Optimizing 8 parameters (4 w2, 4 w1) for 4 active terms...
+  Optimization finished in 12.15 seconds. Success: True
+
+  --- Refined RelNoise10pct LarsAIC Model Summary ---
+  Number of active terms: 4
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 4.9885, w1 = 0.9441
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0968, w1 = 5.1699
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.8639, w1 = 1.1447
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.5091, w1 = 1.4627
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_LarsAIC_LarsAIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for LarsBIC coefficients.
+    NNLS for LarsBIC: 3 -> 3 positive coefficients.
+
+--- Stage 2: Refining RelNoise10pct LarsBIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise10pct LarsBIC coefficients.
+    NNLS for RelNoise10pct LarsBIC: 3 initially selected -> 3 positive coefficients.
+  Optimizing 5 parameters (3 w2, 2 w1) for 3 active terms...
+  Optimization finished in 5.08 seconds. Success: True
+
+  --- Refined RelNoise10pct LarsBIC Model Summary ---
+  Number of active terms: 3
+    Term 7 (c7(I2-3)^2): w2 = 5.8383
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.0893, w1 = 5.1520
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.3856, w1 = 1.3231
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_LarsBIC_LarsBIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPCV coefficients.
+    NNLS for OMPCV: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise10pct OMPCV Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise10pct OMPCV coefficients.
+    NNLS for RelNoise10pct OMPCV: 5 initially selected -> 5 positive coefficients.
+  Optimizing 9 parameters (5 w2, 4 w1) for 5 active terms...
+  Optimization finished in 42.21 seconds. Success: True
+
+  --- Refined RelNoise10pct OMPCV Model Summary ---
+  Number of active terms: 5
+    Term 7 (c7(I2-3)^2): w2 = 3.8164
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.1051, w1 = 5.1261
+    Term 20 (c20exp(w10(I4n-1)^2)): w2 = 1.4499, w1 = 1.6840
+    Term 24 (c24exp(w12(I8fs)^2)): w2 = 0.0201, w1 = 9.7924
+    Term 28 (c28exp(w14(I8fn)^2)): w2 = 0.1073, w1 = 3.4065
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_OMPCV_OMPCV_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPAIC coefficients.
+    NNLS for OMPAIC: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise10pct OMPAIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise10pct OMPAIC coefficients.
+    NNLS for RelNoise10pct OMPAIC: 5 initially selected -> 5 positive coefficients.
+  Optimizing 7 parameters (5 w2, 2 w1) for 5 active terms...
+  Optimization finished in 15.60 seconds. Success: True
+
+  --- Refined RelNoise10pct OMPAIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 4.5804, w1 = 0.9461
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.1016, w1 = 5.1116
+    Term 19 (c19(I4n-1)^2): w2 = 2.1916
+    Term 23 (c23(I8fs)^2): w2 = 1.0390
+    Term 27 (c27(I8fn)^2): w2 = 0.4503
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_OMPAIC_OMPAIC_Comparison.pdf
+  INFO: Applying NNLS pre-refinement for OMPBIC coefficients.
+    NNLS for OMPBIC: 5 -> 5 positive coefficients.
+
+--- Stage 2: Refining RelNoise10pct OMPBIC Model ---
+  INFO: Applying NNLS pre-refinement for RelNoise10pct OMPBIC coefficients.
+    NNLS for RelNoise10pct OMPBIC: 5 initially selected -> 5 positive coefficients.
+  Optimizing 7 parameters (5 w2, 2 w1) for 5 active terms...
+  Optimization finished in 15.42 seconds. Success: True
+
+  --- Refined RelNoise10pct OMPBIC Model Summary ---
+  Number of active terms: 5
+    Term 8 (c8exp(w4(I2-3)^2)): w2 = 4.5804, w1 = 0.9461
+    Term 16 (c16exp(w8(I4s-1)^2)): w2 = 0.1016, w1 = 5.1116
+    Term 19 (c19(I4n-1)^2): w2 = 2.1916
+    Term 23 (c23(I8fs)^2): w2 = 1.0390
+    Term 27 (c27(I8fn)^2): w2 = 0.4503
+Saved plot: outputs_cofC/RelNoise10pct/RelNoise10pct_OMPBIC_OMPBIC_Comparison.pdf
+
+
+================================================================================
+### FINAL DETAILED PERFORMANCE SUMMARY ACROSS NOISE LEVELS ###
+================================================================================
+
+
+--- FINAL DETAILED PERFORMANCE SUMMARY TABLE ---
+    Noise Level    Method Selection  N Terms  Overall R2  Overall RMSE  0.5:1_f R2  0.5:1_n R2  0.75:1_f R2  0.75:1_n R2  1:0.5_f R2  1:0.5_n R2  1:0.75_f R2  1:0.75_n R2  1:1_f R2  1:1_n R2  fn R2  fs R2  nf R2  ns R2  sf R2  sn R2  0.5:1_f RMSE  0.5:1_n RMSE  0.75:1_f RMSE  0.75:1_n RMSE  1:0.5_f RMSE  1:0.5_n RMSE  1:0.75_f RMSE  1:0.75_n RMSE  1:1_f RMSE  1:1_n RMSE  fn RMSE  fs RMSE  nf RMSE  ns RMSE  sf RMSE  sn RMSE
+N/A (Reference) PDF Model         -        4       0.924         0.373       0.759       0.923        0.946        0.853       0.895       0.895        0.966        0.904     0.906     0.861  0.978  0.989  0.775  0.802  0.953  0.911         0.356         0.252          0.263          0.330         0.474         0.175          0.335          0.269       0.778       0.555    0.228    0.174    0.378    0.366    0.225    0.308
+   RelNoise0pct        CV     Lasso        4       0.872         0.484       0.938       0.743        0.994        0.781       0.598       0.798        0.793        0.806     0.891     0.867  0.910  0.932  0.985  0.977  0.927  0.913         0.181         0.458          0.088          0.402         0.925         0.242          0.821          0.383       0.838       0.543    0.460    0.436    0.098    0.124    0.281    0.304
+   RelNoise0pct       AIC     Lasso        5       0.876         0.477       0.943       0.743        0.993        0.783       0.594       0.786        0.791        0.802     0.892     0.865  0.943  0.934  0.980  0.984  0.928  0.953         0.174         0.458          0.095          0.400         0.930         0.250          0.826          0.387       0.835       0.548    0.368    0.428    0.112    0.105    0.278    0.224
+   RelNoise0pct       BIC     Lasso        5       0.876         0.477       0.943       0.743        0.993        0.783       0.594       0.786        0.791        0.802     0.892     0.865  0.943  0.934  0.980  0.984  0.928  0.953         0.174         0.458          0.095          0.400         0.930         0.250          0.826          0.387       0.835       0.548    0.368    0.428    0.112    0.105    0.278    0.224
+   RelNoise0pct        CV      Lars        5       0.873         0.483       0.946       0.745        0.993        0.774       0.595       0.779        0.795        0.792     0.900     0.850  0.935  0.912  0.986  0.963  0.914  0.944         0.170         0.457          0.093          0.409         0.928         0.254          0.816          0.397       0.802       0.577    0.393    0.496    0.093    0.158    0.303    0.244
+   RelNoise0pct       AIC      Lars        4       0.872         0.484       0.938       0.742        0.994        0.781       0.598       0.799        0.793        0.806     0.892     0.867  0.909  0.932  0.985  0.978  0.927  0.912         0.181         0.459          0.088          0.402         0.925         0.242          0.821          0.383       0.837       0.544    0.463    0.436    0.099    0.123    0.281    0.305
+   RelNoise0pct       BIC      Lars        4       0.872         0.484       0.938       0.742        0.994        0.781       0.598       0.799        0.793        0.806     0.892     0.867  0.909  0.932  0.985  0.978  0.927  0.912         0.181         0.459          0.088          0.402         0.925         0.242          0.821          0.383       0.837       0.544    0.463    0.436    0.099    0.123    0.281    0.305
+   RelNoise0pct        CV       OMP        5       0.866         0.495       0.939       0.743        0.994        0.781       0.597       0.796        0.793        0.805     0.892     0.866  0.925  0.854  0.974  0.979  0.918  0.938         0.179         0.458          0.089          0.402         0.926         0.244          0.822          0.385       0.835       0.546    0.420    0.638    0.129    0.118    0.298    0.256
+   RelNoise0pct       AIC       OMP        5       0.866         0.495       0.939       0.743        0.994        0.781       0.597       0.796        0.793        0.805     0.892     0.866  0.925  0.854  0.974  0.979  0.918  0.938         0.179         0.458          0.089          0.402         0.926         0.244          0.822          0.385       0.835       0.546    0.420    0.638    0.129    0.118    0.298    0.256
+   RelNoise0pct       BIC       OMP        5       0.866         0.495       0.939       0.743        0.994        0.781       0.597       0.796        0.793        0.805     0.892     0.866  0.925  0.854  0.974  0.979  0.918  0.938         0.179         0.458          0.089          0.402         0.926         0.244          0.822          0.385       0.835       0.546    0.420    0.638    0.129    0.118    0.298    0.256
+   RelNoise5pct        CV     Lasso        4       0.862         0.503       0.943       0.755        0.991        0.787       0.604       0.783        0.786        0.812     0.872     0.892  0.889  0.868  0.987  0.961  0.915  0.931         0.173         0.447          0.105          0.397         0.919         0.251          0.835          0.377       0.909       0.491    0.512    0.607    0.090    0.163    0.301    0.271
+   RelNoise5pct       AIC     Lasso        5       0.873         0.482       0.948       0.753        0.990        0.790       0.598       0.769        0.783        0.808     0.874     0.888  0.930  0.934  0.978  0.985  0.930  0.966         0.165         0.449          0.112          0.394         0.926         0.259          0.841          0.381       0.902       0.498    0.407    0.428    0.118    0.100    0.273    0.191
+   RelNoise5pct       BIC     Lasso        5       0.873         0.482       0.948       0.753        0.990        0.790       0.598       0.769        0.783        0.808     0.874     0.888  0.930  0.934  0.978  0.985  0.930  0.966         0.165         0.449          0.112          0.394         0.926         0.259          0.841          0.381       0.902       0.498    0.407    0.428    0.118    0.100    0.273    0.191
+   RelNoise5pct        CV      Lars        5       0.872         0.483       0.948       0.753        0.990        0.791       0.597       0.770        0.783        0.809     0.874     0.889  0.925  0.934  0.977  0.986  0.930  0.964         0.166         0.449          0.112          0.393         0.926         0.259          0.841          0.380       0.903       0.497    0.420    0.428    0.121    0.098    0.274    0.196
+   RelNoise5pct       AIC      Lars        4       0.869         0.489       0.944       0.753        0.991        0.789       0.602       0.782        0.785        0.812     0.873     0.891  0.893  0.932  0.986  0.975  0.928  0.931         0.172         0.449          0.106          0.395         0.921         0.252          0.836          0.377       0.905       0.493    0.502    0.436    0.094    0.131    0.278    0.270
+   RelNoise5pct       BIC      Lars        3       0.852         0.520       0.935       0.750        0.993        0.788       0.605       0.803        0.788        0.819     0.873     0.892  0.761  0.888  0.927  0.856  0.921  0.965         0.185         0.452          0.096          0.396         0.917         0.240          0.831          0.371       0.905       0.489    0.751    0.560    0.214    0.313    0.290    0.194
+   RelNoise5pct        CV       OMP        5       0.871         0.485       0.952       0.746        0.989        0.799       0.585       0.757        0.777        0.808     0.877     0.884  0.957  0.902  0.968  0.973  0.954  0.978         0.159         0.456          0.121          0.386         0.940         0.266          0.853          0.382       0.891       0.507    0.318    0.524    0.143    0.134    0.223    0.153
+   RelNoise5pct       AIC       OMP        5       0.871         0.485       0.952       0.746        0.989        0.799       0.585       0.757        0.777        0.808     0.877     0.884  0.957  0.902  0.968  0.973  0.954  0.978         0.159         0.456          0.121          0.386         0.940         0.266          0.853          0.382       0.891       0.507    0.318    0.524    0.143    0.134    0.223    0.153
+   RelNoise5pct       BIC       OMP        5       0.871         0.485       0.952       0.746        0.989        0.799       0.585       0.757        0.777        0.808     0.877     0.884  0.957  0.902  0.968  0.973  0.954  0.978         0.159         0.456          0.121          0.386         0.940         0.266          0.853          0.382       0.891       0.507    0.318    0.524    0.143    0.134    0.223    0.153
+  RelNoise10pct        CV     Lasso        4       0.859         0.508       0.956       0.776        0.987        0.782       0.613       0.743        0.782        0.805     0.855     0.905  0.879  0.871  0.985  0.974  0.909  0.942         0.152         0.428          0.130          0.402         0.908         0.274          0.843          0.385       0.968       0.460    0.535    0.600    0.096    0.132    0.312    0.249
+  RelNoise10pct       AIC     Lasso        5       0.870         0.487       0.963       0.776        0.985        0.783       0.607       0.719        0.778        0.798     0.856     0.902  0.940  0.937  0.965  0.959  0.933  0.975         0.140         0.427          0.141          0.401         0.915         0.286          0.851          0.392       0.965       0.466    0.375    0.420    0.148    0.168    0.267    0.162
+  RelNoise10pct       BIC     Lasso        5       0.870         0.487       0.963       0.776        0.985        0.783       0.607       0.719        0.778        0.798     0.856     0.902  0.940  0.937  0.965  0.959  0.933  0.975         0.140         0.427          0.141          0.401         0.915         0.286          0.851          0.392       0.965       0.466    0.375    0.420    0.148    0.168    0.267    0.162
+  RelNoise10pct        CV      Lars        5       0.870         0.488       0.964       0.778        0.984        0.782       0.608       0.715        0.778        0.797     0.854     0.903  0.935  0.937  0.964  0.961  0.933  0.972         0.139         0.425          0.143          0.402         0.914         0.288          0.851          0.393       0.970       0.464    0.393    0.419    0.151    0.164    0.268    0.172
+  RelNoise10pct       AIC      Lars        4       0.861         0.504       0.956       0.773        0.987        0.784       0.610       0.745        0.781        0.806     0.857     0.904  0.882  0.882  0.987  0.977  0.916  0.946         0.153         0.431          0.129          0.400         0.911         0.273          0.845          0.384       0.962       0.462    0.528    0.574    0.090    0.125    0.300    0.238
+  RelNoise10pct       BIC      Lars        3       0.848         0.528       0.950       0.773        0.989        0.783       0.615       0.764        0.784        0.812     0.855     0.907  0.737  0.886  0.949  0.881  0.918  0.958         0.163         0.431          0.121          0.401         0.905         0.262          0.839          0.378       0.969       0.454    0.788    0.565    0.179    0.284    0.296    0.211
+  RelNoise10pct        CV       OMP        5       0.870         0.487       0.962       0.777        0.985        0.782       0.608       0.721        0.778        0.798     0.855     0.903  0.938  0.936  0.964  0.955  0.933  0.972         0.141         0.427          0.140          0.401         0.914         0.285          0.850          0.391       0.966       0.464    0.381    0.422    0.152    0.175    0.268    0.171
+  RelNoise10pct       AIC       OMP        5       0.860         0.507       0.959       0.776        0.986        0.782       0.610       0.732        0.780        0.801     0.856     0.904  0.912  0.849  0.958  0.987  0.905  0.967         0.147         0.427          0.135          0.402         0.911         0.280          0.846          0.388       0.966       0.463    0.456    0.648    0.163    0.095    0.319    0.188
+  RelNoise10pct       BIC       OMP        5       0.860         0.507       0.959       0.776        0.986        0.782       0.610       0.732        0.780        0.801     0.856     0.904  0.912  0.849  0.958  0.987  0.905  0.967         0.147         0.427          0.135          0.402         0.911         0.280          0.846          0.388       0.966       0.463    0.456    0.648    0.163    0.095    0.319    0.188
+
+Completed all scenarios at: 2026-07-24 10:32:03
+Total analysis duration: 0:14:14.445886

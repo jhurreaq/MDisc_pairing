@@ -1,5 +1,6 @@
 # Local environment
 venvMDisc/
+.venvMDisc/
 
 # Python caches
 __pycache__/
@@ -14,4 +15,3 @@ __pycache__/
 # Input data files (keep folders, ignore contents except .gitkeep)
 **/input/*
 !**/input/.gitkeep
-

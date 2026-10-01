@@ -1,0 +1,676 @@
+Starting Sparse Regression Analysis (Fit Subset / Evaluate Full) at: 2025-11-15 13:50:28
+Using Model Library: MR3_OgdenExt
+Base Save Directory: outputs
+
+--- Loading Full Combined Dataset (for evaluation structure) ---
+
+--- Loading Data ---
+Loaded Treloar UT: ./input/TreloarDataUT.csv
+Loaded Treloar PS: ./input/TreloarDataPS.csv
+Loaded Treloar EBT: ./input/TreloarDataEBT.csv
+Loaded Kawabata (';')
+Processed 75 Kawabata points.
+
+--- Dataset Summary ---
+Total data points combined: 128
+Sources: ['Treloar' 'Kawabata']
+Modes: ['UT' 'PS' 'EBT' 'BIAX']
+--- Full Combined Dataset Loaded Successfully ---
+Saved raw data plot: outputs/Combined_RawData_Reference_RawData.pdf
+
+################################################################################
+### PROCESSING FITTING SCENARIO: Fit_Treloar_Only ###
+### Model Library: MR3_OgdenExt ###
+### Refit Method (on subset): Ridge(α=1.0e-06), Threshold=1.0e-06 ###
+### Weight Factor: 2.0, Small Strain Thresh: 50.0% ###
+################################################################################
+
+--- Creating data subset for fitting: Treloar=True, Kawabata=False ---
+  Included Treloar data for fitting.
+  Total data points in fitting subset: 53
+
+Generating Model Library & Constructing Design Matrix from Fitting Subset...
+INFO: Weighting disabled.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Unweighted): (67, 15)
+Weighted design matrix for FITTING created with shape: (67, 15)
+Scaling fitting data (both X and y)...
+Fitting data prepared and scaled successfully. X shape: (67, 15), y scaled variance: 1.0000
+
+============================== Running Lasso Variants on 'Fit_Treloar_Only' Data ==============================
+
+--- Running LASSO Analysis (CV, AIC, BIC) (Fit_Treloar_Only_MR3_OgdenExt) ---
+  Running LassoCV to determine optimal alpha...
+  LassoCV determined optimal alpha: 0.000451
+
+  Generating a unified Lasso Path for all criteria...
+  Unified path created with 20 unique models.
+  DEBUG: NMSE range: 0.003 to 0.262
+  DEBUG: y variance: 1.000
+  LassoCV model (k=4) identified on unified path in 0.38s.
+  LassoAIC model (k=4) identified on unified path.
+  LassoBIC model (k=4) identified on unified path.
+
+  Generating plots from unified path data...
+Saved activation heatmap: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_Lasso_ActivationHeatmap.pdf
+
+============================== Running LARS Variants on 'Fit_Treloar_Only' Data ==============================
+
+--- Running LARS Analysis (CV, AIC, BIC; unified path) (Fit_Treloar_Only_MR3_OgdenExt) ---
+  Cross-validating on unified LARS supports…
+Saved activation heatmap: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_Lars_ActivationHeatmap.pdf
+
+============================== Running OMP Variants on 'Fit_Treloar_Only' Data ==============================
+
+--- Running OMP Analysis (CV, AIC, BIC; unified path) (Fit_Treloar_Only_MR3_OgdenExt) ---
+  OMP stopped at k=6: no positively-correlated atoms remain.
+  Cross-validating on unified OMP supports…
+Saved activation heatmap: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_OMP_ActivationHeatmap.pdf
+
+======================================== Post-processing All Models for Fitting Scenario: Fit_Treloar_Only ========================================
+--- Refitting on FIT SUBSET, Evaluating on FULL Combined Dataset ---
+
+--- Post-processing Result for: LassoCV (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (LassoCV / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (LassoCV): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (LassoCV - based on fit subset refit):
+    'MR: (I₁-3)': 0.075203
+    'MR: (I₁-3)^3': 0.000031
+    'Ogden: λ^-1': 0.081871
+    'Ogden: λ^1': 0.439828
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C10 Term ('MR: (I₁-3)') Coeff (C10) = 0.0752
+      Ogden Term: Coeff (C_i=0.0819), α=-1.0000 => Implied μ_i=-0.0819. (μ_i*α_i = 0.0819)
+      Ogden Term: Coeff (C_i=0.4398), α=1.0000 => Implied μ_i=0.4398. (μ_i*α_i = 0.4398)
+      MR contribution (2*(C10+C01)) = 0.1504
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.2608
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: LassoCV model passed basic consistency check (μ₀=0.4113).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9968, RMSE=0.0632 | P22 R²=0.9909, RMSE=0.0433
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9959, RMSE=0.1249 (n=25)
+    PS Mode P11: R²=0.9922, RMSE=0.0515 (n=14)
+    EBT Mode P11: R²=0.9990, RMSE=0.0228 (n=14)
+    EBT Mode P22: R²=0.9990, RMSE=0.0228 (n=14)
+    BIAX Mode P11: R²=0.9891, RMSE=0.0319 (n=75)
+    BIAX Mode P22: R²=0.9778, RMSE=0.0462 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for LassoCV...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_LassoCV_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: LassoAIC (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (LassoAIC / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (LassoAIC): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (LassoAIC - based on fit subset refit):
+    'MR: (I₁-3)': 0.075203
+    'MR: (I₁-3)^3': 0.000031
+    'Ogden: λ^-1': 0.081871
+    'Ogden: λ^1': 0.439828
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C10 Term ('MR: (I₁-3)') Coeff (C10) = 0.0752
+      Ogden Term: Coeff (C_i=0.0819), α=-1.0000 => Implied μ_i=-0.0819. (μ_i*α_i = 0.0819)
+      Ogden Term: Coeff (C_i=0.4398), α=1.0000 => Implied μ_i=0.4398. (μ_i*α_i = 0.4398)
+      MR contribution (2*(C10+C01)) = 0.1504
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.2608
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: LassoAIC model passed basic consistency check (μ₀=0.4113).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9968, RMSE=0.0632 | P22 R²=0.9909, RMSE=0.0433
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9959, RMSE=0.1249 (n=25)
+    PS Mode P11: R²=0.9922, RMSE=0.0515 (n=14)
+    EBT Mode P11: R²=0.9990, RMSE=0.0228 (n=14)
+    EBT Mode P22: R²=0.9990, RMSE=0.0228 (n=14)
+    BIAX Mode P11: R²=0.9891, RMSE=0.0319 (n=75)
+    BIAX Mode P22: R²=0.9778, RMSE=0.0462 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for LassoAIC...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_LassoAIC_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: LassoBIC (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (LassoBIC / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (LassoBIC): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (LassoBIC - based on fit subset refit):
+    'MR: (I₁-3)': 0.075203
+    'MR: (I₁-3)^3': 0.000031
+    'Ogden: λ^-1': 0.081871
+    'Ogden: λ^1': 0.439828
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C10 Term ('MR: (I₁-3)') Coeff (C10) = 0.0752
+      Ogden Term: Coeff (C_i=0.0819), α=-1.0000 => Implied μ_i=-0.0819. (μ_i*α_i = 0.0819)
+      Ogden Term: Coeff (C_i=0.4398), α=1.0000 => Implied μ_i=0.4398. (μ_i*α_i = 0.4398)
+      MR contribution (2*(C10+C01)) = 0.1504
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.2608
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: LassoBIC model passed basic consistency check (μ₀=0.4113).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9968, RMSE=0.0632 | P22 R²=0.9909, RMSE=0.0433
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9959, RMSE=0.1249 (n=25)
+    PS Mode P11: R²=0.9922, RMSE=0.0515 (n=14)
+    EBT Mode P11: R²=0.9990, RMSE=0.0228 (n=14)
+    EBT Mode P22: R²=0.9990, RMSE=0.0228 (n=14)
+    BIAX Mode P11: R²=0.9891, RMSE=0.0319 (n=75)
+    BIAX Mode P22: R²=0.9778, RMSE=0.0462 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for LassoBIC...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_LassoBIC_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: LarsCV (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (LarsCV / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (LarsCV): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (LarsCV - based on fit subset refit):
+    'MR: (I₂-3)': 0.002385
+    'MR: (I₁-3)^3': 0.000028
+    'Ogden: λ^1': 0.788450
+    'Ogden: λ^3': 0.006653
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4289 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C01 Term ('MR: (I₂-3)') Coeff (C01) = 0.0024
+      Ogden Term: Coeff (C_i=0.7885), α=1.0000 => Implied μ_i=0.7885. (μ_i*α_i = 0.7885)
+      Ogden Term: Coeff (C_i=0.0067), α=3.0000 => Implied μ_i=0.0200. (μ_i*α_i = 0.0599)
+      MR contribution (2*(C10+C01)) = 0.0048
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.4242
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: LarsCV model passed basic consistency check (μ₀=0.4289).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9964, RMSE=0.0669 | P22 R²=0.9931, RMSE=0.0378
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9954, RMSE=0.1324 (n=25)
+    PS Mode P11: R²=0.9881, RMSE=0.0636 (n=14)
+    EBT Mode P11: R²=0.9968, RMSE=0.0420 (n=14)
+    EBT Mode P22: R²=0.9968, RMSE=0.0420 (n=14)
+    BIAX Mode P11: R²=0.9925, RMSE=0.0265 (n=75)
+    BIAX Mode P22: R²=0.9858, RMSE=0.0369 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for LarsCV...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_LarsCV_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: LarsAIC (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (LarsAIC / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (LarsAIC): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (LarsAIC - based on fit subset refit):
+    'MR: (I₂-3)': 0.002385
+    'MR: (I₁-3)^3': 0.000028
+    'Ogden: λ^1': 0.788450
+    'Ogden: λ^3': 0.006653
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4289 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C01 Term ('MR: (I₂-3)') Coeff (C01) = 0.0024
+      Ogden Term: Coeff (C_i=0.7885), α=1.0000 => Implied μ_i=0.7885. (μ_i*α_i = 0.7885)
+      Ogden Term: Coeff (C_i=0.0067), α=3.0000 => Implied μ_i=0.0200. (μ_i*α_i = 0.0599)
+      MR contribution (2*(C10+C01)) = 0.0048
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.4242
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: LarsAIC model passed basic consistency check (μ₀=0.4289).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9964, RMSE=0.0669 | P22 R²=0.9931, RMSE=0.0378
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9954, RMSE=0.1324 (n=25)
+    PS Mode P11: R²=0.9881, RMSE=0.0636 (n=14)
+    EBT Mode P11: R²=0.9968, RMSE=0.0420 (n=14)
+    EBT Mode P22: R²=0.9968, RMSE=0.0420 (n=14)
+    BIAX Mode P11: R²=0.9925, RMSE=0.0265 (n=75)
+    BIAX Mode P22: R²=0.9858, RMSE=0.0369 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for LarsAIC...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_LarsAIC_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: LarsBIC (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (LarsBIC / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (LarsBIC): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (LarsBIC - based on fit subset refit):
+    'MR: (I₂-3)': 0.002385
+    'MR: (I₁-3)^3': 0.000028
+    'Ogden: λ^1': 0.788450
+    'Ogden: λ^3': 0.006653
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4289 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C01 Term ('MR: (I₂-3)') Coeff (C01) = 0.0024
+      Ogden Term: Coeff (C_i=0.7885), α=1.0000 => Implied μ_i=0.7885. (μ_i*α_i = 0.7885)
+      Ogden Term: Coeff (C_i=0.0067), α=3.0000 => Implied μ_i=0.0200. (μ_i*α_i = 0.0599)
+      MR contribution (2*(C10+C01)) = 0.0048
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.4242
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: LarsBIC model passed basic consistency check (μ₀=0.4289).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9964, RMSE=0.0669 | P22 R²=0.9931, RMSE=0.0378
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9954, RMSE=0.1324 (n=25)
+    PS Mode P11: R²=0.9881, RMSE=0.0636 (n=14)
+    EBT Mode P11: R²=0.9968, RMSE=0.0420 (n=14)
+    EBT Mode P22: R²=0.9968, RMSE=0.0420 (n=14)
+    BIAX Mode P11: R²=0.9925, RMSE=0.0265 (n=75)
+    BIAX Mode P22: R²=0.9858, RMSE=0.0369 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for LarsBIC...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_LarsBIC_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: OMPCV (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (OMPCV / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (OMPCV): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (OMPCV - based on fit subset refit):
+    'MR: (I₁-3)': 0.075203
+    'MR: (I₁-3)^3': 0.000031
+    'Ogden: λ^-1': 0.081871
+    'Ogden: λ^1': 0.439828
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C10 Term ('MR: (I₁-3)') Coeff (C10) = 0.0752
+      Ogden Term: Coeff (C_i=0.0819), α=-1.0000 => Implied μ_i=-0.0819. (μ_i*α_i = 0.0819)
+      Ogden Term: Coeff (C_i=0.4398), α=1.0000 => Implied μ_i=0.4398. (μ_i*α_i = 0.4398)
+      MR contribution (2*(C10+C01)) = 0.1504
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.2608
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: OMPCV model passed basic consistency check (μ₀=0.4113).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9968, RMSE=0.0632 | P22 R²=0.9909, RMSE=0.0433
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9959, RMSE=0.1249 (n=25)
+    PS Mode P11: R²=0.9922, RMSE=0.0515 (n=14)
+    EBT Mode P11: R²=0.9990, RMSE=0.0228 (n=14)
+    EBT Mode P22: R²=0.9990, RMSE=0.0228 (n=14)
+    BIAX Mode P11: R²=0.9891, RMSE=0.0319 (n=75)
+    BIAX Mode P22: R²=0.9778, RMSE=0.0462 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for OMPCV...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_OMPCV_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: OMPAIC (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (OMPAIC / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (OMPAIC): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (OMPAIC - based on fit subset refit):
+    'MR: (I₁-3)': 0.075203
+    'MR: (I₁-3)^3': 0.000031
+    'Ogden: λ^-1': 0.081871
+    'Ogden: λ^1': 0.439828
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C10 Term ('MR: (I₁-3)') Coeff (C10) = 0.0752
+      Ogden Term: Coeff (C_i=0.0819), α=-1.0000 => Implied μ_i=-0.0819. (μ_i*α_i = 0.0819)
+      Ogden Term: Coeff (C_i=0.4398), α=1.0000 => Implied μ_i=0.4398. (μ_i*α_i = 0.4398)
+      MR contribution (2*(C10+C01)) = 0.1504
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.2608
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: OMPAIC model passed basic consistency check (μ₀=0.4113).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9968, RMSE=0.0632 | P22 R²=0.9909, RMSE=0.0433
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9959, RMSE=0.1249 (n=25)
+    PS Mode P11: R²=0.9922, RMSE=0.0515 (n=14)
+    EBT Mode P11: R²=0.9990, RMSE=0.0228 (n=14)
+    EBT Mode P22: R²=0.9990, RMSE=0.0228 (n=14)
+    BIAX Mode P11: R²=0.9891, RMSE=0.0319 (n=75)
+    BIAX Mode P22: R²=0.9778, RMSE=0.0462 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for OMPAIC...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_OMPAIC_RefitSubset_EvalFull_Predictions.pdf
+
+--- Post-processing Result for: OMPBIC (fitted on 'Fit_Treloar_Only') ---
+
+--- Generating Final Model & Predictions (OMPBIC / Ridge Refit on FIT SUBSET / Evaluate on FULL SET) ---
+    Refit Scope: 53 points. Evaluation Scope: 128 points.
+  Initial selection (OMPBIC): 4 features.
+  Reconstructing WEIGHTED design matrix for refit using FIT SUBSET (53 points)...
+INFO: Applied weight factor 2.0 to 17 points <= 50.0% strain.
+Generated 15 unique basis terms for this scenario.
+Constructed design matrix (Weighted): (67, 15)
+  Refitting 4 features on WEIGHTED FIT SUBSET data (shape: (67, 4)) using Ridge...
+  Applying threshold (1.0e-06) to Ridge coefficients...
+  Final selected features after thresholding: 4
+  Final Model (OMPBIC - based on fit subset refit):
+    'MR: (I₁-3)': 0.075203
+    'MR: (I₁-3)^3': 0.000031
+    'Ogden: λ^-1': 0.081871
+    'Ogden: λ^1': 0.439828
+  Checking physical consistency...
+  Consistency Check Results:
+    Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+      MR C10 Term ('MR: (I₁-3)') Coeff (C10) = 0.0752
+      Ogden Term: Coeff (C_i=0.0819), α=-1.0000 => Implied μ_i=-0.0819. (μ_i*α_i = 0.0819)
+      Ogden Term: Coeff (C_i=0.4398), α=1.0000 => Implied μ_i=0.4398. (μ_i*α_i = 0.4398)
+      MR contribution (2*(C10+C01)) = 0.1504
+      Ogden contribution (0.5*Σ(μᵢαᵢ)) = 0.2608
+      NOTE: Ogden consistency assumes discovered 'coeff' C_i relates to standard μ_i via μ_i = C_i * α_i.
+      CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+  INFO: OMPBIC model passed basic consistency check (μ₀=0.4113).
+
+  Reconstructing UNWEIGHTED design matrix for FULL EVALUATION set (128 points)...
+Generated 15 unique basis terms for this scenario.
+    Building unweighted evaluation matrix with expected shape: (217, 15)
+    Filtering non-finite values from full unweighted matrix/target...
+    Final unweighted evaluation matrix shape after filtering: (217, 15)
+  Calculating predictions on FULL evaluation set using matrix shape (217, 4) and 4 coeffs (from subset refit)...
+  Mapping predictions back to original FULL DataFrame structure...
+  Successfully mapped 217 predictions onto the full dataset structure.
+  Calculating OVERALL metrics on FULL evaluation set predictions...
+  Overall Metrics on Full Set: P11 R²=0.9968, RMSE=0.0632 | P22 R²=0.9909, RMSE=0.0433
+  Calculating mode-specific metrics for modes: ['UT' 'PS' 'EBT' 'BIAX']
+    UT Mode P11: R²=0.9959, RMSE=0.1249 (n=25)
+    PS Mode P11: R²=0.9922, RMSE=0.0515 (n=14)
+    EBT Mode P11: R²=0.9990, RMSE=0.0228 (n=14)
+    EBT Mode P22: R²=0.9990, RMSE=0.0228 (n=14)
+    BIAX Mode P11: R²=0.9891, RMSE=0.0319 (n=75)
+    BIAX Mode P22: R²=0.9778, RMSE=0.0462 (n=75)
+  Preparing plots using full dataset structure...
+  DEBUG: Datasets found in plotting structure: ['Treloar' 'Kawabata']
+  DEBUG: Plotting Treloar: True, Plotting Kawabata: True
+  DEBUG: Entering COMBINED plot block for OMPBIC...
+Saved final prediction plot: outputs/Fit_Treloar_Only/Fit_Treloar_Only_MR3_OgdenExt_OMPBIC_RefitSubset_EvalFull_Predictions.pdf
+
+### Finished All Analyses & Post-processing for Fitting Scenario: Fit_Treloar_Only ###
+
+
+================================================================================
+### INITIAL SPARSE SELECTION SUMMARY (Fit on Scenario Subset, Weighted) ###
+================================================================================
+
+--- Fitting Scenario Used: Fit_Treloar_Only ---
+| Method      | Optimal Param    | Non-Zero | AIC       | BIC       | Time (s) |
+|-------------|------------------|----------|-----------|-----------|----------|
+| LassoCV     | CV α≈4.5e-04     | 4        | -3.79e+02 | -3.71e+02 | 0.3804   |
+| LassoAIC    | AIC α≈1.0e-06    | 4        | -3.79e+02 | -3.71e+02 | 0.0076   |
+| LassoBIC    | BIC α≈1.0e-06    | 4        | -3.79e+02 | -3.71e+02 | 0.0076   |
+| LarsCV      | CV k=6           | 4        | -3.61e+02 | -3.46e+02 | 0.0026   |
+| LarsAIC     | AIC k=6          | 4        | -3.61e+02 | -3.46e+02 | 0.0026   |
+| LarsBIC     | BIC k=6          | 4        | -3.61e+02 | -3.46e+02 | 0.0026   |
+| OMPCV       | CV k=6           | 4        | -3.77e+02 | -3.66e+02 | 0.0023   |
+| OMPAIC      | AIC k=6          | 4        | -3.77e+02 | -3.66e+02 | 0.0023   |
+| OMPBIC      | BIC k=6          | 4        | -3.77e+02 | -3.66e+02 | 0.0023   |
+
+================================================================================
+### FINAL MODEL EVALUATION SUMMARY (Refit: Ridge(α=1.0e-06) on Fit Subset, Threshold=1.0e-06) ###
+### Metrics Calculated on FULL UNWEIGHTED Combined Data | Consistency Check (μ₀ > 0) ###
+================================================================================
+
+--- Fitting Scenario Used: Fit_Treloar_Only ---
+| Method      | N Terms | R² (P11) | RMSE (P11) | R² (P22) | RMSE (P22) | Consistent |
+|-------------|---------|----------|------------|----------|------------|------------|
+| LassoCV     | 4       | 0.9968   | 0.0632     | 0.9909   | 0.0433     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₁-3)                              : 0.075203
+|      - MR: (I₁-3)^3                            : 0.000031
+|      - Ogden: λ^-1                             : 0.081871
+|      - Ogden: λ^1                              : 0.439828
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| LassoAIC    | 4       | 0.9968   | 0.0632     | 0.9909   | 0.0433     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₁-3)                              : 0.075203
+|      - MR: (I₁-3)^3                            : 0.000031
+|      - Ogden: λ^-1                             : 0.081871
+|      - Ogden: λ^1                              : 0.439828
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| LassoBIC    | 4       | 0.9968   | 0.0632     | 0.9909   | 0.0433     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₁-3)                              : 0.075203
+|      - MR: (I₁-3)^3                            : 0.000031
+|      - Ogden: λ^-1                             : 0.081871
+|      - Ogden: λ^1                              : 0.439828
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| LarsCV      | 4       | 0.9964   | 0.0669     | 0.9931   | 0.0378     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₂-3)                              : 0.002385
+|      - MR: (I₁-3)^3                            : 0.000028
+|      - Ogden: λ^1                              : 0.788450
+|      - Ogden: λ^3                              : 0.006653
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4289 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| LarsAIC     | 4       | 0.9964   | 0.0669     | 0.9931   | 0.0378     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₂-3)                              : 0.002385
+|      - MR: (I₁-3)^3                            : 0.000028
+|      - Ogden: λ^1                              : 0.788450
+|      - Ogden: λ^3                              : 0.006653
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4289 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| LarsBIC     | 4       | 0.9964   | 0.0669     | 0.9931   | 0.0378     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₂-3)                              : 0.002385
+|      - MR: (I₁-3)^3                            : 0.000028
+|      - Ogden: λ^1                              : 0.788450
+|      - Ogden: λ^3                              : 0.006653
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4289 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| OMPCV       | 4       | 0.9968   | 0.0632     | 0.9909   | 0.0433     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₁-3)                              : 0.075203
+|      - MR: (I₁-3)^3                            : 0.000031
+|      - Ogden: λ^-1                             : 0.081871
+|      - Ogden: λ^1                              : 0.439828
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| OMPAIC      | 4       | 0.9968   | 0.0632     | 0.9909   | 0.0433     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₁-3)                              : 0.075203
+|      - MR: (I₁-3)^3                            : 0.000031
+|      - Ogden: λ^-1                             : 0.081871
+|      - Ogden: λ^1                              : 0.439828
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+| OMPBIC      | 4       | 0.9968   | 0.0632     | 0.9909   | 0.0433     | OK         |
+|  -> Final Model Terms & Coefficients (from subset refit):
+|      - MR: (I₁-3)                              : 0.075203
+|      - MR: (I₁-3)^3                            : 0.000031
+|      - Ogden: λ^-1                             : 0.081871
+|      - Ogden: λ^1                              : 0.439828
+|  -> Calculated initial shear modulus μ₀ ≈ 0.4113 (using μ₀ = 2(C10+C01) + 0.5*Σ(μᵢαᵢ))
+|  -> CONSISTENCY PASS: Initial shear modulus μ₀ is positive.
+|------------------------------------------------------------------------------|
+
+================================================================================
+### MODE-SPECIFIC R² EVALUATION SUMMARY ###
+================================================================================
+
+--- Fitting Scenario Used: Fit_Treloar_Only ---
+| Method      | UT R²(P11) | PS R²(P11) | EBT R²(P11) | EBT R²(P22) | BIAX R²(P11) | BIAX R²(P22) |
+|-------------|------------|------------|-------------|-------------|--------------|--------------|
+| LassoCV     | 0.996      | 0.992      | 0.999       | 0.999       | 0.989        | 0.978        |
+| LassoAIC    | 0.996      | 0.992      | 0.999       | 0.999       | 0.989        | 0.978        |
+| LassoBIC    | 0.996      | 0.992      | 0.999       | 0.999       | 0.989        | 0.978        |
+| LarsCV      | 0.995      | 0.988      | 0.997       | 0.997       | 0.992        | 0.986        |
+| LarsAIC     | 0.995      | 0.988      | 0.997       | 0.997       | 0.992        | 0.986        |
+| LarsBIC     | 0.995      | 0.988      | 0.997       | 0.997       | 0.992        | 0.986        |
+| OMPCV       | 0.996      | 0.992      | 0.999       | 0.999       | 0.989        | 0.978        |
+| OMPAIC      | 0.996      | 0.992      | 0.999       | 0.999       | 0.989        | 0.978        |
+| OMPBIC      | 0.996      | 0.992      | 0.999       | 0.999       | 0.989        | 0.978        |
+
+| Sample Sizes by Mode:
+|   UT: P11: n=25
+|   PS: P11: n=14
+|   EBT: P11: n=14, P22: n=14
+|   BIAX: P11: n=75, P22: n=75
+
+Completed all scenarios at: 2025-11-15 13:50:37
+Total analysis duration: 0:00:09.581051
+================================================================================

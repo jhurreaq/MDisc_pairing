@@ -1,0 +1,234 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage[margin=2cm,landscape]{geometry}
+\usepackage{acronym}
+
+% Define acronyms
+\acrodef{UT}{Uniaxial Tension}
+\acrodef{PS}{Pure Shear}
+\acrodef{EBT}{Equibiaxial Tension}
+
+\begin{document}
+
+{\footnotesize
+\begin{longtable}{@{}lllccccccccc@{}}
+\caption{\textbf{Isotropic Synthetic Data:} Performance summary of discovered models . $R^2$ values are the coefficients of determination of the $P_{11}$ stress component for the \acf{UT}, \acf{PS}, and \acf{EBT} deformation modes. AvgNRMSE is the Averaged Normalized Root Mean Squared Error across the three deformation modes. Both the $R^2$ values and AvgNRMSE are calculated against the clean data. $R^2_{\text{Test}}$ and RMSE$_{\text{Test}}$ are evaluated on generalized deformation modes ($\alpha \in \{1.0, 1.5, ..., 5.0\}$, $\beta=-1$). Time is the initial sparse identification duration in seconds.}
+\label{tab:synth_performance_summary_full_kpa_time_rel} \\
+\toprule
+Scenario & Algorithm & \begin{tabular}[c]{@{}l@{}}Selection\\ criteria\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ground truth\\ discovered?\end{tabular} & $n^{\mathcal{A}}_{\phi}$ & $R^2_{\text{UT}}$ & $R^2_{\text{PS}}$ & $R^2_{\text{EBT}}$ & AvgNRMSE & $R^2_{\text{Test}}$ & \begin{tabular}[c]{@{}c@{}}RMSE$_{\text{Test}}$\\ {[}MPa{]}\end{tabular} & \begin{tabular}[c]{@{}c@{}}Time\\ {[}s{]}\end{tabular} \\
+\midrule
+\endfirsthead
+\toprule
+Scenario & Algorithm & \begin{tabular}[c]{@{}l@{}}Selection\\ criteria\end{tabular} & \begin{tabular}[c]{@{}c@{}}Ground truth\\ discovered?\end{tabular} & $n^{\mathcal{A}}_{\phi}$ & $R^2_{\text{UT}}$ & $R^2_{\text{PS}}$ & $R^2_{\text{EBT}}$ & AvgNRMSE & $R^2_{\text{Test}}$ & \begin{tabular}[c]{@{}c@{}}RMSE$_{\text{Test}}$\\ {[}MPa{]}\end{tabular} & \begin{tabular}[c]{@{}c@{}}Time\\ {[}s{]}\end{tabular} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+O2 & LASSO & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.4196 \\
+0\% noise & & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0074 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0074 \\
+& LARS & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.9988 & 0.0000 & 0.0036 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.9988 & 0.0000 & 0.0062 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.9988 & 0.0000 & 0.0063 \\
+& OMP & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0136 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0136 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0136 \\ \midrule
+O2 & LASSO & CV & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9999 & 0.0020 & 0.9998 & 0.0000 & 0.5454 \\
+5\% noise & & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0088 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0088 \\
+& LARS & CV & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9999 & 0.0020 & 0.9998 & 0.0000 & 0.0276 \\
+& & AIC & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9999 & 0.0020 & 0.9998 & 0.0000 & 0.0371 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0372 \\
+& OMP & CV & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9999 & 0.0020 & 0.9998 & 0.0000 & 0.0133 \\
+& & AIC & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9999 & 0.0020 & 0.9998 & 0.0000 & 0.0133 \\
+& & BIC & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9999 & 0.0020 & 0.9998 & 0.0000 & 0.0133 \\ \midrule
+O2 & LASSO & CV & $\times$ & 4 & 0.9997 & 1.0000 & 0.9998 & 0.0023 & 0.9997 & 0.0000 & 0.4439 \\
+10\% noise & & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0070 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0070 \\
+& LARS & CV & $\times$ & 4 & 0.9997 & 1.0000 & 0.9998 & 0.0023 & 0.9997 & 0.0000 & 0.0314 \\
+& & AIC & $\checkmark$ & 3 & 0.9999 & 1.0000 & 0.9999 & 0.0016 & 1.0000 & 0.0000 & 0.0416 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0418 \\
+& OMP & CV & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9998 & 0.0020 & 0.9998 & 0.0000 & 0.0099 \\
+& & AIC & $\checkmark$ & 3 & 0.9998 & 1.0000 & 0.9998 & 0.0020 & 0.9998 & 0.0000 & 0.0099 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0010 & 1.0000 & 0.0000 & 0.0099 \\ \midrule
+MR2 & LASSO & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.5643 \\
+0\% noise & & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0070 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0070 \\
+& LARS & CV & $\times$ & 1 & 0.9157 & 0.6670 & -0.6002 & 0.1656 & -1.2115 & 0.0003 & 0.0043 \\
+& & AIC & $\times$ & 1 & 0.9157 & 0.6670 & -0.6002 & 0.1656 & -1.2115 & 0.0003 & 0.0065 \\
+& & BIC & $\times$ & 1 & 0.9157 & 0.6670 & -0.6002 & 0.1656 & -1.2115 & 0.0003 & 0.0067 \\
+& OMP & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0061 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0061 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0061 \\ \midrule
+MR2 & LASSO & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.4590 \\
+5\% noise & & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0069 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0069 \\
+& LARS & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0235 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0316 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0317 \\
+& OMP & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0056 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0056 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0007 & 1.0000 & 0.0000 & 0.0056 \\ \midrule
+MR2 & LASSO & CV & $\checkmark$ & 2 & 0.9998 & 1.0000 & 0.9999 & 0.0019 & 0.9978 & 0.0000 & 0.4506 \\
+10\% noise & & AIC & $\checkmark$ & 2 & 0.9999 & 1.0000 & 0.9999 & 0.0017 & 0.9999 & 0.0000 & 0.0074 \\
+& & BIC & $\checkmark$ & 2 & 0.9999 & 1.0000 & 0.9999 & 0.0017 & 0.9999 & 0.0000 & 0.0074 \\
+& LARS & CV & $\checkmark$ & 2 & 0.9998 & 1.0000 & 0.9999 & 0.0019 & 0.9978 & 0.0000 & 0.0229 \\
+& & AIC & $\checkmark$ & 2 & 0.9998 & 1.0000 & 0.9999 & 0.0019 & 0.9978 & 0.0000 & 0.0309 \\
+& & BIC & $\checkmark$ & 2 & 0.9999 & 1.0000 & 0.9999 & 0.0017 & 0.9999 & 0.0000 & 0.0310 \\
+& OMP & CV & $\checkmark$ & 2 & 0.9998 & 1.0000 & 0.9999 & 0.0019 & 0.9978 & 0.0000 & 0.0087 \\
+& & AIC & $\checkmark$ & 2 & 0.9998 & 1.0000 & 0.9999 & 0.0019 & 0.9978 & 0.0000 & 0.0087 \\
+& & BIC & $\checkmark$ & 2 & 0.9998 & 1.0000 & 0.9999 & 0.0019 & 0.9978 & 0.0000 & 0.0087 \\ \midrule
+MR1O1 & LASSO & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.4795 \\
+0\% noise & & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0072 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0072 \\
+& LARS & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0036 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0058 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0059 \\
+& OMP & CV & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0065 \\
+& & AIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0065 \\
+& & BIC & $\checkmark$ & 2 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0065 \\ \midrule
+MR1O1 & LASSO & CV & $\checkmark$ & 2 & 0.9995 & 0.9997 & 0.9988 & 0.0094 & 1.0000 & 0.0000 & 0.6340 \\
+5\% noise & & AIC & $\checkmark$ & 2 & 0.9998 & 0.9999 & 0.9999 & 0.0029 & 1.0000 & 0.0000 & 0.0072 \\
+& & BIC & $\checkmark$ & 2 & 0.9998 & 0.9999 & 0.9999 & 0.0029 & 1.0000 & 0.0000 & 0.0072 \\
+& LARS & CV & $\checkmark$ & 2 & 0.9995 & 0.9997 & 0.9988 & 0.0094 & 1.0000 & 0.0000 & 0.0535 \\
+& & AIC & $\checkmark$ & 2 & 0.9995 & 0.9997 & 0.9988 & 0.0095 & 1.0000 & 0.0000 & 0.0736 \\
+& & BIC & $\checkmark$ & 2 & 0.9995 & 0.9997 & 0.9988 & 0.0095 & 1.0000 & 0.0000 & 0.0737 \\
+& OMP & CV & $\checkmark$ & 2 & 0.9996 & 0.9997 & 0.9996 & 0.0055 & 1.0000 & 0.0000 & 0.0101 \\
+& & AIC & $\checkmark$ & 2 & 0.9995 & 0.9997 & 0.9988 & 0.0094 & 1.0000 & 0.0000 & 0.0101 \\
+& & BIC & $\checkmark$ & 2 & 0.9995 & 0.9997 & 0.9988 & 0.0094 & 1.0000 & 0.0000 & 0.0101 \\ \midrule
+MR1O1 & LASSO & CV & $\checkmark$ & 3 & 0.9996 & 0.9993 & 0.9940 & 0.0209 & 0.9982 & 0.0000 & 0.5172 \\
+10\% noise & & AIC & $\checkmark$ & 2 & 0.9997 & 0.9998 & 0.9995 & 0.0061 & 0.9996 & 0.0000 & 0.0101 \\
+& & BIC & $\checkmark$ & 2 & 0.9997 & 0.9998 & 0.9995 & 0.0061 & 0.9996 & 0.0000 & 0.0101 \\
+& LARS & CV & $\checkmark$ & 3 & 0.9998 & 0.9989 & 0.9991 & 0.0081 & 0.9983 & 0.0000 & 0.0605 \\
+& & AIC & $\checkmark$ & 3 & 0.9998 & 0.9989 & 0.9991 & 0.0081 & 0.9983 & 0.0000 & 0.0820 \\
+& & BIC & $\checkmark$ & 3 & 0.9997 & 0.9985 & 0.9998 & 0.0035 & 0.9983 & 0.0000 & 0.0822 \\
+& OMP & CV & $\checkmark$ & 3 & 0.9997 & 0.9985 & 0.9998 & 0.0035 & 0.9983 & 0.0000 & 0.0129 \\
+& & AIC & $\checkmark$ & 3 & 0.9998 & 0.9989 & 0.9991 & 0.0081 & 0.9983 & 0.0000 & 0.0129 \\
+& & BIC & $\checkmark$ & 3 & 0.9997 & 0.9985 & 0.9998 & 0.0035 & 0.9983 & 0.0000 & 0.0129 \\ \midrule
+MR2O2 & LASSO & CV & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.6153 \\
+0\% noise & & AIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0088 \\
+& & BIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0088 \\
+& LARS & CV & $\checkmark$ & 3 & 0.9543 & 0.9452 & 0.9662 & 0.0481 & 0.9951 & 0.0001 & 0.0062 \\
+& & AIC & $\checkmark$ & 3 & 0.9543 & 0.9452 & 0.9662 & 0.0481 & 0.9951 & 0.0001 & 0.0089 \\
+& & BIC & $\checkmark$ & 3 & 0.9543 & 0.9452 & 0.9662 & 0.0481 & 0.9951 & 0.0001 & 0.0090 \\
+& OMP & CV & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0135 \\
+& & AIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0135 \\
+& & BIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 1.0000 & 0.0000 & 0.0135 \\ \midrule
+& & BIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.0090 \\
+& OMP & CV & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.0135 \\
+& & AIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.0135 \\
+& & BIC & $\checkmark$ & 4 & 1.0000 & 1.0000 & 1.0000 & 0.0000 & 0.0135 \\ \midrule
+MR2O2 & LASSO & CV & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9980 & 0.0118 & 0.9998 & 0.0000 & 0.4682 \\
+5\% noise & & AIC & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9973 & 0.0137 & 0.9998 & 0.0000 & 0.0093 \\
+& & BIC & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9973 & 0.0137 & 0.9998 & 0.0000 & 0.0093 \\
+& LARS & CV & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9980 & 0.0118 & 0.9998 & 0.0000 & 0.0527 \\
+& & AIC & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9980 & 0.0118 & 0.9998 & 0.0000 & 0.0710 \\
+& & BIC & $\checkmark$ & 3 & 0.9972 & 0.9859 & 0.1518 & 0.2413 & 0.9807 & 0.0002 & 0.0711 \\
+& OMP & CV & $\checkmark$ & 4 & 0.9997 & 0.9995 & 0.9998 & 0.0041 & 0.9998 & 0.0000 & 0.0176 \\
+& & AIC & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9980 & 0.0118 & 0.9998 & 0.0000 & 0.0176 \\
+& & BIC & $\checkmark$ & 4 & 0.9999 & 0.9999 & 0.9980 & 0.0118 & 0.9998 & 0.0000 & 0.0176 \\ \midrule
+MR2O2 & LASSO & CV & $\times$ & 4 & 0.9956 & 0.9874 & 0.8135 & 0.1132 & 0.9966 & 0.0001 & 0.6202 \\
+10\% noise & & AIC & $\checkmark$ & 4 & 0.9971 & 0.9969 & 0.9985 & 0.0101 & 0.9990 & 0.0000 & 0.0108 \\
+& & BIC & $\checkmark$ & 4 & 0.9971 & 0.9969 & 0.9985 & 0.0101 & 0.9990 & 0.0000 & 0.0108 \\
+& LARS & CV & $\checkmark$ & 4 & 0.9967 & 0.9936 & 0.9601 & 0.0524 & 0.9983 & 0.0001 & 0.0527 \\
+& & AIC & $\checkmark$ & 4 & 0.9971 & 0.9970 & 0.9982 & 0.0112 & 0.9991 & 0.0000 & 0.0712 \\
+& & BIC & $\checkmark$ & 4 & 0.9971 & 0.9970 & 0.9982 & 0.0112 & 0.9991 & 0.0000 & 0.0713 \\
+& OMP & CV & $\checkmark$ & 4 & 0.9964 & 0.9914 & 0.9010 & 0.0824 & 0.9967 & 0.0001 & 0.0194 \\
+& & AIC & $\checkmark$ & 4 & 0.9967 & 0.9936 & 0.9601 & 0.0524 & 0.9983 & 0.0001 & 0.0194 \\
+& & BIC & $\checkmark$ & 4 & 0.9967 & 0.9936 & 0.9601 & 0.0524 & 0.9983 & 0.0001 & 0.0194 \\
+\end{longtable}
+}
+
+\vspace{1cm}
+
+{\small
+\begin{longtable}{@{}l l cc@{}}
+\caption{\textbf{Isotropic Synthetic Data:} Cases where ground truth was not fully recovered - actual discovered SEF forms.}
+\label{tab:synth_failed_discoveries} \\
+\toprule
+\multicolumn{1}{@{}l}{\begin{tabular}[c]{@{}l@{}}Scenario / Algorithm\\ ($n^{\mathcal{A}}_{\phi}$)\end{tabular}} &
+\multicolumn{1}{l}{Discovered SEF Form ($\overline{W}$)} &
+$R^2_{\min}$ & AvgNRMSE \\
+\midrule
+\endfirsthead
+
+\multicolumn{4}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\toprule
+\multicolumn{1}{@{}l}{\begin{tabular}[c]{@{}l@{}}Scenario / Algorithm\\ ($n^{\mathcal{A}}_{\phi}$)\end{tabular}} &
+\multicolumn{1}{l}{Discovered SEF Form ($\overline{W}$)} &
+$R^2_{\min}$ & AvgNRMSE \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{4}{r}{{Continued on next page}} \\
+\endfoot
+
+\bottomrule
+\multicolumn{4}{l}{\footnotesize{\textit{Note:} Discovered Model coefficients are in Pa. Ogden-type terms follow the form $c_i(\sum_j \lambda_j^{\alpha_i} - 1)$. Mooney-Rivlin terms follow the form $c_i(I_k - 3)$ where $I_k$ is the $k$-th invariant. Coefficients $c_i$ are from Ridge refit. $R^2_{\min}$ is $\min\{R^2(\text{UT } P_{11}), R^2(\text{PS } P_{11}), R^2(\text{EBT } P_{11})\}$. AvgNRMSE is the average of NRMSE values for the same three components. These cases did not fully recover the ground truth model.}} \\
+\endlastfoot
+
+\textbf{O2 (0\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $16.0 \sum (\lambda_k^{-3} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$} \\
+LARS-CV (2) & $16.1 \sum (\lambda_k^{-3} - 1) + 1.4 \sum (\lambda_k^{4} - 1)$ & 0.9531 & 0.0303 \\
+LARS-AIC (2) & $16.1 \sum (\lambda_k^{-3} - 1) + 1.4 \sum (\lambda_k^{4} - 1)$ & 0.9531 & 0.0303 \\
+LARS-BIC (2) & $16.1 \sum (\lambda_k^{-3} - 1) + 1.4 \sum (\lambda_k^{4} - 1)$ & 0.9531 & 0.0303 \\
+\midrule
+
+\textbf{O2 (5\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $16.0 \sum (\lambda_k^{-3} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$} \\
+LASSO-CV (3) & $15.8 \sum (\lambda_k^{-3} - 1) + 5.8 \sum (\lambda_k^{-1} - 1) + 7.8 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+LARS-CV (3) & $15.9 \sum (\lambda_k^{-3} - 1) + 5.9 \sum (\lambda_k^{-1} - 1) + 7.9 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+LARS-AIC (3) & $16.0 \sum (\lambda_k^{-3} - 1) + 2.2 \sum (\lambda_k^{-1} - 1) + 8.1 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+OMP-CV (3) & $15.9 \sum (\lambda_k^{-3} - 1) + 2.8 \sum (\lambda_k^{-1} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+OMP-AIC (3) & $15.9 \sum (\lambda_k^{-3} - 1) + 2.7 \sum (\lambda_k^{-1} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+OMP-BIC (3) & $15.9 \sum (\lambda_k^{-3} - 1) + 2.8 \sum (\lambda_k^{-1} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+\midrule
+
+\textbf{O2 (10\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $16.0 \sum (\lambda_k^{-3} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$} \\
+LASSO-CV (4) & $15.9 \sum (\lambda_k^{-3} - 1) + 5.4 \sum (\lambda_k^{-1} - 1) + 6.5 \sum (\lambda_k^{1} - 1) + 8.1 \sum (\lambda_k^{3} - 1)$ & 0.9997 & 0.0023 \\
+LARS-CV (4) & $15.9 \sum (\lambda_k^{-3} - 1) + 4.6 \sum (\lambda_k^{-1} - 1) + 5.8 \sum (\lambda_k^{1} - 1) + 8.1 \sum (\lambda_k^{3} - 1)$ & 0.9997 & 0.0023 \\
+LARS-AIC (3) & $15.8 \sum (\lambda_k^{-3} - 1) + 6.1 \sum (\lambda_k^{1} - 1) + 8.1 \sum (\lambda_k^{3} - 1)$ & 0.9999 & 0.0016 \\
+OMP-CV (3) & $15.9 \sum (\lambda_k^{-3} - 1) + 4.6 \sum (\lambda_k^{-1} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+OMP-AIC (3) & $15.9 \sum (\lambda_k^{-3} - 1) + 4.6 \sum (\lambda_k^{-1} - 1) + 8.0 \sum (\lambda_k^{3} - 1)$ & 0.9998 & 0.0020 \\
+\midrule
+
+\textbf{MR2 (0\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $40.0 (I_1 - 3) + 20.0 (I_2 - 3)$} \\
+LARS-CV (1) & $37.3 (I_1 - 3)$ & -0.6002 & 0.1656 \\
+LARS-AIC (1) & $37.3 (I_1 - 3)$ & -0.6002 & 0.1656 \\
+LARS-BIC (1) & $37.3 (I_1 - 3)$ & -0.6002 & 0.1656 \\
+\midrule
+
+\textbf{MR1O1 (10\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $40.0 (I_2 - 3) + 8.0 \sum (\lambda_k^{-3} - 1)$} \\
+LASSO-CV (3) & $40.5 (I_2 - 3) + 0.3 \sum (\lambda_k^{-3} - 1) + 8.2 \sum (\lambda_k^{-1} - 1)$ & 0.9940 & 0.0209 \\
+LARS-CV (3) & $39.8 (I_2 - 3) + 0.5 \sum (\lambda_k^{-3} - 1) + 8.0 \sum (\lambda_k^{-1} - 1)$ & 0.9989 & 0.0081 \\
+LARS-AIC (3) & $39.8 (I_2 - 3) + 0.5 \sum (\lambda_k^{-3} - 1) + 8.0 \sum (\lambda_k^{-1} - 1)$ & 0.9989 & 0.0081 \\
+LARS-BIC (3) & $39.4 (I_2 - 3) + 0.6 \sum (\lambda_k^{-3} - 1) + 8.1 \sum (\lambda_k^{-1} - 1)$ & 0.9985 & 0.0035 \\
+OMP-CV (3) & $39.4 (I_2 - 3) + 0.6 \sum (\lambda_k^{-3} - 1) + 8.1 \sum (\lambda_k^{-1} - 1)$ & 0.9985 & 0.0035 \\
+OMP-AIC (3) & $39.8 (I_2 - 3) + 0.5 \sum (\lambda_k^{-3} - 1) + 8.0 \sum (\lambda_k^{-1} - 1)$ & 0.9989 & 0.0081 \\
+OMP-BIC (3) & $39.4 (I_2 - 3) + 0.6 \sum (\lambda_k^{-3} - 1) + 8.1 \sum (\lambda_k^{-1} - 1)$ & 0.9985 & 0.0035 \\
+\midrule
+
+\textbf{MR2O2 (0\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $40.0 (I_1 - 3) + 20.0 (I_2 - 3) + 16.0 \sum (\lambda_k^{-3} - 1) + 800.0 \sum (\lambda_k^{1} - 1)$} \\
+LARS-CV (3) & $41.7 (I_1 - 3) + 21.6 (I_2 - 3) + 56.0 \sum (\lambda_k^{-3} - 1)$ & 0.9452 & 0.0481 \\
+LARS-AIC (3) & $41.7 (I_1 - 3) + 21.6 (I_2 - 3) + 56.0 \sum (\lambda_k^{-3} - 1)$ & 0.9452 & 0.0481 \\
+LARS-BIC (3) & $41.7 (I_1 - 3) + 21.6 (I_2 - 3) + 56.0 \sum (\lambda_k^{-3} - 1)$ & 0.9452 & 0.0481 \\
+\midrule
+
+\textbf{MR2O2 (5\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $40.0 (I_1 - 3) + 20.0 (I_2 - 3) + 16.0 \sum (\lambda_k^{-3} - 1) + 800.0 \sum (\lambda_k^{1} - 1)$} \\
+LARS-BIC (3) & $60.1 (I_1 - 3) + 30.4 (I_2 - 3) + 571.8 \sum (\lambda_k^{1} - 1)$ & 0.1518 & 0.2413 \\
+OMP-CV (4) & $18.1 (I_2 - 3) + 16.7 \sum (\lambda_k^{-3} - 1) + 3.1 \sum (\lambda_k^{3} - 1) + 792.2 \sum (\lambda_k^{1} - 1)$ & 0.9995 & 0.0041 \\
+\midrule
+
+\textbf{MR2O2 (10\% noise):} & \multicolumn{3}{l}{\textit{Ground Truth: } $40.0 (I_1 - 3) + 20.0 (I_2 - 3) + 16.0 \sum (\lambda_k^{-3} - 1) + 800.0 \sum (\lambda_k^{1} - 1)$} \\
+LASSO-CV (4) & $22.3 (I_1 - 3) - 36.8 (I_2 - 3) + 23.6 \sum (\lambda_k^{-3} - 1) + 1076.5 \sum (\lambda_k^{1} - 1)$ & 0.8135 & 0.1132 \\
+\end{longtable}
+}
+
+\end{document}
