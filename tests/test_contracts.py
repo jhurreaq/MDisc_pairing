@@ -1,5 +1,4 @@
 """Independent mechanics, numerical and execution contracts for the corrected project."""
-import json
 import os
 from pathlib import Path
 import subprocess
@@ -14,7 +13,7 @@ from mdisc.types import Observations
 from mdisc.preprocessing import WeightPolicy, DesignScaling
 from mdisc.regression import fit_nonnegative
 from mdisc.criteria import information_criteria
-from mdisc.paths import distinct_supports, discovery_path, PathSettings
+from mdisc.paths import discovery_path, PathSettings
 from mdisc.discovery import grouped_mode_folds, discover, DiscoverySettings
 from mdisc.runner import run_case
 
@@ -159,16 +158,13 @@ class Statistics(unittest.TestCase):
         self.assertAlmostEqual(fit.nonlinear[23],3,places=5)
         self.assertAlmostEqual(fit.coefficients[i],2,places=5)
 
-    def test_weighted_affine_nnls_recovers_exact_line(self):
-        X=np.arange(3.)[:,None]; y=1+2*X[:,0]
-        fit=fit_nonnegative(X,y,weights=[1,4,9],fit_intercept=True)
-        np.testing.assert_allclose(fit.coefficients,[2],atol=1e-14)
-        self.assertAlmostEqual(fit.intercept,1,places=13)
-        np.testing.assert_allclose(fit.prediction,y,atol=1e-14)
+    def test_weighted_nnls_matches_analytical_origin_preserving_fit(self):
+        X=np.arange(1.,4.)[:,None]; y=np.array([2.,5.,5.])
+        fit=fit_nonnegative(X,y,weights=[1,4,9])
+        self.assertAlmostEqual(fit.coefficients[0],177/98,places=13)
 
     def test_default_refit_has_no_stress_intercept(self):
         fit=fit_nonnegative(np.array([[0.],[1.],[2.]]),np.array([1.,3.,5.]))
-        self.assertEqual(fit.intercept,0)
         self.assertEqual(fit.prediction[0],0)
 
     def test_fallback_converges_and_records_solver(self):
@@ -190,7 +186,7 @@ class Statistics(unittest.TestCase):
     def test_scaling_preserves_origin_and_physical_coefficients(self):
         X=np.array([[0.,0.],[1.,3.],[2.,4.]])
         y=np.array([0.,3.,4.]);w=np.array([1.,4.,9.])
-        sc=DesignScaling.fit(X,y,w); A,b=sc.transform(X,y,w)
+        sc=DesignScaling.fit(X,y,w); A,_=sc.transform(X,y,w)
         np.testing.assert_array_equal(A[0],[0,0])
         beta=np.array([.2,.4])
         np.testing.assert_allclose(A@beta,(X@sc.coefficients_to_physical(beta))/sc.target*np.sqrt(w),atol=1e-14)
@@ -207,8 +203,10 @@ class Statistics(unittest.TestCase):
         self.assertTrue(np.isfinite(information_criteria(np.arange(3.),np.arange(3.),0)).all())
 
     def test_same_size_distinct_supports_are_retained(self):
-        supports=distinct_supports(np.array([[1.,1.,0.],[0.,2.,3.],[0.,0.,4.]]))
-        self.assertEqual(supports,[(0,),(0,1),(1,2)])
+        settings=DiscoverySettings(folds=2,ridge=0,paths=PathSettings(path_count=3))
+        with patch('mdisc.discovery.discovery_path',return_value=np.array([[1.,0.,1.],[0.,1.,0.]])):
+            result=discover(isotropic_library(mr_order=1),fixture(),'OMP',settings)
+        self.assertEqual([candidate.support for candidate in result.candidates],[(0,),(1,),(0,)])
 
     def test_lar_uses_documented_algorithm_and_refit_positivity(self):
         import mdisc.paths as paths

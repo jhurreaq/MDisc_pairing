@@ -9,7 +9,7 @@ This replaces the compatibility implementation at `ea0a3c6` on `dev_MDisc_app`. 
 | P0 | Cardiac surrogate omits fibre contributions and stretch factors | Use full tensor differentiation and push-forward for both biaxial and shear measurements. |
 | P0 | Stress-measure, pressure and unit ambiguity | Explicit nominal/Cauchy observation contracts, native units, incompressible kinematics and boundary-condition pressure. |
 | P0 | Tension-only invariant treated inconsistently | Differentiate its inactive-compression branch; keep the squared reference response continuously differentiable. |
-| P0 | Constitutive stress intercept gives spurious reference stress | No stress intercept in any constitutive discovery/refit. Correct weighted centering in the optional generic affine helper. |
+| P0 | Constitutive stress intercept gives spurious reference stress | Origin-preserving regression only; no stress intercept or unused affine fitting option. |
 | P0 | Scaling, weights and support selection leak validation information | Repeat weighting, scaling, path generation, support selection and nonlinear calibration inside every training fold. |
 | P0 | Duplicated or paired stresses counted as independent observations | Drop copied Treloar EBT components and group genuinely paired Kawabata/cardiac stresses. |
 | P0 | Positive amplitudes treated as a stability certificate | Check energy, reference stress, symmetry and sampled isochoric rank-one curvature; reject failing candidates and report the absence of global certification. |
@@ -37,5 +37,6 @@ This replaces the compatibility implementation at `ea0a3c6` on `dev_MDisc_app`. 
 | P2 | Missing data/result provenance | Input manifest, source and input hashes, effective configuration, library IDs and dependency versions in results. |
 | P2 | Colliding or misleading plot filenames | Consistent method/criterion names; retain original prediction layouts and palettes. |
 | P2 | Obsolete exact-output acceptance checks | Preserve historical checks in Git; replace active acceptance with mechanics tests and corrected-output reproducibility. |
+| P2 | Remaining legacy launchers and unused scaffolding | Delete the three dated launchers and three thin `models.py` wrappers; remove the unused support helper, palette alias, affine regression branch, synthetic metric-title code and unused figure-creation branches. Keep data-folder placeholders in the checkout but exclude them from the installed wheel. |
 
 The mathematical assumptions and remaining limits are described in [MECHANICS.md](MECHANICS.md). A successful sparse fit is not a uniqueness proof, a global nonlinear-optimality certificate or a global stability proof. The implementation reports these distinctions explicitly.

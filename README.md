@@ -50,7 +50,7 @@ mdisc treloar --fit-datasets Treloar Kawabata
 mdisc cardiac --folds 5 --seed 42 --alpha-count 40 --path-count 21
 ```
 
-The three historical dated scripts remain small compatibility entry points.
+Use the centralized `scripts/run_*.py` launchers or the installed `mdisc` command. The dated compatibility launchers have been removed.
 
 ## Project structure
 

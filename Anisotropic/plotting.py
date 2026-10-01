@@ -13,8 +13,7 @@ def render_predictions(records, prediction, reference, noisy, clean, mode_scores
                                  'y_exp': clean[indices], 'y_noisy': noisy[indices],
                                  'y_pred_refined': prediction[indices], 'y_pred_pdf': reference[indices],
                                  'title': mode}
-    # Figure (4:3 ratio)
-    fig_w, fig_h = 9.5, 12.5  # 4:3
+    fig_w, fig_h = 9.5, 12.5
     fig, axs = plt.subplots(6, 3, figsize=(fig_w, fig_h))
 
     # Legend prototypes
@@ -108,8 +107,7 @@ def render_predictions(records, prediction, reference, noisy, clean, mode_scores
 
     # Assign labels to ALL subplots now
     for r in range(6):
-        axs[r, 0].set_ylabel("Stress [kPa]", fontsize=context.PLOT_LABEL_FONTSIZE)#, rotation=0,
-                            #  ha='right', va='center')
+        axs[r, 0].set_ylabel("Stress [kPa]", fontsize=context.PLOT_LABEL_FONTSIZE)
 
     for r in range(6):
         axs[r, 0].set_xlabel("Shear Strain $\\gamma$ [-]", fontsize=context.PLOT_LABEL_FONTSIZE)

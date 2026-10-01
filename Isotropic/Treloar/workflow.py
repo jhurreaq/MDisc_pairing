@@ -4,10 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mdisc.data import isotropic_observations
 from mdisc.evaluation import metrics
+from mdisc.mechanics import isotropic_library
 from mdisc.reporting import provenance, run_scenario, write_report, log_line
 from mdisc.rendering import plot_style, save_figure
 from .configuration import Configuration
-from .models import make_library
 from .data import load_data
 from .plotting import plot_treloar_prediction, plot_Kawabata_prediction, plot_treloar_data, plot_Kawabata_data
 
@@ -19,7 +19,8 @@ def run(*, input_dir, output_dir, configuration=None, log=None, plots=True):
     if fit_frame.empty or set(configuration.fit_datasets) - set(frame['dataset']):
         raise ValueError('Configured fitting datasets are missing')
     training, evaluation = isotropic_observations(fit_frame), isotropic_observations(frame)
-    library = make_library(configuration)
+    library = isotropic_library(mr_order=configuration.mr_order,
+                                ogden_exponents=configuration.ogden_exponents)
     style = plot_style(configuration.plot)
     output_dir = Path(output_dir)
     prefix = 'Fit_' + '_'.join(configuration.fit_datasets) + '_Only'

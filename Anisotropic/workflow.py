@@ -2,10 +2,10 @@
 from pathlib import Path
 import numpy as np
 from mdisc.evaluation import mode_metrics, metrics
+from mdisc.mechanics import cardiac_library
 from mdisc.reporting import provenance, run_scenario, write_report, log_line
 from mdisc.rendering import plot_style
 from .configuration import Configuration
-from .models import make_library
 from .data import load_data
 from .refinement import refine
 from .plotting import render_predictions
@@ -14,7 +14,7 @@ from .plotting import render_predictions
 def run(*, input_dir, output_dir, configuration=None, log=None, plots=True):
     configuration = configuration or Configuration()
     clean, records = load_data(input_dir, sheet=configuration.sheet)
-    library = make_library()
+    library = cardiac_library()
     style = plot_style(configuration.plot)
     output_dir = Path(output_dir)
     reference_full = np.zeros(32)

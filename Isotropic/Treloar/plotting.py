@@ -1,13 +1,12 @@
 """Case-specific rendering templates; numerical results are supplied by evaluation."""
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
 def plot_treloar_prediction(df, axes, r2_overall_precomputed=np.nan, *, context):
     """Plot Treloar data with model predictions (Helper). Needs axes=[ax_full, ax_zoom]. Uses precomputed R2 for title."""
     ax_full, ax_zoom = axes
-    colors = {'UT': context.TRUNCATED_PLASMA_CMAP(0.2), 'PS': context.TRUNCATED_PLASMA_CMAP(0.5), 'EBT': context.TRUNCATED_PLASMA_CMAP(0.8)}
+    colors = {'UT': context.plasma(0.2), 'PS': context.plasma(0.5), 'EBT': context.plasma(0.8)}
     markers = {'UT': 'o', 'PS': 's', 'EBT': '^'}
 
     df_plot = df[df['dataset']=='Treloar'].copy()
@@ -90,7 +89,7 @@ def plot_Kawabata_prediction(df, axes, r2_p11_precomputed=np.nan, r2_p22_precomp
     df_plot['P22'] = pd.to_numeric(df_plot['P22'], errors='coerce')
     df_plot['P22_pred'] = pd.to_numeric(df_plot['P22_pred'], errors='coerce')
     lambda1_values = sorted(df_plot['lambda1'].unique())
-    cmap = context.TRUNCATED_PLASMA_CMAP
+    cmap = context.plasma
     colors = cmap(np.linspace(0.1, 0.9, len(lambda1_values)))
 
     r2_P11 = r2_p11_precomputed
@@ -105,7 +104,7 @@ def plot_Kawabata_prediction(df, axes, r2_p11_precomputed=np.nan, r2_p22_precomp
         subset = df_plot[df_plot['lambda1'] == lambda1].sort_values(by='lambda2')
         v_p11 = valid_p11_plot[subset.index]
         if v_p11.sum() == 0: continue
-        sc = ax_p11.scatter(subset['lambda2'][v_p11], subset['P11'][v_p11], color=colors[i], s=context.PLOT_MARKER_SIZE, alpha=0.7, marker='o', edgecolor='k', linewidth=0.5)
+        ax_p11.scatter(subset['lambda2'][v_p11], subset['P11'][v_p11], color=colors[i], s=context.PLOT_MARKER_SIZE, alpha=0.7, marker='o', edgecolor='k', linewidth=0.5)
         pl, = ax_p11.plot(subset['lambda2'][v_p11], subset['P11_pred'][v_p11], color=colors[i], linestyle='-', linewidth=context.PLOT_PRED_LINEWIDTH, label=f'λ₁={lambda1:.2f}')
         if i == 0:
             handles_p11.extend([Patch(color='gray', alpha=0.7, label='Exp'), Patch(color='black', label='Model')])
@@ -127,7 +126,7 @@ def plot_Kawabata_prediction(df, axes, r2_p11_precomputed=np.nan, r2_p22_precomp
         subset = df_plot[df_plot['lambda1'] == lambda1].sort_values(by='lambda2')
         v_p22 = valid_p22_plot[subset.index]
         if v_p22.sum() == 0: continue
-        sc = ax_p22.scatter(subset['lambda2'][v_p22], subset['P22'][v_p22], color=colors[i], s=context.PLOT_MARKER_SIZE, alpha=0.7, marker='s', edgecolor='k', linewidth=0.5)
+        ax_p22.scatter(subset['lambda2'][v_p22], subset['P22'][v_p22], color=colors[i], s=context.PLOT_MARKER_SIZE, alpha=0.7, marker='s', edgecolor='k', linewidth=0.5)
         pl, = ax_p22.plot(subset['lambda2'][v_p22], subset['P22_pred'][v_p22], color=colors[i], linestyle='--', linewidth=context.PLOT_PRED_LINEWIDTH, label=f'λ₁={lambda1:.2f}')
         if i == 0:
             handles_p22.extend([Patch(color='gray', alpha=0.7, label='Exp'), Patch(color='black', linestyle='--', label='Model')])
@@ -144,9 +143,8 @@ def plot_Kawabata_prediction(df, axes, r2_p11_precomputed=np.nan, r2_p22_precomp
     ax_p22.set_ylim(bottom= min(0, np.nanmin(df_plot['P22'][valid_p22_plot])-0.1) if valid_p22_plot.sum() > 0 else 0, top=max(0.2, max_y_p22*1.1))
 
 
-def plot_treloar_data(df, ax=None, *, context):
+def plot_treloar_data(df, ax, *, context):
     """Plot Treloar dataset - Helper for raw data plot"""
-    if ax is None: fig, ax = plt.subplots(figsize=(6, 5))
     colors = {'UT': 'blue', 'PS': 'green', 'EBT': 'red'}
     markers = {'UT': 'o', 'PS': 's', 'EBT': '^'}
     for mode in ['UT', 'PS', 'EBT']:
@@ -167,11 +165,10 @@ def plot_treloar_data(df, ax=None, *, context):
     return ax
 
 
-def plot_Kawabata_data(df, ax=None, *, context):
+def plot_Kawabata_data(df, ax, *, context):
     """Plot Kawabata biaxial dataset - Helper for raw data plot"""
-    if ax is None: fig, ax = plt.subplots(figsize=(6, 5))
     lambda1_values = sorted(df['lambda1'].unique())
-    cmap = context.TRUNCATED_PLASMA_CMAP
+    cmap = context.plasma
     colors = cmap(np.linspace(0.1, 0.9, len(lambda1_values)))
     handles = [] # For legend
     for i, lambda1 in enumerate(lambda1_values):
@@ -182,7 +179,8 @@ def plot_Kawabata_data(df, ax=None, *, context):
         valid_p11 = ~np.isnan(subset['P11'])
         valid_p22 = ~np.isnan(subset['P22'])
         line_p11, = ax.plot(subset['lambda2'][valid_p11], subset['P11'][valid_p11], marker='o', markersize=4, color=colors[i], linestyle='-', linewidth=context.PLOT_PRED_LINEWIDTH, label=f'λ₁={lambda1:.2f}') if valid_p11.sum() > 0 else (None,)
-        line_p22, = ax.plot(subset['lambda2'][valid_p22], subset['P22'][valid_p22], marker='s', markersize=4, color=colors[i], linestyle='--', linewidth=context.PLOT_PRED_LINEWIDTH) if valid_p22.sum() > 0 else (None,)
+        if valid_p22.sum() > 0:
+            ax.plot(subset['lambda2'][valid_p22], subset['P22'][valid_p22], marker='s', markersize=4, color=colors[i], linestyle='--', linewidth=context.PLOT_PRED_LINEWIDTH)
         if i==0: handles.extend([Patch(color='gray', label='P₁₁'), Patch(color='gray', linestyle='--', label='P₂₂')]) # General labels
         if line_p11: handles.append(line_p11) # Add specific lambda line handle
     ax.set_xlabel('λ₂', fontsize=context.PLOT_LABEL_FONTSIZE)

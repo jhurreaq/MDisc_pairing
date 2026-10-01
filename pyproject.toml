@@ -23,10 +23,9 @@ dependencies = [
 [project.scripts]
 mdisc = "mdisc.cli:main"
 
+[tool.setuptools]
+include-package-data = false
+
 [tool.setuptools.packages.find]
 include = ["mdisc*", "Anisotropic*", "Isotropic*"]
 namespaces = false
-
-[tool.setuptools.package-data]
-"Anisotropic" = ["input/.gitkeep"]
-"Isotropic.Treloar" = ["input/.gitkeep"]

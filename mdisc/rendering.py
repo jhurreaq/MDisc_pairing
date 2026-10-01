@@ -10,7 +10,6 @@ from .configuration import PlotSettings
 def plot_style(settings=None):
     style = SimpleNamespace(**asdict(settings or PlotSettings()))
     style.plasma = plt.get_cmap('plasma')
-    style.TRUNCATED_PLASMA_CMAP = style.plasma
     style.HEATMAP_CMAP = plt.get_cmap('Blues')
     style.color_original = 'black'
     style.color_refined = style.plasma(0.15)

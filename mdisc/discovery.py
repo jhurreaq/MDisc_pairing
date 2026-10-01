@@ -66,7 +66,6 @@ def grouped_mode_folds(observations, folds, seed):
 
 
 def linear_refit(library, observations, X, support, weights, scaling, settings):
-    coefficients = np.zeros(X.shape[1])
     support = np.asarray(support, dtype=int)
     A, b = scaling.transform(X, observations.y, weights)
     fitted = fit_nonnegative(A[:, support], b, ridge=settings.ridge * len(b))

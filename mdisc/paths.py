@@ -36,17 +36,6 @@ class PathSettings:
         raise ValueError(f"Unknown discovery method: {method}")
 
 
-def distinct_supports(coefficients, tolerance=1e-8):
-    """Deduplicate only identical supports, never merely equal cardinalities."""
-    seen, supports = set(), []
-    for beta in np.asarray(coefficients).T:
-        support = tuple(np.flatnonzero(np.abs(beta) > tolerance).tolist())
-        if support not in seen:
-            seen.add(support)
-            supports.append(support)
-    return supports
-
-
 def nonnegative_omp_path(X, y):
     """Greedy positive-correlation selection followed by constrained refits.
 
@@ -77,7 +66,7 @@ def discovery_path(X, y, method, settings, *, diagnostics=None):
     if method == 'Lasso':
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always', ConvergenceWarning)
-            _, coefficients, gaps = lasso_path(X, y, alphas=settings.parameters(method),
+            _, coefficients, _ = lasso_path(X, y, alphas=settings.parameters(method),
                                                positive=True, max_iter=settings.max_iter,
                                                tol=settings.solver_tolerance)
         if any(issubclass(w.category, ConvergenceWarning) for w in caught):

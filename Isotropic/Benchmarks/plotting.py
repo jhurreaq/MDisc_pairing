@@ -1,10 +1,9 @@
 """Case-specific rendering templates; numerical results are supplied by evaluation."""
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import matplotlib.ticker
 
-def style_y_axis(ax, kpa_conversion, *, context):
+def style_y_axis(ax, *, context):
     y_lim = ax.get_ylim()
 
     ticks_to_set = sorted(list(set([y_lim[0], y_lim[1]])))
@@ -38,13 +37,8 @@ def style_y_axis(ax, kpa_conversion, *, context):
     ax.tick_params(axis='y', which='major', labelsize=context.PLOT_LABEL_FONTSIZE)
 
 
-def plot_synthetic_uniaxial(df, ax, r2_p11_precomputed=np.nan, rmse_p11_precomputed_kpa=np.nan, *, context):
-    """Plots synthetic uniaxial data (P11 vs lambda1) and model predictions using TRUNCATED_PLASMA_CMAP and kPa units."""
-    if ax is None:
-        fig, ax = plt.subplots(figsize=(5, 2))
-    else:
-        fig = ax.get_figure()
-
+def plot_predictions(df, ax, *, context):
+    """Render UT, PS or EBT nominal stress predictions in kPa on supplied axes."""
     kpa_conversion = 1e3
 
     mode = df['mode'].iloc[0]
@@ -84,17 +78,6 @@ def plot_synthetic_uniaxial(df, ax, r2_p11_precomputed=np.nan, rmse_p11_precompu
     ax.tick_params(axis='x', which='major', labelsize=context.PLOT_LABEL_FONTSIZE)
 
     first_line_title = {'UT': 'Uniaxial', 'PS': 'Pure Shear', 'EBT': 'Equi-biaxial'}[mode] + ' $P_{11}$'
-    second_line_title_parts = []
-    if pd.notna(r2_p11_precomputed):
-        second_line_title_parts.append(f'$R^2 \\approx {r2_p11_precomputed:.3f}$')
-    if pd.notna(rmse_p11_precomputed_kpa):
-        second_line_title_parts.append(f'RMSE $\\approx {rmse_p11_precomputed_kpa:.3f}$ kPa')
-
-    if second_line_title_parts:
-        title_str = first_line_title + "\n" + ", ".join(second_line_title_parts)
-    else:
-        title_str = first_line_title
-    # ax.set_title(title_str, fontsize=PLOT_TITLE_FONTSIZE)
     ax.set_title(first_line_title, fontsize=context.PLOT_TITLE_FONTSIZE)
 
     ax.legend(fontsize=context.PLOT_LEGEND_FONTSIZE, frameon=False) # Legend box turned off
@@ -123,7 +106,7 @@ def plot_synthetic_uniaxial(df, ax, r2_p11_precomputed=np.nan, rmse_p11_precompu
         final_y_min = min_valid_y - padding
         final_y_max = max_valid_y + padding
         ax.set_ylim(final_y_min, final_y_max)
-        style_y_axis(ax, kpa_conversion, context=context)
+        style_y_axis(ax, context=context)
     else:
         ax.tick_params(axis='y', which='major', labelsize=context.PLOT_LABEL_FONTSIZE)
 

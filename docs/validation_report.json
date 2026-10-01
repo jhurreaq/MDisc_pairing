@@ -103,7 +103,7 @@
           "CANNsHEARTdata_shear05.xlsx": "f7b19b0b350bfc1bf2e73144ae2d8e211da1feded2b65e39fb06ec0cf9878847"
         },
         "python": "3.9.6",
-        "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c"
+        "source_sha256": "14d87545ebc6f8ea31daabd10f49c320419e9c27baa37be5725f144ed45dc263"
       },
       "scenarios": 3,
       "selected_models": 27
@@ -313,7 +313,7 @@
         "information_criteria": "Conditional Gaussian working likelihood; local effective df plus residual variance",
         "input_sha256": {},
         "python": "3.9.6",
-        "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c"
+        "source_sha256": "14d87545ebc6f8ea31daabd10f49c320419e9c27baa37be5725f144ed45dc263"
       },
       "scenarios": 12,
       "selected_models": 108
@@ -397,17 +397,29 @@
           "TreloarDataUT.csv": "86364db965190f17b2ff2b56e1a954b01539338002f7b7b6e96f70cb8037b59e"
         },
         "python": "3.9.6",
-        "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c"
+        "source_sha256": "14d87545ebc6f8ea31daabd10f49c320419e9c27baa37be5725f144ed45dc263"
       },
       "scenarios": 1,
       "selected_models": 9
     }
   },
+  "cleanup_comparison": {
+    "baseline_commit": "cad0faf",
+    "compared_files": 259,
+    "identical_logs": 3,
+    "identical_pdfs": 253,
+    "identical_result_payloads": 3,
+    "ignored_provenance_keys": [
+      "source_sha256"
+    ]
+  },
   "differing_files": [],
   "files": 259,
   "matching": true,
   "package_checks": {
+    "data_placeholders_excluded": true,
     "default_outputs_in_caller_workspace": true,
+    "deleted_modules_excluded": true,
     "installed_outside_checkout": true,
     "wheel_built": true
   },
@@ -460,7 +472,7 @@
     "cardiac/RelNoise5pct/RelNoise5pct_OMP_ActivationHeatmap.pdf": "e2489cc13644d72cfba4f7323786fc038d8b0ec9954b37008466bc8ca0c55d45",
     "cardiac/RelNoise5pct/RelNoise5pct_OMP_Criteria.pdf": "1f5e95f2f93bb4efe7b9f87a8b51794c78c66f5fd0681e1c80cb4f30ebb35e61",
     "cardiac/log.txt": "6965c04ed42499c4430fbb266f11ba876a5c00c4e76b46d9e139cc1998cccc4c",
-    "cardiac/results.json": "a11e8224319a880b0c4c4ba446c1f44c4cf33932657cfd0c63492cc8a6cbf600",
+    "cardiac/results.json": "f05d82c4fd3834f40366439cf802f0a4cc0c0576a128ede4ff44436f1b3aab9a",
     "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
     "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
     "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
@@ -654,7 +666,7 @@
     "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_OMP_Criteria.pdf": "73eb127a593775952b0594ea690742267c9d9ba5be99a16d1931c99529be1945",
     "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_RawSynthData_P11_MPa.pdf": "1a304e1a79ff0e80527e27a7dd2283cdd3e708eccae464651b48fcba0ddc4387",
     "synthetic/log_clean.txt": "bef7ea174aa9dd63325fec66ba317dff3d9863930b6f6695037ef1731ec686dd",
-    "synthetic/results.json": "cd80d9d1487a8b7fc2790bea8b691e3341e5c85f3ea1aeb16501a93159f66f1a",
+    "synthetic/results.json": "d6fde08ac3355cefc7d223c22b4b6c9bba68af9c3f5555ccec4e85aa67d07d7c",
     "treloar/Combined_RawData_Reference_RawData.pdf": "26e4768ffb377a8935a1ec3bc6d0bf202a494d62c5f98a1795a39fc97bfff738",
     "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LarsAIC_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
     "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LarsBIC_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
@@ -672,9 +684,9 @@
     "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMP_ActivationHeatmap.pdf": "9590805bb3465d490cf1fbb5ce54f490eb10c56f9e3e0b5cd0342528580fe066",
     "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMP_Criteria.pdf": "d62509aa1a4efa53710d210e7bb336a002b078032eaa3d891e30235c8cc5b2a3",
     "treloar/log.txt": "c0503bc234d0e97cd34cfd699c0424040d64924710d21e49a782501dfb40bb1a",
-    "treloar/results.json": "1d9e2820770867ec1efcc454315f68563cb68034d6ee47bed418cc8be760c990"
+    "treloar/results.json": "8f48f87c80ad4d9e20b3088d0883f96789eeea8d3b76553543133201c3e987d8"
   },
-  "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c",
+  "source_sha256": "14d87545ebc6f8ea31daabd10f49c320419e9c27baa37be5725f144ed45dc263",
   "unit_tests": {
     "command": "python -m unittest discover -s tests -v",
     "passed": 35
