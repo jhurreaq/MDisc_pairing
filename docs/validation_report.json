@@ -1,0 +1,683 @@
+{
+  "case": "all",
+  "cases": {
+    "cardiac": {
+      "all_selected_sampled_checks_passed": true,
+      "max_reference_stress_norm": 0.0,
+      "pdfs": 45,
+      "provenance": {
+        "configuration": {
+          "discovery": {
+            "folds": 5,
+            "paths": {
+              "alpha_count": 40,
+              "alpha_max": 1.0,
+              "alpha_min": 1e-06,
+              "coefficient_tolerance": 1e-08,
+              "max_iter": 50000,
+              "path_count": 21,
+              "solver_tolerance": 1e-07
+            },
+            "refinement": {
+              "max_evaluations": 1000,
+              "max_exponential_argument": 100.0,
+              "starts": [
+                1.0,
+                0.25,
+                4.0
+              ],
+              "tolerance": 1e-08
+            },
+            "ridge": 1e-07,
+            "seed": 42,
+            "weights": {
+              "balance_modes": true,
+              "normalize_stress": true,
+              "rms_floor_fraction": 1e-06
+            }
+          },
+          "noise_levels": [
+            0.0,
+            0.05,
+            0.1
+          ],
+          "plot": {
+            "PLOT_HEATMAP_YLABEL_SIZE": 9,
+            "PLOT_LABEL_FONTSIZE": 14,
+            "PLOT_LEGEND_FONTSIZE": 10,
+            "PLOT_LINEWIDTH": 1.5,
+            "PLOT_MARKER_SIZE": 30,
+            "PLOT_PRED_LINEWIDTH": 1.5,
+            "PLOT_TICK_FONTSIZE": 14,
+            "PLOT_TITLE_FONTSIZE": 14,
+            "SMALL_FIG_LASSO_LARS_OMP": [
+              3.0,
+              4.5
+            ]
+          },
+          "reference_coefficients": [
+            [
+              6,
+              5.162
+            ],
+            [
+              11,
+              0.081
+            ],
+            [
+              19,
+              0.315
+            ],
+            [
+              23,
+              0.486
+            ]
+          ],
+          "reference_nonlinear": [
+            [
+              11,
+              21.151
+            ],
+            [
+              19,
+              4.371
+            ],
+            [
+              23,
+              0.508
+            ]
+          ],
+          "sheet": "Sheet1"
+        },
+        "cv_scope": "Grouped, mode-stratified model-selection CV including preprocessing, discovery and refitting; not an independent test estimate",
+        "dependencies": {
+          "matplotlib": "3.7.2",
+          "numpy": "1.25.2",
+          "openpyxl": "3.1.5",
+          "pandas": "2.2.3",
+          "scikit-learn": "1.3.0",
+          "scipy": "1.11.2"
+        },
+        "information_criteria": "Conditional Gaussian working likelihood; local effective df plus residual variance",
+        "input_sha256": {
+          "CANNsHEARTdata_shear05.xlsx": "f7b19b0b350bfc1bf2e73144ae2d8e211da1feded2b65e39fb06ec0cf9878847"
+        },
+        "python": "3.9.6",
+        "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c"
+      },
+      "scenarios": 3,
+      "selected_models": 27
+    },
+    "synthetic": {
+      "all_selected_sampled_checks_passed": true,
+      "max_reference_stress_norm": 0.0,
+      "pdfs": 192,
+      "provenance": {
+        "configuration": {
+          "discovery": {
+            "folds": 5,
+            "paths": {
+              "alpha_count": 40,
+              "alpha_max": 1.0,
+              "alpha_min": 1e-06,
+              "coefficient_tolerance": 1e-08,
+              "max_iter": 50000,
+              "path_count": 21,
+              "solver_tolerance": 1e-07
+            },
+            "refinement": {
+              "max_evaluations": 1000,
+              "max_exponential_argument": 100.0,
+              "starts": [
+                1.0,
+                0.25,
+                4.0
+              ],
+              "tolerance": 1e-08
+            },
+            "ridge": 1e-07,
+            "seed": 42,
+            "weights": {
+              "balance_modes": true,
+              "normalize_stress": true,
+              "rms_floor_fraction": 1e-06
+            }
+          },
+          "ground_truths": [
+            {
+              "coefficients_pa": [
+                {
+                  "coefficient_pa": 16,
+                  "exponent": -3,
+                  "family": "Ogden",
+                  "powers": [
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "coefficient_pa": 8,
+                  "exponent": 3,
+                  "family": "Ogden",
+                  "powers": [
+                    0,
+                    0
+                  ]
+                }
+              ],
+              "name": "O2"
+            },
+            {
+              "coefficients_pa": [
+                {
+                  "coefficient_pa": 40,
+                  "exponent": 0.0,
+                  "family": "MR",
+                  "powers": [
+                    1,
+                    0
+                  ]
+                },
+                {
+                  "coefficient_pa": 20,
+                  "exponent": 0.0,
+                  "family": "MR",
+                  "powers": [
+                    0,
+                    1
+                  ]
+                }
+              ],
+              "name": "MR2"
+            },
+            {
+              "coefficients_pa": [
+                {
+                  "coefficient_pa": 40,
+                  "exponent": 0.0,
+                  "family": "MR",
+                  "powers": [
+                    0,
+                    1
+                  ]
+                },
+                {
+                  "coefficient_pa": 8,
+                  "exponent": -3,
+                  "family": "Ogden",
+                  "powers": [
+                    0,
+                    0
+                  ]
+                }
+              ],
+              "name": "MR1O1"
+            },
+            {
+              "coefficients_pa": [
+                {
+                  "coefficient_pa": 40,
+                  "exponent": 0.0,
+                  "family": "MR",
+                  "powers": [
+                    1,
+                    0
+                  ]
+                },
+                {
+                  "coefficient_pa": 20,
+                  "exponent": 0.0,
+                  "family": "MR",
+                  "powers": [
+                    0,
+                    1
+                  ]
+                },
+                {
+                  "coefficient_pa": 16,
+                  "exponent": -3,
+                  "family": "Ogden",
+                  "powers": [
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "coefficient_pa": 800,
+                  "exponent": 1,
+                  "family": "Ogden",
+                  "powers": [
+                    0,
+                    0
+                  ]
+                }
+              ],
+              "name": "MR2O2"
+            }
+          ],
+          "mr_order": 4,
+          "noise_levels": [
+            0.0,
+            0.05,
+            0.1
+          ],
+          "ogden_exponents": [
+            -10,
+            -9,
+            -8,
+            -7,
+            -6,
+            -5,
+            -4,
+            -3,
+            -1,
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "plot": {
+            "PLOT_HEATMAP_YLABEL_SIZE": 9,
+            "PLOT_LABEL_FONTSIZE": 14,
+            "PLOT_LEGEND_FONTSIZE": 10,
+            "PLOT_LINEWIDTH": 1.5,
+            "PLOT_MARKER_SIZE": 30,
+            "PLOT_PRED_LINEWIDTH": 1.5,
+            "PLOT_TICK_FONTSIZE": 14,
+            "PLOT_TITLE_FONTSIZE": 14,
+            "SMALL_FIG_LASSO_LARS_OMP": [
+              3.0,
+              4.5
+            ]
+          },
+          "points": 60,
+          "stretch_range": [
+            0.6,
+            5.0
+          ]
+        },
+        "cv_scope": "Grouped, mode-stratified model-selection CV including preprocessing, discovery and refitting; not an independent test estimate",
+        "dependencies": {
+          "matplotlib": "3.7.2",
+          "numpy": "1.25.2",
+          "openpyxl": "3.1.5",
+          "pandas": "2.2.3",
+          "scikit-learn": "1.3.0",
+          "scipy": "1.11.2"
+        },
+        "information_criteria": "Conditional Gaussian working likelihood; local effective df plus residual variance",
+        "input_sha256": {},
+        "python": "3.9.6",
+        "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c"
+      },
+      "scenarios": 12,
+      "selected_models": 108
+    },
+    "treloar": {
+      "all_selected_sampled_checks_passed": true,
+      "max_reference_stress_norm": 0.0,
+      "pdfs": 16,
+      "provenance": {
+        "configuration": {
+          "discovery": {
+            "folds": 5,
+            "paths": {
+              "alpha_count": 40,
+              "alpha_max": 1.0,
+              "alpha_min": 1e-06,
+              "coefficient_tolerance": 1e-08,
+              "max_iter": 50000,
+              "path_count": 21,
+              "solver_tolerance": 1e-07
+            },
+            "refinement": {
+              "max_evaluations": 1000,
+              "max_exponential_argument": 100.0,
+              "starts": [
+                1.0,
+                0.25,
+                4.0
+              ],
+              "tolerance": 1e-08
+            },
+            "ridge": 1e-07,
+            "seed": 42,
+            "weights": {
+              "balance_modes": true,
+              "normalize_stress": true,
+              "rms_floor_fraction": 1e-06
+            }
+          },
+          "fit_datasets": [
+            "Treloar"
+          ],
+          "mr_order": 3,
+          "ogden_exponents": [
+            -4,
+            -3,
+            -1,
+            1,
+            3,
+            4
+          ],
+          "plot": {
+            "PLOT_HEATMAP_YLABEL_SIZE": 9,
+            "PLOT_LABEL_FONTSIZE": 14,
+            "PLOT_LEGEND_FONTSIZE": 10,
+            "PLOT_LINEWIDTH": 1.5,
+            "PLOT_MARKER_SIZE": 30,
+            "PLOT_PRED_LINEWIDTH": 1.5,
+            "PLOT_TICK_FONTSIZE": 14,
+            "PLOT_TITLE_FONTSIZE": 14,
+            "SMALL_FIG_LASSO_LARS_OMP": [
+              3.0,
+              4.5
+            ]
+          }
+        },
+        "cv_scope": "Grouped, mode-stratified model-selection CV including preprocessing, discovery and refitting; not an independent test estimate",
+        "dependencies": {
+          "matplotlib": "3.7.2",
+          "numpy": "1.25.2",
+          "openpyxl": "3.1.5",
+          "pandas": "2.2.3",
+          "scikit-learn": "1.3.0",
+          "scipy": "1.11.2"
+        },
+        "information_criteria": "Conditional Gaussian working likelihood; local effective df plus residual variance",
+        "input_sha256": {
+          "Kawabata.csv": "423e31a00efa75ba30af79ef510aee321052a132c985cc5b0f0910eec6a04968",
+          "TreloarDataEBT.csv": "be59b5e1f99abb7a0af79b571e0662cf6430a95a439891c06fa5d11a5ae91449",
+          "TreloarDataPS.csv": "244c63d0a54e9c184c621d486d5541ced724fad57cc52de4072eb5f3e15cf50b",
+          "TreloarDataUT.csv": "86364db965190f17b2ff2b56e1a954b01539338002f7b7b6e96f70cb8037b59e"
+        },
+        "python": "3.9.6",
+        "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c"
+      },
+      "scenarios": 1,
+      "selected_models": 9
+    }
+  },
+  "differing_files": [],
+  "files": 259,
+  "matching": true,
+  "package_checks": {
+    "default_outputs_in_caller_workspace": true,
+    "installed_outside_checkout": true,
+    "wheel_built": true
+  },
+  "pdfs": 253,
+  "quick": false,
+  "sha256": {
+    "cardiac/RelNoise0pct/RelNoise0pct_LarsAIC_Comparison.pdf": "474857e1e5187354701b0529264c395ac8d2de3128ae160edc2b042406b58220",
+    "cardiac/RelNoise0pct/RelNoise0pct_LarsBIC_Comparison.pdf": "b282cc33c006828219a1f9a9ee507de664045cdae2db4c9f73afc8ca87b26b13",
+    "cardiac/RelNoise0pct/RelNoise0pct_LarsCV_Comparison.pdf": "b1c84359e6886c02e666d0158376d9937919f34d3e6cb8848fd637dfbad7a972",
+    "cardiac/RelNoise0pct/RelNoise0pct_Lars_ActivationHeatmap.pdf": "4cdf863b1bad8611d1767f0bbd894c2c7cafce72cf5aee5ec953e264aa5e3508",
+    "cardiac/RelNoise0pct/RelNoise0pct_Lars_Criteria.pdf": "13808c6531986f65b21e525cd65e99d5c05db7f2b4e1a67fe1545799aa145ae7",
+    "cardiac/RelNoise0pct/RelNoise0pct_LassoAIC_Comparison.pdf": "fc5a5ed0943d17f07e54f266d3addca29ffdf0452fc6076c9ca1334109d4716a",
+    "cardiac/RelNoise0pct/RelNoise0pct_LassoBIC_Comparison.pdf": "b1e3f09ca15cf403381307be7a1efb598f0e05d42118d51ddda64e9ebe7a7808",
+    "cardiac/RelNoise0pct/RelNoise0pct_LassoCV_Comparison.pdf": "62ff74d3c1c7e44f646a6cd77cba4c26e2369c810e97fac6c2838d552d263f87",
+    "cardiac/RelNoise0pct/RelNoise0pct_Lasso_ActivationHeatmap.pdf": "a484a0afb17caa3d81821b472b4b83b167f71dec09467622642d0494e6a097bf",
+    "cardiac/RelNoise0pct/RelNoise0pct_Lasso_Criteria.pdf": "943a05cc96f19f86be5bc53dd4e2b1aa12471806c31710ae6160c64600abb58e",
+    "cardiac/RelNoise0pct/RelNoise0pct_OMPAIC_Comparison.pdf": "8dc1eb649af4434f6f93e6e3fc9a2600244d303e0d701cd53e0810a4b07ab36a",
+    "cardiac/RelNoise0pct/RelNoise0pct_OMPBIC_Comparison.pdf": "404a68148e1aeec908f724acb42476dae0c9f258f0ee03f0b44e6a4f899e845d",
+    "cardiac/RelNoise0pct/RelNoise0pct_OMPCV_Comparison.pdf": "1c1c45e9551849c6e4a1c0c22995f6b0657094aa2f806fcd4fcef7c294b8941d",
+    "cardiac/RelNoise0pct/RelNoise0pct_OMP_ActivationHeatmap.pdf": "8e5b85d53c6415a3d33eeb8e27d31cb0be4410d89f345ece435d3c6c6d2c7882",
+    "cardiac/RelNoise0pct/RelNoise0pct_OMP_Criteria.pdf": "16999183d0b4562331e0fcf0a10ab459300fa1029d65038c24caf46b6509130c",
+    "cardiac/RelNoise10pct/RelNoise10pct_LarsAIC_Comparison.pdf": "b2ecb8ea02f9baea9a99100799421fba8f6d548a660f054772d90c1554aa345b",
+    "cardiac/RelNoise10pct/RelNoise10pct_LarsBIC_Comparison.pdf": "c0793c45f0045ed280ffb943f2bc3a47f815b924a7e78faf4dca5bc21047dfe1",
+    "cardiac/RelNoise10pct/RelNoise10pct_LarsCV_Comparison.pdf": "75c13c8c5dc532806341681df79be8a3bfd3316796322950fd45233317f9680a",
+    "cardiac/RelNoise10pct/RelNoise10pct_Lars_ActivationHeatmap.pdf": "b48d52e50149893c72e59231517aaec6151e68bc4e6ec8b8a33529dda9b69fa6",
+    "cardiac/RelNoise10pct/RelNoise10pct_Lars_Criteria.pdf": "66bc774e5ace923af193cec48a7cba4076b27f816b04a80f2fd671c8e1edfb63",
+    "cardiac/RelNoise10pct/RelNoise10pct_LassoAIC_Comparison.pdf": "1457bd973989178430208945cf94b0518dd5361b25b08b45f688f295854fca0f",
+    "cardiac/RelNoise10pct/RelNoise10pct_LassoBIC_Comparison.pdf": "2f4747944c6fdd76f8acd01ba707ca249b8201ae8d26f23221ebd5754fc9a57a",
+    "cardiac/RelNoise10pct/RelNoise10pct_LassoCV_Comparison.pdf": "da25be31fad8d531bead53dd2bec003f86ae995da95cc0f629f02d16a6780e5f",
+    "cardiac/RelNoise10pct/RelNoise10pct_Lasso_ActivationHeatmap.pdf": "bbef094c50413ea621b359bdbf982f95614fb1c0d89ac154fab841f63ab178d2",
+    "cardiac/RelNoise10pct/RelNoise10pct_Lasso_Criteria.pdf": "d33a3f421ee1d7d2674c0a69fa59142b33ab3c9268d1e11c48623f6fa7554e60",
+    "cardiac/RelNoise10pct/RelNoise10pct_OMPAIC_Comparison.pdf": "e07e9d7d5d798b05219cc9b33307d6ed4133da9da7cececbe8edeaf1a3f574f7",
+    "cardiac/RelNoise10pct/RelNoise10pct_OMPBIC_Comparison.pdf": "e2506f7ad4b810190c3f54accfdf6fbf83fdd0b1161ab78b93313eafb452ee26",
+    "cardiac/RelNoise10pct/RelNoise10pct_OMPCV_Comparison.pdf": "79e4ccad87ef4ab778d3c3feda001d135caa0d11c3c922a67d16308b812e66c1",
+    "cardiac/RelNoise10pct/RelNoise10pct_OMP_ActivationHeatmap.pdf": "f27315385ecebcb56f951b2c32d2ddf1d7c7877e38d6cd15b926cad8d65eb232",
+    "cardiac/RelNoise10pct/RelNoise10pct_OMP_Criteria.pdf": "3b4b6ac9f1301638402f1996c3fc008030d814a227bb4cc987e32d21d3e4283b",
+    "cardiac/RelNoise5pct/RelNoise5pct_LarsAIC_Comparison.pdf": "b729c32e026f4c4ac89b79866a875da855761d7f889476f4446f1b70d016cb16",
+    "cardiac/RelNoise5pct/RelNoise5pct_LarsBIC_Comparison.pdf": "dc0515a11f0c6fc4993683b40b865e6e301a9b6546b38f316e31b81cde4e4f8b",
+    "cardiac/RelNoise5pct/RelNoise5pct_LarsCV_Comparison.pdf": "878f8046ccde02c21e1c57da87c42b232d21e1e2f901847fb4db671c8a747966",
+    "cardiac/RelNoise5pct/RelNoise5pct_Lars_ActivationHeatmap.pdf": "1d4da8ce5449326680c373677999a0c89f928e9e06a37cd56b1beff7320f23f1",
+    "cardiac/RelNoise5pct/RelNoise5pct_Lars_Criteria.pdf": "591e6f07ab5cf2a7a83f7b4ee60f5df642e44a6568824919214b677513b0c914",
+    "cardiac/RelNoise5pct/RelNoise5pct_LassoAIC_Comparison.pdf": "a432b02f7e2bd69b97690e286076ba20ada7fc374ae66b68776d9e3855576e17",
+    "cardiac/RelNoise5pct/RelNoise5pct_LassoBIC_Comparison.pdf": "d67efd73ebcafe9e96c054622538257f36e9ec0116e2bd862aff3c541e9aec54",
+    "cardiac/RelNoise5pct/RelNoise5pct_LassoCV_Comparison.pdf": "adf7452d7727938fe7905685a84e6e9077fadcf060c2bbe09c53a92f0b0c21bd",
+    "cardiac/RelNoise5pct/RelNoise5pct_Lasso_ActivationHeatmap.pdf": "fc100903035c7fbef13ccc65b73c9a2320cb49adc030625f1e113af6adabcfbc",
+    "cardiac/RelNoise5pct/RelNoise5pct_Lasso_Criteria.pdf": "bbc5940e3ba08d03d29ce68270d7cdd535d37a584d2ac4a3999144fcd0bab02b",
+    "cardiac/RelNoise5pct/RelNoise5pct_OMPAIC_Comparison.pdf": "5acb75cc61d3c5fe4d7d401f79048c30a4f25f4ea0a428e4c9bf0bbf86d3b02a",
+    "cardiac/RelNoise5pct/RelNoise5pct_OMPBIC_Comparison.pdf": "2a2142aebf77873e3fe110c4dfd85353f2caba58069a0281ddcc3f07a4b32bd4",
+    "cardiac/RelNoise5pct/RelNoise5pct_OMPCV_Comparison.pdf": "aa505e9d635eb44e3e145d8357f9a2a64a6e5dd6cbcc3b2f5657663fbdd2121f",
+    "cardiac/RelNoise5pct/RelNoise5pct_OMP_ActivationHeatmap.pdf": "e2489cc13644d72cfba4f7323786fc038d8b0ec9954b37008466bc8ca0c55d45",
+    "cardiac/RelNoise5pct/RelNoise5pct_OMP_Criteria.pdf": "1f5e95f2f93bb4efe7b9f87a8b51794c78c66f5fd0681e1c80cb4f30ebb35e61",
+    "cardiac/log.txt": "6965c04ed42499c4430fbb266f11ba876a5c00c4e76b46d9e139cc1998cccc4c",
+    "cardiac/results.json": "a11e8224319a880b0c4c4ba446c1f44c4cf33932657cfd0c63492cc8a6cbf600",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_Lars_ActivationHeatmap.pdf": "2331ad6f37b7bb86dbb2317afb91b31dd070e699138f0f58693809dfb28ec9e2",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_Lars_Criteria.pdf": "423681dcbf47e79f60c67ecdf40c384acc4bac3fe5bb04e0dc4a3aa5a5f6cc1b",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_Lasso_ActivationHeatmap.pdf": "7d4b5cb567f8fd40adda06e303d6dffd6ec6c03626461bf4bf48f47dd99be8fe",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_Lasso_Criteria.pdf": "e2a540b4b269ea5ab7393a5c63c2a85825a43aea641968467ae48e7d02229071",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "a5fca09a61ba2758ef4dd32b783d76542a407a9f4f767825cf4e128678830364",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_OMP_ActivationHeatmap.pdf": "b8ff8916be707f0c4fa6ce05fa024671d47ee1e8f4cdb95daee9c19ceb197ed9",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_OMP_Criteria.pdf": "515df2186995d3da64b877374da2c0b3f9f181a1ff728ecc3e271c49ed48f734",
+    "synthetic/MR1O1_RelNoise0pct/MR1O1_RelNoise0pct_RawSynthData_P11_MPa.pdf": "7980cc17bec9156005fd8af02dc8f1038997f25eb7494516636fb008bc2a7df9",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "75b44b643408e5e247dd71e84006ad00d0118f6761f7476609d0ad2aa3addbf0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "75b44b643408e5e247dd71e84006ad00d0118f6761f7476609d0ad2aa3addbf0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "75b44b643408e5e247dd71e84006ad00d0118f6761f7476609d0ad2aa3addbf0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_Lars_ActivationHeatmap.pdf": "412ad6df1fe3ae115ec24c9e24e2cf8948c78e5a50b4014e4cdd8291238a4e63",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_Lars_Criteria.pdf": "5ecf84d13fa3197beec9f073c2c61897ca3ee5fa6adad25448649d90c93d8bd6",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "75b44b643408e5e247dd71e84006ad00d0118f6761f7476609d0ad2aa3addbf0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "75b44b643408e5e247dd71e84006ad00d0118f6761f7476609d0ad2aa3addbf0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "75b44b643408e5e247dd71e84006ad00d0118f6761f7476609d0ad2aa3addbf0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_Lasso_ActivationHeatmap.pdf": "e29666ad74b4a89034ba858077a87c4b1f54c52c797228be6b9a11901ca771be",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_Lasso_Criteria.pdf": "6672c84b93434c8dd4e27db8866dba0e476b9c5270397f58c0993d8114d59afb",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "35312f86bad5fbd61e63a6a6a3bbbb1324cb600e98502c6056473333903f4592",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "35312f86bad5fbd61e63a6a6a3bbbb1324cb600e98502c6056473333903f4592",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "35312f86bad5fbd61e63a6a6a3bbbb1324cb600e98502c6056473333903f4592",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_OMP_ActivationHeatmap.pdf": "4ba6b4bc77fe655661e0cc70445d21111dda0a78acc231dfbc47a0d837254fa0",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_OMP_Criteria.pdf": "7bbd326dccf83e8f9fb79e91bffae2ee9d14f51833593f1a5bbca705e38976cc",
+    "synthetic/MR1O1_RelNoise10pct/MR1O1_RelNoise10pct_RawSynthData_P11_MPa.pdf": "4df7492be446ba9e523d06386e618bef84c30baf9cd80ddf3a951b12203a662f",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "790e01b4fb94dcf8886c9aab1ab0c040789c99bf4328a5c3516577ab72e65d0e",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "790e01b4fb94dcf8886c9aab1ab0c040789c99bf4328a5c3516577ab72e65d0e",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "790e01b4fb94dcf8886c9aab1ab0c040789c99bf4328a5c3516577ab72e65d0e",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_Lars_ActivationHeatmap.pdf": "f47352d6f48fcf828c841a5929b88f6172793cb4bdc052630a06abb59981cf1a",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_Lars_Criteria.pdf": "f5e009991409c7bde3314f172e292ae9c7fdb9eae350fa95194a064f34f9e6fd",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "790e01b4fb94dcf8886c9aab1ab0c040789c99bf4328a5c3516577ab72e65d0e",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "790e01b4fb94dcf8886c9aab1ab0c040789c99bf4328a5c3516577ab72e65d0e",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "790e01b4fb94dcf8886c9aab1ab0c040789c99bf4328a5c3516577ab72e65d0e",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_Lasso_ActivationHeatmap.pdf": "67096568a566f550d5bff6d0583d17df9159a31063a22f379d06a7b6c3998849",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_Lasso_Criteria.pdf": "fa825d1ded5e6585846bcbb471bc721552a6e805501a9b9a8878085fcc6c3d53",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "560dfe966062067624fb35fd021ddbd4d190984578bc5f40e86b501e47803dbf",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "560dfe966062067624fb35fd021ddbd4d190984578bc5f40e86b501e47803dbf",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "560dfe966062067624fb35fd021ddbd4d190984578bc5f40e86b501e47803dbf",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_OMP_ActivationHeatmap.pdf": "71317b62cb2143d387f4b3ea287c2093be8493cd7484b1eb8ae3eb8aa310b881",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_OMP_Criteria.pdf": "c24d054519c96e567bf7ee5dc22d83b030327eddac10c142418b4578f056aa1b",
+    "synthetic/MR1O1_RelNoise5pct/MR1O1_RelNoise5pct_RawSynthData_P11_MPa.pdf": "ccc51d87b83193357bfdedfbb4aa38d383560bcaeca7c566380d2e7804ae1eec",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_Lars_ActivationHeatmap.pdf": "7374f8dafce3e80c9874649d2c2f3b315dd6f7bc7bf899946c584143851d7e69",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_Lars_Criteria.pdf": "1c4df669b0b83c8faef5bc80361850d161f6f272b56142d84f98683c82cbd63c",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_Lasso_ActivationHeatmap.pdf": "60c5927d2a00984622e98977dff795f382a8dd301622e22c632a609506b34242",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_Lasso_Criteria.pdf": "f026e30828785ac369150a2e5668d8717a89f986e39031282b462393e5e11b91",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "49c0950ad07afe750d97f6ec2a463a09e59c691a5f590af5a5e2d8db70c41c5e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_OMP_ActivationHeatmap.pdf": "26e5a5fee1264a158ebbd7458dd4ecfee4224c90496322d2f27407c0c59fcd8e",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_OMP_Criteria.pdf": "d488d3fc588f698c3d97c1239fa3ce46afd73576d3857eb4d48a890b5943070b",
+    "synthetic/MR2O2_RelNoise0pct/MR2O2_RelNoise0pct_RawSynthData_P11_MPa.pdf": "f972e6a9b88f4531720f3eb5aa96da7341b5d016195fb98fbd62f3754bf74e62",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "1c41b9f1d35150219c762581605d8ad1fe01b262371e02cde69ba5013d948e7e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "1c41b9f1d35150219c762581605d8ad1fe01b262371e02cde69ba5013d948e7e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "1c41b9f1d35150219c762581605d8ad1fe01b262371e02cde69ba5013d948e7e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_Lars_ActivationHeatmap.pdf": "8d148c644c5c7584bd46eced74768348baf8fd4e4631c60dc552413d7cea2041",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_Lars_Criteria.pdf": "4ed394b205427d75ab8eb18ff8caefa97b75b20b9f38e785320dccb2e33007c4",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "1c41b9f1d35150219c762581605d8ad1fe01b262371e02cde69ba5013d948e7e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "1c41b9f1d35150219c762581605d8ad1fe01b262371e02cde69ba5013d948e7e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "1c41b9f1d35150219c762581605d8ad1fe01b262371e02cde69ba5013d948e7e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_Lasso_ActivationHeatmap.pdf": "2660c16f5049040e69ad4616df7e5cc33974785285387b64aac2d7f9e9f032c8",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_Lasso_Criteria.pdf": "4cbdd43aa340ded1e2e2e2b946b0d8b0310f472bd26bec6b5a016280049ae414",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "8bdc9a48ca57e6bc3fe23aae981c57457e36a7817902a4614aabaa9a9f7c1e60",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "8bdc9a48ca57e6bc3fe23aae981c57457e36a7817902a4614aabaa9a9f7c1e60",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "0e3d3f730c16988b2fb541e94fd2590b6cca3e0020a5e5bf483b2d484d81b864",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_OMP_ActivationHeatmap.pdf": "92b5c52a3168a9014b52ce25b57d000401e3ce1938fdf6ccf0f8122cc0857f6e",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_OMP_Criteria.pdf": "a4094309bf30d888c0bccbdb9d872150c1022f51afeaac339149b40f3c58a545",
+    "synthetic/MR2O2_RelNoise10pct/MR2O2_RelNoise10pct_RawSynthData_P11_MPa.pdf": "5d101e376801b247af56a5a209417340993d381d02b3e75996a3d893e7621bd8",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "aefd5cbac34ae7dc04ae7a0b7395e8da2e8903cd4c7f74f5b9d4541733a0fa81",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "aefd5cbac34ae7dc04ae7a0b7395e8da2e8903cd4c7f74f5b9d4541733a0fa81",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "aefd5cbac34ae7dc04ae7a0b7395e8da2e8903cd4c7f74f5b9d4541733a0fa81",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_Lars_ActivationHeatmap.pdf": "1d76286e523d7b69c8926850ce8ebcf7a9f1bc8f21a0e0d1d3dbfc8baf6ce056",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_Lars_Criteria.pdf": "4bd975e80e32c305c9020b7cd876d239958601d1e39a273d30c56aae391776b4",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "aefd5cbac34ae7dc04ae7a0b7395e8da2e8903cd4c7f74f5b9d4541733a0fa81",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "aefd5cbac34ae7dc04ae7a0b7395e8da2e8903cd4c7f74f5b9d4541733a0fa81",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "aefd5cbac34ae7dc04ae7a0b7395e8da2e8903cd4c7f74f5b9d4541733a0fa81",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_Lasso_ActivationHeatmap.pdf": "051698268407ed89e34068885056cf98dfe50f96d71e4c9635ca1e6cc9dd2867",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_Lasso_Criteria.pdf": "aead81beaf10a76bd1af68be04598696df8b8196afba315d05320027e2c3d074",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "ed306f74e34bf93bf6db47e87565c7f853382b593ffd6629c78f5416d599ee96",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "ed306f74e34bf93bf6db47e87565c7f853382b593ffd6629c78f5416d599ee96",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "58a8297be0baddc200376dee23fa44af4b0d16fb953fb10cc7476d3f5dcdbfc5",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_OMP_ActivationHeatmap.pdf": "e988718fc99233abb3fde1f41491e8b2dfdadf2ce2efe73f6bdd12ec8baca279",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_OMP_Criteria.pdf": "9a19bdc96d733c2ba19d6d2fe4e3ff278b049d0341a72c8ce31daec68502ab53",
+    "synthetic/MR2O2_RelNoise5pct/MR2O2_RelNoise5pct_RawSynthData_P11_MPa.pdf": "fd259bfe23fc73b4c5b953a59697dc44c89c793bc846a26f2eb82c03a1e4c053",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_Lars_ActivationHeatmap.pdf": "5b1a3c0b854e583eb72647427d1d534bafadea74514702042e1b0cf478636e68",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_Lars_Criteria.pdf": "1ede30c45253793b70382c6957249ddd7b92bbc2c80c607780b8ee6677a668f6",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_Lasso_ActivationHeatmap.pdf": "42b1ca761465b5cd8b92981d80811fd68d73a18ae7a859af90cbcfb42f086734",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_Lasso_Criteria.pdf": "82e27226bb9a2594b376fec8c96a67fa9b2ffa39972b6dfa673a2519db4cb785",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "e6e922f0e6290922bc0999edbab12caaa4f07e9806f51a7133ffc150b0c6f673",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_OMP_ActivationHeatmap.pdf": "d517fa0493ba40413cbe39e13c233440c70fabe4139145e4801a4589e884e49a",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_OMP_Criteria.pdf": "964d803e786daa18ae1318097d3ac8b4480c57033ce264ffa1a15e630126c773",
+    "synthetic/MR2_RelNoise0pct/MR2_RelNoise0pct_RawSynthData_P11_MPa.pdf": "61b1c9470f2a42c330ba0e89a9a41bb91c49aaf3d84d8cc936ae1facb3d35a8d",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_Lars_ActivationHeatmap.pdf": "cacb248e1d58bd080fdf7c28d719189aca11c4d3fc39790cabc7797b62d170ff",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_Lars_Criteria.pdf": "89501a69ee8af54cdcb33de7f19e9e10aba52b613515518fbc1c570c4515aa92",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_Lasso_ActivationHeatmap.pdf": "42b1ca761465b5cd8b92981d80811fd68d73a18ae7a859af90cbcfb42f086734",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_Lasso_Criteria.pdf": "bae5dadbe897f5f61d96c8dba09b8e6c1c2079e8605f59016678e242cff9976e",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "7ab5d3e441976fe19a42a9647fb75988693e185cffa9285dd5a828b69eda8fc8",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_OMP_ActivationHeatmap.pdf": "d517fa0493ba40413cbe39e13c233440c70fabe4139145e4801a4589e884e49a",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_OMP_Criteria.pdf": "43ac45c2f50ba735d60742cb8e69a030f95205af247556ed1f6e6fc623bb9a6c",
+    "synthetic/MR2_RelNoise10pct/MR2_RelNoise10pct_RawSynthData_P11_MPa.pdf": "a9995ab43fe2f820aba03f496e2b597f5f72857a4835d859069b6a25e00e35bd",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_Lars_ActivationHeatmap.pdf": "cacb248e1d58bd080fdf7c28d719189aca11c4d3fc39790cabc7797b62d170ff",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_Lars_Criteria.pdf": "a405acbbe9042b493f5000f47c7880fbf6457fcc7eef143a65481f9ca92fc56c",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_Lasso_ActivationHeatmap.pdf": "42b1ca761465b5cd8b92981d80811fd68d73a18ae7a859af90cbcfb42f086734",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_Lasso_Criteria.pdf": "f40520f089edbcb17461cd414e83bf79bb4a3b892c22e08c87abf75dc57a2d99",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "f9a89371072b3e9ebc33c7b5eb8ae0088d98867968efced568ceb12b64544b0b",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_OMP_ActivationHeatmap.pdf": "d517fa0493ba40413cbe39e13c233440c70fabe4139145e4801a4589e884e49a",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_OMP_Criteria.pdf": "c00d1c55aa5f2861a46a19c96e48d3ed4fae71257b258bbada46b4bd785b8c0a",
+    "synthetic/MR2_RelNoise5pct/MR2_RelNoise5pct_RawSynthData_P11_MPa.pdf": "e9218c49a7fdde1cfcca058daf66b3507a22b3bd429cf6c398633d6b72827df5",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_Lars_ActivationHeatmap.pdf": "b37d49cb892a799127d50f1dcc3ed7e304dcd998f8bf321e82ce33684f6a896e",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_Lars_Criteria.pdf": "680376cfc6d554b4a35d76408f8e2a4e590aefcbad4304c8bd476aa572a60603",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_Lasso_ActivationHeatmap.pdf": "6d3e44d5ea12bd993e059eba99ba9c4ca9b9817eaa427827d56dbc7681d37389",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_Lasso_Criteria.pdf": "3872832aa4ca0683d5ce9887b90180b0a29f338a9d93bbe431dfcc6a8d9945d1",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "d41d7b8d3b8862a6d2cbc7fe5cbf20768c52d5e92bf242b4aad917839771f2d6",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_OMP_ActivationHeatmap.pdf": "b37d49cb892a799127d50f1dcc3ed7e304dcd998f8bf321e82ce33684f6a896e",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_OMP_Criteria.pdf": "680376cfc6d554b4a35d76408f8e2a4e590aefcbad4304c8bd476aa572a60603",
+    "synthetic/O2_RelNoise0pct/O2_RelNoise0pct_RawSynthData_P11_MPa.pdf": "84b608774379537c3f81a57a34db34e31799b8e73a819acbbd6cc00a9890d177",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_Lars_ActivationHeatmap.pdf": "879c6ca7fc90716090291e9eaf08ef975a3908f9f10370e175e281ac83f06ed2",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_Lars_Criteria.pdf": "c79d72efd2253ee102d254fa1c8cd32fb1a370ef782f7a74f0b664322ae14b98",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_Lasso_ActivationHeatmap.pdf": "8d21ec2c1d1d78549ec2f69698c8c007456e608e138558953d0323889456f820",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_Lasso_Criteria.pdf": "20a8a8d0db5113bfa5beb7a3235c9b90e8917c1a7b7868cedfe6834eb99f97a9",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "894e3dca956d5cf8ad447bbf425e51b0e9f666c97299d73e888d435c6015ccb0",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_OMP_ActivationHeatmap.pdf": "48632264a5c3be4a6eba85ffb932cf6052fa6b3c755f877205ee03d85a8f0b7c",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_OMP_Criteria.pdf": "84d0eb9212b646788b003ce8da9342be6a335c7853302d60e5773300f0841f6a",
+    "synthetic/O2_RelNoise10pct/O2_RelNoise10pct_RawSynthData_P11_MPa.pdf": "13d0589731fcc81d1d376d72a4fb1ec326b86dd82387020ae0e19be36f526660",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_LarsAIC_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_LarsBIC_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_LarsCV_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_Lars_ActivationHeatmap.pdf": "442ba24cde5519e9b8008d311e328a1392739e0111e6493376269fff384d49a3",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_Lars_Criteria.pdf": "9be2445eedaa850d65b47338fe5f2f77b9cec01e530dc80744b2156d46774df1",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_LassoAIC_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_LassoBIC_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_LassoCV_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_Lasso_ActivationHeatmap.pdf": "b33c972718b419a59567021e5f8cbceaa9d1ed94ebe969473690db6d58aa199f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_Lasso_Criteria.pdf": "ed62cce27e801af1bf0b48f3fbcfaf476cc276d75f4e05524b7c538d48dff5fc",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_OMPAIC_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_OMPBIC_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_OMPCV_Predictions_Final_Checked_kPa.pdf": "8ee8008e9396fa4b826aadc1438a0ba54033f73cb1e88f804732565b6c9d021f",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_OMP_ActivationHeatmap.pdf": "1cfa7ca3002afefefe6e003b2bb4544481d02e1bf4fafee38ebd623da16f72bc",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_OMP_Criteria.pdf": "73eb127a593775952b0594ea690742267c9d9ba5be99a16d1931c99529be1945",
+    "synthetic/O2_RelNoise5pct/O2_RelNoise5pct_RawSynthData_P11_MPa.pdf": "1a304e1a79ff0e80527e27a7dd2283cdd3e708eccae464651b48fcba0ddc4387",
+    "synthetic/log_clean.txt": "bef7ea174aa9dd63325fec66ba317dff3d9863930b6f6695037ef1731ec686dd",
+    "synthetic/results.json": "cd80d9d1487a8b7fc2790bea8b691e3341e5c85f3ea1aeb16501a93159f66f1a",
+    "treloar/Combined_RawData_Reference_RawData.pdf": "26e4768ffb377a8935a1ec3bc6d0bf202a494d62c5f98a1795a39fc97bfff738",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LarsAIC_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LarsBIC_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LarsCV_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_Lars_ActivationHeatmap.pdf": "34a5742e04637aec7d17b97894eca76fe89eeb435ed8be2c48d587e6f269ccd0",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_Lars_Criteria.pdf": "196a360b885447e361a7c6b286ce3136256c5cf8f716d2de17378eb04d101877",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LassoAIC_RefitSubset_EvalFull_Predictions.pdf": "a94931f3739512968f095e738450dc681198c894a9e16eafc7ddefbcade3d67a",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LassoBIC_RefitSubset_EvalFull_Predictions.pdf": "a94931f3739512968f095e738450dc681198c894a9e16eafc7ddefbcade3d67a",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_LassoCV_RefitSubset_EvalFull_Predictions.pdf": "a94931f3739512968f095e738450dc681198c894a9e16eafc7ddefbcade3d67a",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_Lasso_ActivationHeatmap.pdf": "6bc99a05617236aa388b586a37f082189e39f9183da9ebeb13306f8bd5bf1f99",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_Lasso_Criteria.pdf": "119b02f993889a646eb670950b3f6b27dd2fba31f9e28d2383b1a110cf563c8f",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMPAIC_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMPBIC_RefitSubset_EvalFull_Predictions.pdf": "21a39104acf46f3493604efebfa8200e11583412de5bc776d383ea3c0942020d",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMPCV_RefitSubset_EvalFull_Predictions.pdf": "18e86a2a24a643414c5a6b77f8dc0a8b979edbd1667bd96a88c3b145e0a515c5",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMP_ActivationHeatmap.pdf": "9590805bb3465d490cf1fbb5ce54f490eb10c56f9e3e0b5cd0342528580fe066",
+    "treloar/Fit_Treloar_Only/Fit_Treloar_Only_OMP_Criteria.pdf": "d62509aa1a4efa53710d210e7bb336a002b078032eaa3d891e30235c8cc5b2a3",
+    "treloar/log.txt": "c0503bc234d0e97cd34cfd699c0424040d64924710d21e49a782501dfb40bb1a",
+    "treloar/results.json": "1d9e2820770867ec1efcc454315f68563cb68034d6ee47bed418cc8be760c990"
+  },
+  "source_sha256": "28af484c55dbd5276c498dd732114351e94e4bab9278edbed4433888adb29f9c",
+  "unit_tests": {
+    "command": "python -m unittest discover -s tests -v",
+    "passed": 35
+  },
+  "validation_date": "2026-10-01"
+}

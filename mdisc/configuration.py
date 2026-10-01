@@ -1,12 +1,8 @@
-"""Plot defaults shared by the original experiments."""
-
+"""Immutable plot template settings, separate from mechanics and runtime data."""
 from dataclasses import dataclass
-from typing import Any, Tuple
+from typing import Tuple
 
-import matplotlib.pyplot as plt
-
-
-@dataclass
+@dataclass(frozen=True)
 class PlotSettings:
     PLOT_TITLE_FONTSIZE: int = 14
     PLOT_LABEL_FONTSIZE: int = 14
@@ -17,20 +13,3 @@ class PlotSettings:
     PLOT_PRED_LINEWIDTH: float = 1.5
     PLOT_HEATMAP_YLABEL_SIZE: int = 9
     SMALL_FIG_LASSO_LARS_OMP: Tuple[float, float] = (3.0, 4.5)
-    plasma: Any = None
-    TRUNCATED_PLASMA_CMAP: Any = None
-    HEATMAP_CMAP: Any = None
-
-
-def initialize_plot_palette(settings, *, broad_fallback=False):
-    """Keep the original plasma/Blues palettes and each case's fallback policy."""
-    try:
-        settings.plasma = plt.get_cmap("plasma")
-        blues = plt.get_cmap("Blues")
-    except Exception as error:
-        if not broad_fallback and not isinstance(error, ValueError):
-            raise
-        settings.plasma = plt.cm.plasma
-        blues = plt.cm.Blues
-    settings.TRUNCATED_PLASMA_CMAP = settings.plasma
-    settings.HEATMAP_CMAP = blues

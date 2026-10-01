@@ -1,0 +1,45 @@
+{
+  "files": [
+    {
+      "case": "cardiac",
+      "path": "Anisotropic/input/CANNsHEARTdata_shear05.xlsx",
+      "sha256": "f7b19b0b350bfc1bf2e73144ae2d8e211da1feded2b65e39fb06ec0cf9878847",
+      "source": "https://github.com/LivingMatterLab/CANN/tree/main/HEART/input",
+      "stress_measure": "cauchy",
+      "stress_unit": "kPa"
+    },
+    {
+      "case": "treloar",
+      "path": "Isotropic/Treloar/input/Kawabata.csv",
+      "sha256": "423e31a00efa75ba30af79ef510aee321052a132c985cc5b0f0910eec6a04968",
+      "source": "Project-supplied digitized CSV files",
+      "stress_measure": "nominal",
+      "stress_unit": "MPa"
+    },
+    {
+      "case": "treloar",
+      "path": "Isotropic/Treloar/input/TreloarDataEBT.csv",
+      "sha256": "be59b5e1f99abb7a0af79b571e0662cf6430a95a439891c06fa5d11a5ae91449",
+      "source": "Project-supplied digitized CSV files",
+      "stress_measure": "nominal",
+      "stress_unit": "MPa"
+    },
+    {
+      "case": "treloar",
+      "path": "Isotropic/Treloar/input/TreloarDataPS.csv",
+      "sha256": "244c63d0a54e9c184c621d486d5541ced724fad57cc52de4072eb5f3e15cf50b",
+      "source": "Project-supplied digitized CSV files",
+      "stress_measure": "nominal",
+      "stress_unit": "MPa"
+    },
+    {
+      "case": "treloar",
+      "path": "Isotropic/Treloar/input/TreloarDataUT.csv",
+      "sha256": "86364db965190f17b2ff2b56e1a954b01539338002f7b7b6e96f70cb8037b59e",
+      "source": "Project-supplied digitized CSV files",
+      "stress_measure": "nominal",
+      "stress_unit": "MPa"
+    }
+  ],
+  "note": "External inputs are ignored by Git; hashes identify the files used for local validation. Synthetic data are generated from configuration."
+}

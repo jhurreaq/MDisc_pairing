@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mdisc-pairing"
-version = "0.1.0"
+version = "0.2.0"
 description = "Constitutive model discovery by pairing sparse regression algorithms with model selection criteria"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.12"
 license = {file = "LICENSE"}
 dependencies = [
     "numpy==1.25.2",

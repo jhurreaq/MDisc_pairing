@@ -1,96 +1,100 @@
-"""Shared LARS support compression and positive OMP path construction."""
-
+"""Actual LAR, positive coordinate-descent LASSO, and nonnegative OMP paths."""
+from dataclasses import dataclass
+import warnings
 import numpy as np
-from scipy.optimize import nnls
+from sklearn.linear_model import lasso_path, lars_path
+from sklearn.exceptions import ConvergenceWarning
+from .regression import fit_nonnegative
 
-from .regression import clip_nonnegative, solve_nnls
+@dataclass(frozen=True)
+class PathSettings:
+    alpha_min: float = 1e-6
+    alpha_max: float = 1.0
+    alpha_count: int = 40
+    path_count: int = 21
+    coefficient_tolerance: float = 1e-8
+    max_iter: int = 50000
+    solver_tolerance: float = 1e-7
 
+    def __post_init__(self):
+        if not np.isfinite([self.alpha_min, self.alpha_max, self.solver_tolerance,
+                            self.coefficient_tolerance]).all():
+            raise ValueError('Path bounds and tolerances must be finite')
+        if any(not isinstance(count, (int, np.integer))
+               for count in (self.alpha_count, self.path_count, self.max_iter)):
+            raise ValueError('Candidate and iteration counts must be integers')
+        if not (0 < self.alpha_min <= self.alpha_max) or self.alpha_count < 2 or self.path_count < 2:
+            raise ValueError('Require positive alpha bounds and at least two candidates')
+        if self.max_iter < 1 or self.solver_tolerance <= 0 or self.coefficient_tolerance <= 0:
+            raise ValueError('Solver iteration counts and tolerances must be positive')
 
-def unique_size_supports(coefficients, *, absolute=False, eps=1e-10):
-    """Keep the first nonempty support of each size in the original column order."""
-    supports, indices = [], []
-    seen = set()
-    for index in range(coefficients.shape[1]):
-        beta = coefficients[:, index]
-        values = np.abs(beta) if absolute else np.maximum(beta, 0.0)
-        support = np.flatnonzero(values > eps)
-        size = int(support.size)
-        if size == 0 or size in seen:
-            continue
-        seen.add(size)
-        supports.append(support)
-        indices.append(index)
-    return supports, indices
-
-
-def monotone_nonnegative_path(raw_coefficients):
-    """Original cardiac LARS cleaning: clip at 1e-12, count above 1e-6."""
-    columns, steps = [], []
-    last_size = 0
-    for index in range(1, raw_coefficients.shape[1]):
-        beta = clip_nonnegative(raw_coefficients[:, index])
-        size = int(np.sum(beta > 1e-6))
-        if size > last_size:
-            columns.append(beta)
-            steps.append(size)
-            last_size = size
-    return (np.column_stack(columns) if columns else None), np.array(steps, dtype=int)
+    def parameters(self, method):
+        if method == 'Lasso':
+            return np.geomspace(self.alpha_max, self.alpha_min, self.alpha_count)
+        if method in ('LARS', 'OMP'):
+            return np.linspace(0, 1, self.path_count)
+        raise ValueError(f"Unknown discovery method: {method}")
 
 
-def positive_omp_path(X, y, *, variant, eps=1e-10):
-    """Build the shared greedy path while retaining each isotropic case's policy.
+def distinct_supports(coefficients, tolerance=1e-8):
+    """Deduplicate only identical supports, never merely equal cardinalities."""
+    seen, supports = set(), []
+    for beta in np.asarray(coefficients).T:
+        support = tuple(np.flatnonzero(np.abs(beta) > tolerance).tolist())
+        if support not in seen:
+            seen.add(support)
+            supports.append(support)
+    return supports
 
-    Synthetic uses direct SciPy NNLS and updates residuals on the compact support.
-    Treloar retains its PGD fallback, nonnegative clipping, and full-matrix residual
-    multiplication. The different multiplication orders must not be combined:
-    doing so can change floating-point rounding and subsequent support selection.
+
+def nonnegative_omp_path(X, y):
+    """Greedy positive-correlation selection followed by constrained refits.
+
+    This is explicitly nonnegative OMP, not signed classical OMP. Keep every
+    iterate, including changed equal-size supports and the zero model.
     """
-    if variant not in ("synthetic", "treloar"):
-        raise ValueError(f"Unknown OMP path variant: {variant}")
-    n_features = X.shape[1]
-    y_centered = y - np.mean(y)
-    max_k = min(n_features, max(1, np.linalg.matrix_rank(X)))
-    active, columns = [], []
-    residual = y_centered.copy()
-    for k in range(1, max_k + 1):
-        correlations = X.T @ residual
-        if active:
-            correlations[np.array(active, dtype=int)] = -np.inf
-        if variant == "treloar":
-            correlations[correlations <= 0] = -np.inf
+    p = X.shape[1]
+    columns, visited = [np.zeros(p)], set()
+    beta = np.zeros(p)
+    for _ in range(p):
+        correlations = X.T @ (y - X @ beta)
+        if visited:
+            correlations[list(visited)] = -np.inf
         index = int(np.argmax(correlations))
-        if not np.isfinite(correlations[index]) or (variant == "synthetic" and correlations[index] <= 0):
-            if variant == "synthetic":
-                print(f"  OMP stops at k={k}: no atom with positive correlation remains.")
-            else:
-                print(f"  OMP stopped at k={k-1}: no positively-correlated atoms remain.")
+        if not np.isfinite(correlations[index]) or correlations[index] <= 1e-12 * max(1, np.linalg.norm(y)):
             break
-        if index in active:
-            print(f"  OMP early stop at k={k} (duplicate).")
-            break
-        active.append(index)
-        selected_X = X[:, active]
-        if variant == "synthetic":
-            try:
-                selected_beta, _ = nnls(selected_X, y_centered)
-            except Exception as error:
-                print(f"  WARN: NNLS failed at k={k}: {error}; stopping.")
-                break
-        else:
-            selected_beta = solve_nnls(selected_X, y_centered, eps=eps)
-        beta = np.zeros(n_features)
-        beta[np.array(active, dtype=int)] = selected_beta
-        if variant == "synthetic":
-            columns.append(beta)
-            residual = y_centered - selected_X @ selected_beta
-        else:
-            columns.append(np.maximum(beta.copy(), 0.0))
-            residual = y_centered - X @ beta
-        if np.linalg.norm(residual) < 1e-14:
-            print(f"  OMP residual ~0 at k={k}; stopping.")
-            break
-    if not columns:
-        print("ERROR: empty OMP path.")
-        return None
-    coefficients = np.column_stack(columns)
-    return np.maximum(coefficients, 0.0) if variant == "treloar" else coefficients
+        visited.add(index)
+        S = sorted(visited)
+        beta = np.zeros(p)
+        beta[S] = fit_nonnegative(X[:, S], y).coefficients
+        columns.append(beta)
+    return np.column_stack(columns)
+
+
+def discovery_path(X, y, method, settings, *, diagnostics=None):
+    diagnostics = {} if diagnostics is None else diagnostics
+    diagnostics.update(features=X.shape[1], numerical_rank=int(np.linalg.matrix_rank(X)))
+    if method == 'Lasso':
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always', ConvergenceWarning)
+            _, coefficients, gaps = lasso_path(X, y, alphas=settings.parameters(method),
+                                               positive=True, max_iter=settings.max_iter,
+                                               tol=settings.solver_tolerance)
+        if any(issubclass(w.category, ConvergenceWarning) for w in caught):
+            raise RuntimeError("LASSO path did not converge; increase max_iter or revise the library")
+        return coefficients
+    if method == 'LARS':
+        # 'lar' is the documented LAR algorithm. Positivity is imposed during
+        # constitutive refits, since positive=True is not supported by LAR.
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always', ConvergenceWarning)
+            _, _, raw = lars_path(X, y, method='lar', positive=False,
+                                  max_iter=min(settings.max_iter, diagnostics['numerical_rank']))
+        diagnostics['warnings'] = [str(w.message) for w in caught]
+        diagnostics['raw_path_steps'] = raw.shape[1]
+    elif method == 'OMP':
+        raw = nonnegative_omp_path(X, y)
+    else:
+        raise ValueError(f"Unknown method: {method}")
+    indices = np.rint(settings.parameters(method) * (raw.shape[1] - 1)).astype(int)
+    return raw[:, indices]

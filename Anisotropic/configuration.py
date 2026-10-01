@@ -1,47 +1,18 @@
-"""Per-run settings and state; no mutable module globals or import-time execution."""
+"""Cardiac experiment settings and the published four-term comparison model."""
+from dataclasses import dataclass, field
+from mdisc.discovery import DiscoverySettings
+from mdisc.configuration import PlotSettings
 
-from dataclasses import dataclass
-from typing import Any
-from mdisc.configuration import PlotSettings, initialize_plot_palette
-import numpy as np
-import warnings
-from sklearn.exceptions import ConvergenceWarning
+@dataclass(frozen=True)
+class Configuration:
+    discovery: DiscoverySettings = field(default_factory=DiscoverySettings)
+    plot: PlotSettings = field(default_factory=PlotSettings)
+    noise_levels: tuple = (0.0, 0.05, 0.10)
+    sheet: str = 'Sheet1'
+    # Original zero-based indices; exported reports also provide one-based IDs.
+    reference_coefficients: tuple = ((6, 5.162), (11, 0.081), (19, 0.315), (23, 0.486))
+    reference_nonlinear: tuple = ((11, 21.151), (19, 4.371), (23, 0.508))
 
-
-@dataclass
-class CaseContext(PlotSettings):
-    """Own the settings and data needed by this case's model and plotting functions."""
-
-    BASE_SAVE_DIR: str = 'outputs'
-    CV_FOLDS: int = 5
-    DATA_START_ROW: int = 4
-    EPS: float = 1e-10
-    EXCEL_FILE_NAME: str = './input/CANNsHEARTdata_shear05.xlsx'
-    NON_LINEAR_OPTIMIZER_METHOD: str = 'L-BFGS-B'
-    NON_LINEAR_OPTIMIZER_TOL: float = 1e-06
-    RELATIVE_NOISE_LEVELS: Any = None
-    SHEET_NAME: str = 'Sheet1'
-    WEIGHTING_EPSILON: float = 1e-06
-    X_features_stage1: Any = None
-    color_noisy_data: Any = None
-    color_original: str = 'black'
-    color_pdf: Any = None
-    color_refined: Any = None
-    experimental_data_list_filtered: Any = None
-    experimental_plot_series: Any = None
-    num_psi_terms: Any = None
-    psi_terms_definitions: Any = None
-
-
-def create_context():
-    context = CaseContext()
-    warnings.filterwarnings('ignore', category=ConvergenceWarning)
-    warnings.filterwarnings("ignore", category=UserWarning, module='sklearn')
-    warnings.filterwarnings('ignore', category=RuntimeWarning)
-    np.random.seed(42)
-    context.RELATIVE_NOISE_LEVELS = [0.0, 0.05, 0.10]
-    initialize_plot_palette(context, broad_fallback=False)
-    context.color_refined = context.plasma(0.15)
-    context.color_pdf = context.plasma(0.55)
-    context.color_noisy_data = context.plasma(0.7)
-    return context
+    def __post_init__(self):
+        if not self.noise_levels or any(not (0 <= n < 1) for n in self.noise_levels):
+            raise ValueError('Specify noise levels with 0 <= noise < 1')
