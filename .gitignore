@@ -15,3 +15,7 @@ __pycache__/
 **/input/*
 !**/input/.gitkeep
 
+# Python package build artifacts
+build/
+dist/
+*.egg-info/
