@@ -8,7 +8,41 @@ import platform
 import numpy as np
 from .discovery import discover
 from .evaluation import metrics, mode_metrics
-from .rendering import render_selection
+from .rendering import render_selection, plot_style
+from .configuration import PlotSettings
+from .mechanics import EnergyLibrary, EnergyTerm
+from .types import Candidate, DiscoveryResult, ModelFit
+
+
+def replot_selection(report_path, output_dir=None):
+    """Redraw selection PDFs from saved paths, without fitting or changing reports.
+
+    With no output directory, replace the selection PDFs beside results.json.
+    Numerical provenance in that report continues to describe its original run.
+    """
+    report_path = Path(report_path)
+    report = json.loads(report_path.read_text())
+    style = plot_style(PlotSettings(**report['provenance']['configuration']['plot']))
+    destination = report_path.parent if output_dir is None else Path(output_dir)
+    for prefix, scenario in report['scenarios'].items():
+        terms = [EnergyTerm(**dict(term, powers=tuple(term['powers']))) for term in scenario['library']]
+        library = EnergyLibrary(terms)
+        for path in scenario['paths'].values():
+            candidates = []
+            for candidate in path['candidates']:
+                saved_fit = candidate['fit']
+                fit = ModelFit(**dict(saved_fit,
+                    coefficients=np.array(saved_fit['coefficients'], dtype=float),
+                    prediction=np.array(saved_fit['prediction'], dtype=float),
+                    nonlinear={int(k): v for k, v in saved_fit['nonlinear'].items()}))
+                candidates.append(Candidate(**dict(candidate, fit=fit,
+                    support=tuple(candidate['support']),
+                    path_coefficients=np.array(candidate['path_coefficients'], dtype=float),
+                    cv_mse=np.nan if candidate['cv_mse'] is None else candidate['cv_mse'],
+                    cv_std=np.nan if candidate['cv_std'] is None else candidate['cv_std'])))
+            result = DiscoveryResult(**dict(path, candidates=candidates))
+            render_selection(result, library, destination / prefix, prefix, style=style)
+    return destination
 
 
 def json_value(value):

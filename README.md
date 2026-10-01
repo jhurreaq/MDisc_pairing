@@ -42,6 +42,18 @@ mdisc all --project-root /path/to/MDisc_pairing --output-dir /path/to/new/result
 
 All runs write a log, selection panels, activation heatmaps, prediction figures and `results.json`. Synthetic retains `log_clean.txt`; the other cases use `log.txt`, inside their output directories. The original plasma/Blues palettes, font defaults and case-specific prediction layouts are retained. Criteria labels and contents now describe the actual computations. PDF timestamps are omitted for reproducibility.
 
+Heatmaps show **binary activation of the final refitted terms**: blue means active, white means inactive. Rows retain the original term IDs and show only terms active somewhere along the path. Columns use the same penalty/path-fraction grid as the criteria panels. [PLOTTING.md](docs/PLOTTING.md) explains the axes, selection markers, CV band and cardiac expressions.
+
+Redraw the heatmaps and criteria panels from an existing numerical report without rerunning discovery:
+
+```bash
+python scripts/replot_selection.py Anisotropic/output_mdisc_app/results.json
+# Keep existing plots and write the redrawn selection PDFs elsewhere:
+python scripts/replot_selection.py Anisotropic/output_mdisc_app/results.json --output-dir /tmp/cardiac-plots
+```
+
+This command leaves logs, numerical reports and prediction plots unchanged. The numerical report's source hash continues to identify the implementation that originally computed its results.
+
 Use `--no-plots` for numerical runs. Settings can be overridden without editing scripts:
 
 ```bash

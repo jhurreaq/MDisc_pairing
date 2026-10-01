@@ -4,7 +4,7 @@ Completed on 2026-10-01 with Python 3.9.6 and the scientific dependency versions
 
 ## Independent contracts
 
-**35 tests passed** with `python -m unittest discover -s tests -v`. They cover:
+**40 tests passed** with `python -m unittest discover -s tests -v`. They cover:
 
 - Every enabled energy term's reference energy and pressure-corrected reference stress.
 - Independent finite-difference energy gradients and nonlinear stress Jacobians.
@@ -20,6 +20,18 @@ Completed on 2026-10-01 with Python 3.9.6 and the scientific dependency versions
 - CSV reference-row retention and copied-versus-independent stress components.
 - Synthetic generation independent of display labels.
 - Public API, centralized script invocation outside the checkout, import side effects and failure-state preservation.
+- Binary, unit-invariant heatmap activation using physical refits and original IDs; coincident criterion markers; untransformed criteria values and truthful path axes.
+- Actual rendered text bounds at the original figure/font sizes, including a zero-response path; saved-result replay without fitting or changing logs/reports.
+
+## Selection-plot revision
+
+The latest change affects rendering only. All **96 heatmaps and criteria PDFs** from the 16 saved review scenarios were redrawn twice into isolated folders. Every PDF matched byte for byte between replays. All 96 figures passed checks for overlapping text using rendered tick, label, title and legend bounds.
+
+Those 96 PDFs were then replaced in the three `output_mdisc_app/` folders. The remaining **163 review files** are byte-identical, including all three numerical reports, all three enriched logs and all 157 prediction PDFs. All **255 historical output files** are unchanged. The [plot validation record](plot_validation_report.json) stores the numerical report and revised PDF hashes; temporary previews and both replay sets are in `/private/tmp/mdisc-plot-validation-20261001`.
+
+This is a rendering replay of the existing full numerical results, not a new numerical fit. The earlier full end-to-end validation record below describes the implementation before the plot revision. [PLOTTING.md](PLOTTING.md) documents the revised display semantics.
+
+The reduced-grid end-to-end validator also ran all three cases twice with the revised renderer: all **53 files** matched, including **47 PDFs**, three reports and three logs. Artifacts are in `/private/tmp/mdisc-selection-quick-20261001`. The centralized replot script was invoked from outside the checkout and produced the same six Treloar selection PDFs as the library replay.
 
 ## Full end-to-end reproducibility
 
